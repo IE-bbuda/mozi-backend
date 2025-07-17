@@ -1,0 +1,147 @@
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### IDE ###
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+# Eclipse
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# VS Code
+.vscode/
+
+### OS ###
+# Mac OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# Linux
+*~
+
+### Java ###
+# Compiled class file
+*.class
+
+# Log file
+*.log
+
+# Package Files
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# virtual machine crash logs
+hs_err_pid*
+
+### Database ###
+# H2 Database (테스트용)
+*.db
+*.trace.db
+*.lock.db
+
+### Configuration Files (민감정보 포함시) ###
+# Database connection info
+**/database.properties
+**/jdbc.properties
+**/db-config.properties
+
+# Application Properties (민감정보 포함시)
+**/application-prod.properties
+**/application-local.properties
+application.properties
+
+# Log Configuration
+**/log4jdbc.log4j2.properties
+**/logback.xml
+**/logback-spring.xml
+logs/
+log/
+
+# MyBatis configuration (민감정보 있으면)
+# **/mybatis-config.xml
+
+### Temporary files ###
+*.tmp
+*.temp
+*.swp
+*.swo
+
+### Environment Variables ###
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+### Security ###
+# SSL certificates
+*.pem
+*.key
+*.crt
+*.csr
+
+# API Keys and secrets (파일명에 포함된 경우)
+*secret*
+*password*
+*key*
+*token*
+
+# 테스트 결과 파일들 (코드 자체는 올림)
+build/reports/tests/
+build/test-results/
+**/TEST-*.xml
+
+# 테스트용 임시 파일들
+**/test-output/
+**/target/surefire-reports/
+
+### Custom ###
+# 팀 프로젝트에서 제외하고 싶은 파일들
+# TODO: 필요시 여기에 추가
+
+# 개발자 개인 메모
+**/personal-notes.md
+**/todo-private.txt
