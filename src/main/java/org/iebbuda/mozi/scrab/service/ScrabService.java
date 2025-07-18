@@ -1,4 +1,4 @@
 package org.iebbuda.mozi.scrab.service;
 
-public class ScrabService {
+public interface ScrabService {
 }
