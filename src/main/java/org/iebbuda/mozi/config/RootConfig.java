@@ -19,7 +19,7 @@ import javax.sql.DataSource;
 @Configuration
 @PropertySource({"classpath:/application.properties"})
 @EnableTransactionManagement
-//@MapperScan(basePackages = {})
+@MapperScan(basePackages = {"org.iebbuda.mozi.user.mapper"})
 public class RootConfig {
     @Value("${jdbc.driver}") String driver;
     @Value("${jdbc.url}") String url;
