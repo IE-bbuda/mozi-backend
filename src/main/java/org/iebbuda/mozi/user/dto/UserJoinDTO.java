@@ -5,8 +5,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.iebbuda.mozi.user.domain.UserVO;
+import org.springframework.format.annotation.DateTimeFormat;
 
-import java.time.LocalDateTime;
+import java.sql.Date;
+
 
 @Data
 @NoArgsConstructor
@@ -18,6 +20,9 @@ public class UserJoinDTO {
     private String phoneNumber;
     private String email;
 
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private String birthDate;   // "1990-01-15" 형태로 받음
+
 
     public UserVO toVO(){
         return UserVO.builder()
@@ -25,6 +30,7 @@ public class UserJoinDTO {
                 .password(password)
                 .phoneNumber(phoneNumber)
                 .email(email)
+                .birthDate(Date.valueOf(birthDate))
                 .build();
     }
 }
