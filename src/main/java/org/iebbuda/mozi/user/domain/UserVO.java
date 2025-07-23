@@ -16,6 +16,7 @@ import java.util.List;
 public class UserVO {
     private int userId;
     private String loginId;
+    private String username;
     private String password;
     private String phoneNumber;
     private String email;
