@@ -107,19 +107,20 @@ class UserDetailsMapperTest {
 
             // 1. User 데이터 삽입 및 생성된 ID 가져오기
             String userSql = """
-                INSERT INTO User (login_id, password, phone_number, email, create_at, updated_at, main_bank, birth_date)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO User (username,login_id, password, phone_number, email, create_at, updated_at, main_bank, birth_date)
+                VALUES (?,?, ?, ?, ?, ?, ?, ?, ?)
                 """;
 
             try (PreparedStatement pstmt = conn.prepareStatement(userSql, PreparedStatement.RETURN_GENERATED_KEYS)) {
-                pstmt.setString(1, "test_alice123");
-                pstmt.setString(2, passwordEncoder.encode("1234"));
-                pstmt.setString(3, "010-1111-2222");
-                pstmt.setString(4, "alice@test.com");
-                pstmt.setObject(5, LocalDateTime.now());
+                pstmt.setString(1, "alice");
+                pstmt.setString(2, "test_alice123");
+                pstmt.setString(3, passwordEncoder.encode("1234"));
+                pstmt.setString(4, "010-1111-2222");
+                pstmt.setString(5, "alice@test.com");
                 pstmt.setObject(6, LocalDateTime.now());
-                pstmt.setString(7, "국민은행");
-                pstmt.setObject(8, LocalDate.of(1990, 1, 1));
+                pstmt.setObject(7, LocalDateTime.now());
+                pstmt.setString(8, "국민은행");
+                pstmt.setObject(9, LocalDate.of(1990, 1, 1));
 
                 int result = pstmt.executeUpdate();
                 log.info("User 데이터 삽입 완료: {} rows", result);
