@@ -1,5 +1,6 @@
 package org.iebbuda.mozi.config;
 
+import org.iebbuda.mozi.security.config.SecurityConfig;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 import javax.servlet.Filter;
@@ -13,7 +14,7 @@ public class WebConfig  extends AbstractAnnotationConfigDispatcherServletInitial
     final int FILE_SIZE_THRESHOLD = 1024 * 1024 * 5;
     @Override
     protected Class<?>[] getRootConfigClasses() {
-        return new Class[] { RootConfig.class };
+        return new Class[] { RootConfig.class, SecurityConfig.class };
     }
     @Override
     protected Class<?>[] getServletConfigClasses() {
