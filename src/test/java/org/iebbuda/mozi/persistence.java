@@ -25,7 +25,7 @@ public class persistence {
             Properties props = new Properties();
             props.load(persistence.class.getResourceAsStream("/application.properties"));
             // 값 설정
-            String driver = props.getProperty("jdbc.test.driver");
+            String driver = props.getProperty("jdbc.driver");
             Class.forName(driver);
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
@@ -42,9 +42,9 @@ public class persistence {
             Properties props = new Properties();
             props.load(getClass().getResourceAsStream("/application.properties"));
 
-            String url = props.getProperty("jdbc.test.url");
-            String username = props.getProperty("jdbc.test.username");
-            String password = props.getProperty("jdbc.test.password");
+            String url = props.getProperty("jdbc.url");
+            String username = props.getProperty("jdbc.username");
+            String password = props.getProperty("jdbc.password");
 
             try (Connection conn = DriverManager.getConnection(url, username, password)) {
                 log.info(conn);
