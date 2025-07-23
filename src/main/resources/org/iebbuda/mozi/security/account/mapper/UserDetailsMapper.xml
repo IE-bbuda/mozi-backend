@@ -10,6 +10,7 @@
 
     <resultMap id="userMap" type="org.iebbuda.mozi.user.domain.UserVO">
         <id property="userId" column="user_id"/>
+        <result property="username" column="username"/>
         <result property="loginId" column="login_id"/>
         <result property="password" column="password"/>
         <result property="email" column="email"/>
