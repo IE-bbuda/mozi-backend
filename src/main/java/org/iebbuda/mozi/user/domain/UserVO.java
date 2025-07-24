@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.iebbuda.mozi.security.account.domain.AuthVO;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 @Data
@@ -23,6 +24,7 @@ public class UserVO {
     private LocalDateTime createAt;
     private LocalDateTime updateAt;
     private String mainBank;
+    private Date birthDate;
 
     private List<AuthVO> authList;
 }
