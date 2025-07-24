@@ -44,5 +44,15 @@
     <select id="findByLoginId" resultMap="userMap">
         SELECT * FROM User WHERE login_id = #{loginId}
     </select>
+    <select id="findLoginIdByEmail" resultType="String">
+        SELECT login_id
+        FROM User
+        WHERE username = #{username} AND email=#{email}
+    </select>
+    <select id="findLoginIdByPhoneNumber" resultType="String">
+        SELECT login_id
+        FROM User
+        WHERE username = #{username} AND phone_number = #{phoneNumber}
+    </select>
 </mapper>
 
