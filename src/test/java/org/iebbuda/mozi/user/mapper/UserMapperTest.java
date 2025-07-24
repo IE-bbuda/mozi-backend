@@ -43,8 +43,8 @@ class UserMapperTest {
 
     @BeforeEach
     void setUp(){
-        testUser =createTestUser();
         randomNumber = UUID.randomUUID().toString().substring(0, 8);
+        testUser =createTestUser();
     }
 
     @Test
@@ -106,6 +106,29 @@ class UserMapperTest {
 
     }
 
+    @Test
+    @DisplayName("이메일로 로그인ID 찾기")
+    void findLoginIdByEmail(){
+        mapper.insert(testUser);
+
+        String loginIdByEmail = mapper.findLoginIdByEmail(testUser.getUsername(),testUser.getEmail());
+
+        assertNotNull(loginIdByEmail);
+        assertEquals(testUser.getLoginId(), loginIdByEmail);
+        log.info("loginId={}", loginIdByEmail);
+    }
+
+    @Test
+    @DisplayName("전화번호로 로그인ID 찾기")
+    void findLoginIdByPhoneNumber(){
+        mapper.insert(testUser);
+
+        String loginIdByPhoneNumber = mapper.findLoginIdByPhoneNumber(testUser.getUsername(),testUser.getPhoneNumber());
+
+        assertNotNull(loginIdByPhoneNumber);
+        assertEquals(testUser.getLoginId(), loginIdByPhoneNumber);
+        log.info("loginId={}", loginIdByPhoneNumber);
+    }
 
     private UserVO createTestUser() {
         LocalDateTime now = LocalDateTime.now();
