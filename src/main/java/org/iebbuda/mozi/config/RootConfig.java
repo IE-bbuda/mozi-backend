@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
@@ -20,6 +21,7 @@ import javax.sql.DataSource;
 @PropertySource({"classpath:/application.properties"})
 @EnableTransactionManagement
 @MapperScan(basePackages = {"org.iebbuda.mozi.user.mapper"})
+@ComponentScan(basePackages = {"org.iebbuda.mozi.user.service"})
 public class RootConfig {
     @Value("${jdbc.driver}") String driver;
     @Value("${jdbc.url}") String url;
