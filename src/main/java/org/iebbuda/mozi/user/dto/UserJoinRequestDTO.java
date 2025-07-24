@@ -1,12 +1,10 @@
 package org.iebbuda.mozi.user.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+
 import lombok.*;
 import org.iebbuda.mozi.user.domain.UserVO;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-
-import java.sql.Date;
 import java.time.LocalDateTime;
 
 

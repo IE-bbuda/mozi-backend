@@ -4,13 +4,10 @@ package org.iebbuda.mozi.user.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
-import org.iebbuda.mozi.security.account.domain.AuthVO;
+
 import org.iebbuda.mozi.user.domain.UserVO;
 
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
-import java.util.List;
 
 @Getter
 @NoArgsConstructor
@@ -18,12 +15,17 @@ import java.util.List;
 @Builder
 public class UserJoinResponseDTO {
 
+    @JsonProperty("user_id")
     private int userId;
+
+    @JsonProperty("login_id")
     private String loginId;
+
     private String username;
     private String email;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonProperty("created_at")
     private String createdAt;
 
     public static UserJoinResponseDTO of(UserVO vo){
