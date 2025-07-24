@@ -1,18 +1,16 @@
 package org.iebbuda.mozi.user.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.iebbuda.mozi.user.domain.UserVO;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 
 import java.sql.Date;
 import java.time.LocalDateTime;
 
 
-@Data
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -22,26 +20,20 @@ public class UserJoinRequestDTO {
     private String password;
     private String phoneNumber;
     private String email;
-
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private String createAt;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private String updateAt;
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private String birthDate;   // "1990-01-15" 형태로 받음
+    private String birthDate;   // "010203" 형태로 받음
 
 
-    public UserVO toVO(){
+    public UserVO toVO(PasswordEncoder passwordEncoder){
         LocalDateTime now = LocalDateTime.now();
-        return UserVO.builder()
-                .loginId(loginId)
-                .username(username)
-                .password(password)
-                .phoneNumber(phoneNumber)
-                .email(email)
-                .createAt(now)
-                .updateAt(now)
-                .birthDate(Date.valueOf(birthDate))
-                .build();
+        UserVO userVO = new UserVO();
+        userVO.setLoginId(loginId);
+        userVO.setUsername(username);
+        userVO.setPassword(passwordEncoder.encode(password));
+        userVO.setPhoneNumber(phoneNumber);
+        userVO.setEmail(email);
+        userVO.setCreatedAt(now);
+        userVO.setUpdatedAt(now);
+        userVO.setBirthDate(birthDate);
+        return userVO;
     }
 }

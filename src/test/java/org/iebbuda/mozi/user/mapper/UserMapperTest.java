@@ -19,6 +19,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 
@@ -66,8 +67,8 @@ class UserMapperTest {
         log.info("found ={}", found);
 
         assertEquals(testUser.getLoginId(), found.getLoginId());
-        assertNotNull(found.getCreateAt());
-        assertNotNull(found.getUpdateAt());
+        assertNotNull(found.getCreatedAt());
+        assertNotNull(found.getUpdatedAt());
     }
 
     @Test
@@ -107,14 +108,18 @@ class UserMapperTest {
 
 
     private UserVO createTestUser() {
-        UserVO user = UserVO.builder()
-                .username("테스트유저" + randomNumber)
-                .loginId("testuser" + randomNumber)
-                .password(passwordEncoder.encode("password123"))
-                .phoneNumber("010-1234-5678")
-                .email("test" + randomNumber + "@email.com")
-                .birthDate(Date.valueOf("1990-01-15"))
-                .build();
+        LocalDateTime now = LocalDateTime.now();
+
+        UserVO user = new UserVO();
+        user.setUsername("테스트유저" + randomNumber);
+        user.setLoginId("testuser" + randomNumber);
+        user.setPassword(passwordEncoder.encode("password123"));
+        user.setPhoneNumber("010-1234-5678");
+        user.setEmail("test" + randomNumber + "@email.com");
+        user.setBirthDate("010203");
+        user.setCreatedAt(now);
+        user.setUpdatedAt(now);
+
         return user;
     }
 

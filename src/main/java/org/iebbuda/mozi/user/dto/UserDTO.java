@@ -2,10 +2,7 @@ package org.iebbuda.mozi.user.dto;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.iebbuda.mozi.security.account.domain.AuthVO;
 import org.iebbuda.mozi.user.domain.UserVO;
 
@@ -15,7 +12,7 @@ import java.time.format.DateTimeFormatter;
 
 import java.util.List;
 
-@Data
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -29,10 +26,10 @@ public class UserDTO {
     private String mainBank;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private String createAt;
+    private String createdAt;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private String updateAt;
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    private String updatedAt;
+
     private String birthDate;
 
     private List<AuthVO> authList;
@@ -44,24 +41,27 @@ public class UserDTO {
                 .username(vo.getUsername())
                 .phoneNumber(vo.getPhoneNumber())
                 .email(vo.getEmail())
-                .createAt(vo.getCreateAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
-                .updateAt(vo.getUpdateAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+                .createdAt(vo.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+                .updatedAt(vo.getUpdatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
                 .mainBank(vo.getMainBank())
-                .birthDate(vo.getBirthDate().toString())
+                .birthDate(vo.getBirthDate())
                 .authList(vo.getAuthList())
                 .build();
     }
+
     public UserVO toVO(){
-        return UserVO.builder()
-                .userId(userId)
-                .loginId(loginId)
-                .username(username)
-                .phoneNumber(phoneNumber)
-                .createAt(LocalDateTime.parse(createAt, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
-                .createAt(LocalDateTime.parse(createAt, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
-                .mainBank(mainBank)
-                .birthDate(Date.valueOf(birthDate))
-                .authList(authList)
-                .build();
+        UserVO userVO = new UserVO();
+        userVO.setUserId(userId);
+        userVO.setLoginId(loginId);
+        userVO.setUsername(username);
+        userVO.setPhoneNumber(phoneNumber);
+        userVO.setEmail(email);
+        userVO.setCreatedAt(LocalDateTime.parse(createdAt, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        userVO.setUpdatedAt(LocalDateTime.parse(updatedAt, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        userVO.setMainBank(mainBank);
+        userVO.setBirthDate(birthDate);
+        userVO.setAuthList(authList);
+
+        return userVO;
     }
 }

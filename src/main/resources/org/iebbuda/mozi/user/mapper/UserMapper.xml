@@ -15,8 +15,8 @@
         <result property="password" column="password" />
         <result property="phoneNumber" column="phone_number"/>
         <result property="email" column="email" />
-        <result property="createAt" column="create_at" />
-        <result property="updateAt" column="updated_at" />
+        <result property="createdAt" column="created_at" />
+        <result property="updatedAt" column="updated_at" />
         <result property="mainBank" column="main_bank"/>
         <result property="birthDate" column="birth_date"/>
         <collection property="authList" resultMap="authMap" />
@@ -34,7 +34,7 @@
 
     <select id="findByUserId"  resultMap="userMap">
         SELECT u.user_id, u.username, u.login_id, u.password, u.phone_number, u.email,
-               u.create_at, u.updated_at, u.birth_date, a.auth
+               u.created_at, u.updated_at, u.birth_date, a.auth
         FROM User u
         LEFT OUTER JOIN Auth a
         ON u.user_id = a.user_id

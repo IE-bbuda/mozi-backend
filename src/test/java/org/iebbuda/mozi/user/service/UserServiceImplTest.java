@@ -93,8 +93,8 @@ class UserServiceImplTest {
         Optional<UserDTO> result = userService.get(userId);
 
         assertTrue(result.isPresent());
-        assertNotNull(result.map(UserDTO::getUpdateAt));
-        assertNotNull(result.map(UserDTO::getCreateAt));
+        assertNotNull(result.map(UserDTO::getUpdatedAt));
+        assertNotNull(result.map(UserDTO::getCreatedAt));
         log.info("result={}",result.get());
     }
 

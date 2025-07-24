@@ -45,8 +45,8 @@ public class UserServiceImpl implements UserService{
 //            log.warn("중복된 아이디로 가입 시도: " + dto.getLoginId());
 //            throw new DuplicateLoginIdException("이미 존재하는 아이디입니다.");
 //        }
-        dto.setPassword(passwordEncoder.encode(dto.getPassword()));
-        UserVO user = dto.toVO();
+
+        UserVO user = dto.toVO(passwordEncoder);
         mapper.insert(user);
 
         AuthVO auth = new AuthVO(user.getUserId(), UserRole.ROLE_USER);
