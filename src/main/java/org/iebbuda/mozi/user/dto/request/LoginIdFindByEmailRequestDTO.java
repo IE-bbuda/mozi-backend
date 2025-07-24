@@ -1,7 +1,6 @@
-package org.iebbuda.mozi.user.dto;
+package org.iebbuda.mozi.user.dto.request;
 
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,9 +10,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class LoginIdFindByPhoneRequestDTO {
+public class LoginIdFindByEmailRequestDTO {
 
     private String username;
-
-    private String phoneNumber;
+    private String email;
 }

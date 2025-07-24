@@ -4,11 +4,11 @@ import lombok.extern.log4j.Log4j2;
 import org.iebbuda.mozi.config.RootConfig;
 import org.iebbuda.mozi.security.config.SecurityConfig;
 
-import org.iebbuda.mozi.user.dto.LoginIdFindResponseDTO;
-import org.iebbuda.mozi.user.dto.UserDTO;
-import org.iebbuda.mozi.user.dto.UserJoinRequestDTO;
+import org.iebbuda.mozi.user.dto.response.LoginIdFindResponseDTO;
+import org.iebbuda.mozi.user.dto.response.UserDTO;
+import org.iebbuda.mozi.user.dto.request.UserJoinRequestDTO;
 
-import org.iebbuda.mozi.user.dto.UserJoinResponseDTO;
+import org.iebbuda.mozi.user.dto.response.UserJoinResponseDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

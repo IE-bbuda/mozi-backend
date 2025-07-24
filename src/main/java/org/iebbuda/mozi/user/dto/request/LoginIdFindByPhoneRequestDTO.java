@@ -1,4 +1,4 @@
-package org.iebbuda.mozi.user.dto;
+package org.iebbuda.mozi.user.dto.request;
 
 
 import lombok.AllArgsConstructor;
@@ -10,8 +10,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class LoginIdFindByEmailRequestDTO {
+public class LoginIdFindByPhoneRequestDTO {
 
     private String username;
-    private String email;
+
+    private String phoneNumber;
 }

@@ -1,4 +1,4 @@
-package org.iebbuda.mozi.user.dto;
+package org.iebbuda.mozi.user.dto.response;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
