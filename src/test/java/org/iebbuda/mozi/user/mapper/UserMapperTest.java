@@ -6,6 +6,8 @@ import org.iebbuda.mozi.security.account.domain.AuthVO;
 import org.iebbuda.mozi.security.account.domain.UserRole;
 import org.iebbuda.mozi.security.config.SecurityConfig;
 import org.iebbuda.mozi.user.domain.UserVO;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,38 +37,47 @@ class UserMapperTest {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    private UserVO testUser;
+    private String randomNumber;
 
-
-    @Test
-    void insert() {
-        UserVO user = createTestUser();
-
-        int result = mapper.insert(user);
-        log.info("result = {}", result);
-        assertEquals(1, result);
-        assertTrue(user.getUserId()>0);
+    @BeforeEach
+    void setUp(){
+        testUser =createTestUser();
+        randomNumber = UUID.randomUUID().toString().substring(0, 8);
     }
 
     @Test
-    void findByUserId(){
-        UserVO user = createTestUser();
-        int result = mapper.insert(user);
+    @DisplayName("사용자 등록 테스트")
+    void insert() {
 
-        UserVO found = mapper.findByUserId(user.getUserId());
+        int result = mapper.insert(testUser);
+        log.info("result = {}", result);
+        assertEquals(1, result);
+        assertTrue(testUser.getUserId()>0);
+    }
+
+    @Test
+    @DisplayName("사용자 ID로 조회 테스트")
+    void findByUserId(){
+
+        int result = mapper.insert(testUser);
+
+        UserVO found = mapper.findByUserId(testUser.getUserId());
         log.info("found ={}", found);
 
-        assertEquals(user.getLoginId(), found.getLoginId());
+        assertEquals(testUser.getLoginId(), found.getLoginId());
         assertNotNull(found.getCreateAt());
         assertNotNull(found.getUpdateAt());
     }
 
     @Test
+    @DisplayName("로그인 ID로 조회 테스트")
     void findByLoginId(){
-        UserVO user = createTestUser();
-        mapper.insert(user);
+
+        mapper.insert(testUser);
 
         //찾는경우
-        String loginId1 = user.getLoginId();
+        String loginId1 = testUser.getLoginId();
         UserVO found1 = mapper.findByLoginId(loginId1);
         log.info("found1={}",found1);
 
@@ -74,7 +85,7 @@ class UserMapperTest {
         assertEquals(loginId1, found1.getLoginId());
 
         //못찾는 경우
-        String loginId2 ="1q2w3e4r"+UUID.randomUUID().toString().substring(0, 8);
+        String loginId2 ="1q2w3e4r"+randomNumber;
         UserVO found2 = mapper.findByLoginId(loginId2);
         log.info("found2={}", found2);
 
@@ -82,11 +93,11 @@ class UserMapperTest {
     }
 
     @Test
+    @DisplayName("사용자 권한 등록 테스트")
     void insertAuth(){
-        UserVO user = createTestUser();
-        mapper.insert(user);
+        mapper.insert(testUser);
 
-        AuthVO auth = new AuthVO(user.getUserId(), UserRole.ROLE_USER);
+        AuthVO auth = new AuthVO(testUser.getUserId(), UserRole.ROLE_USER);
         log.info("auth={}", auth);
         int result = mapper.insertAuth(auth);
 
@@ -96,8 +107,6 @@ class UserMapperTest {
 
 
     private UserVO createTestUser() {
-        String randomNumber = UUID.randomUUID().toString().substring(0, 8);
-
         UserVO user = UserVO.builder()
                 .username("테스트유저" + randomNumber)
                 .loginId("testuser" + randomNumber)
