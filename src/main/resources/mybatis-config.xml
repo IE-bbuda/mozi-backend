@@ -10,4 +10,8 @@
         <package name="org.iebbuda.mozi.security.account.domain"/>
         <package name="org.iebbuda.mozi.user.domain"/>
     </typeAliases>
+    <typeAliases>
+        <package name="org.iebbuda.mozi.security.account.domain"/>
+        <package name="org.iebbuda.mozi.user.domain"/>
+    </typeAliases>
 </configuration>
