@@ -11,7 +11,8 @@ import org.springframework.web.servlet.view.JstlView;
 @EnableWebMvc
 @ComponentScan(basePackages = {
         "org.iebbuda.mozi.controller",
-"org.iebbuda.mozi.exception"})    // Spring MVC용 컴포넌트 등록을 위한 스캔 패키지
+"org.iebbuda.mozi.exception",
+"org.iebbuda.mozi.product.controller"})    // Spring MVC용 컴포넌트 등록을 위한 스캔 패키지
 public class ServletConfig implements WebMvcConfigurer {
     @Override
     public void addViewControllers(ViewControllerRegistry registry){
@@ -27,6 +28,9 @@ public class ServletConfig implements WebMvcConfigurer {
 
         registry.addResourceHandler("/assets/**")
                 .addResourceLocations("/resources/assets/");
+
+        registry.addResourceHandler("/images/**")
+                        .addResourceLocations("/resources/images/");
 
 
         // Swagger UI 리소스를 위한 핸들러 설정

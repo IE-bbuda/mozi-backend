@@ -9,17 +9,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.web.client.RestTemplate;
 
 import javax.sql.DataSource;
 
 @Configuration
 @PropertySource({"classpath:/application.properties"})
 @EnableTransactionManagement
-//@MapperScan(basePackages = {})
+@MapperScan(basePackages = {"org.iebbuda.mozi.product.mapper"})
+@ComponentScan(basePackages = {"org.iebbuda.mozi.product.scheduler",
+"org.iebbuda.mozi.product.service",
+})
 public class RootConfig {
     @Value("${jdbc.driver}") String driver;
     @Value("${jdbc.url}") String url;
@@ -56,6 +61,11 @@ public class RootConfig {
     public DataSourceTransactionManager transactionManager(){
         DataSourceTransactionManager manager = new DataSourceTransactionManager(dataSource());
         return manager;
+    }
+
+    @Bean
+    public RestTemplate restTemplate(){ //서비스 계층에서 사용
+        return new RestTemplate();
     }
 }
 
