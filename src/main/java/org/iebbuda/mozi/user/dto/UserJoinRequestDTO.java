@@ -14,7 +14,7 @@ import java.sql.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserJoinDTO {
+public class UserJoinRequestDTO {
     private String loginId;
     private String password;
     private String phoneNumber;
