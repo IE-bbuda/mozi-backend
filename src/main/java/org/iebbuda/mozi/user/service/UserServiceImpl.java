@@ -5,10 +5,12 @@ import lombok.extern.log4j.Log4j2;
 import org.iebbuda.mozi.security.account.domain.AuthVO;
 import org.iebbuda.mozi.security.account.domain.UserRole;
 import org.iebbuda.mozi.user.domain.UserVO;
+
 import org.iebbuda.mozi.user.dto.response.LoginIdFindResponseDTO;
 import org.iebbuda.mozi.user.dto.response.UserDTO;
 import org.iebbuda.mozi.user.dto.response.UserJoinResponseDTO;
 import org.iebbuda.mozi.user.dto.request.UserJoinRequestDTO;
+
 import org.iebbuda.mozi.user.mapper.UserMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -85,4 +87,5 @@ public class UserServiceImpl implements UserService{
         // 긴 아이디는 앞 4글자 + *** + 끝 1글자
         return loginId.substring(0, 4) + "***" + loginId.charAt(loginId.length() - 1);
     }
+
 }

@@ -145,3 +145,13 @@ build/test-results/
 # 개발자 개인 메모
 **/personal-notes.md
 **/todo-private.txt
+
+# 예외: DTO 클래스들은 허용
+!**/*DTO.java
+!**/*dto*.java
+
+# 예외 추가
+!**/*Mapper.java
+!**/*Service.java
+!**/*Mapper.xml
+

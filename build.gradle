@@ -102,6 +102,9 @@ dependencies {
 
     //@PostConstruct
     implementation 'javax.annotation:javax.annotation-api:1.3.2'
+
+    // 정책 API 파싱
+    implementation 'com.google.code.gson:gson:2.10.1'
 }
 
 

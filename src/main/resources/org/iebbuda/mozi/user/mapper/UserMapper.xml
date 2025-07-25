@@ -54,5 +54,6 @@
         FROM User
         WHERE username = #{username} AND phone_number = #{phoneNumber}
     </select>
+
 </mapper>
 

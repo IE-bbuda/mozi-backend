@@ -4,11 +4,13 @@ import lombok.extern.log4j.Log4j2;
 import org.iebbuda.mozi.config.RootConfig;
 import org.iebbuda.mozi.security.config.SecurityConfig;
 
+
 import org.iebbuda.mozi.user.dto.response.LoginIdFindResponseDTO;
 import org.iebbuda.mozi.user.dto.response.UserDTO;
 import org.iebbuda.mozi.user.dto.request.UserJoinRequestDTO;
 
 import org.iebbuda.mozi.user.dto.response.UserJoinResponseDTO;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -94,6 +96,7 @@ class UserServiceImplTest {
         Optional<UserDTO> result = userService.get(userId);
 
         assertTrue(result.isPresent());
+
         assertNotNull(result.map(UserDTO::getUpdatedAt));
         assertNotNull(result.map(UserDTO::getCreatedAt));
         log.info("result={}",result.get());
@@ -132,6 +135,7 @@ class UserServiceImplTest {
     }
 
 
+
     private UserJoinRequestDTO createTestJoinRequest() {
         return UserJoinRequestDTO.builder()
                 .loginId("testuser" + randomNumber)
@@ -139,7 +143,9 @@ class UserServiceImplTest {
                 .password("password123")
                 .email("test" + randomNumber + "@email.com")
                 .phoneNumber("010-1234-5678")
+
                 .birthDate("010607")
+
                 .build();
     }
 }

@@ -20,5 +20,6 @@ public class UserVO {
     private String mainBank;
     private String birthDate;
 
+
     private List<AuthVO> authList;
 }
