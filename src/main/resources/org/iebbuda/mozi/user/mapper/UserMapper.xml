@@ -77,5 +77,24 @@
         WHERE login_id = #{loginId}
           AND email = #{email}
     </select>
+
+    <!-- 사용자 기본 정보 수정 (이메일, 전화번호) -->
+    <update id="updateUserInfo">
+        UPDATE User
+        SET
+            email = #{email},
+            phone_number = #{phoneNumber},
+            updated_at = NOW()
+        WHERE login_id = #{loginId}
+    </update>
+
+    <!-- 마이페이지 비밀번호 변경 (로그인된 상태) -->
+    <update id="updatePasswordByLoginId">
+        UPDATE User
+        SET
+            password = #{newPassword},
+            updated_at = NOW()
+        WHERE login_id = #{loginId}
+    </update>
 </mapper>
 
