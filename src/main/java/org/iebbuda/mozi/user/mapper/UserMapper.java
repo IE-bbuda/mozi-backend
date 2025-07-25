@@ -13,6 +13,7 @@ public interface UserMapper {
     UserVO findByLoginId(String loginId);
     int insert(UserVO userVO);
     int insertAuth(AuthVO auth);
+
     String findLoginIdByEmail(@Param("username")String username, @Param("email")String email);
     String findLoginIdByPhoneNumber(@Param("username")String username, @Param("phoneNumber")String phoneNumber);
 
@@ -34,4 +35,5 @@ public interface UserMapper {
     int updateUserPassword(@Param("userId") int userId,
                            @Param("password") String password,
                            @Param("updatedAt") LocalDateTime updatedAt);
+
 }

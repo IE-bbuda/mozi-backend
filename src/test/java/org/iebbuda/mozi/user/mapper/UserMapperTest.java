@@ -18,6 +18,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
+
 import java.time.LocalDateTime;
 
 import java.util.UUID;
@@ -43,10 +44,8 @@ class UserMapperTest {
 
     @BeforeEach
     void setUp(){
-
         randomNumber = UUID.randomUUID().toString().substring(0, 8);
         testUser =createTestUser();
-
     }
 
     @Test
@@ -108,6 +107,7 @@ class UserMapperTest {
         assertEquals(1, result);
 
     }
+
 
 
     @Test

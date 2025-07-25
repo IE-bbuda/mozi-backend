@@ -20,10 +20,8 @@ import javax.sql.DataSource;
 @Configuration
 @PropertySource({"classpath:/application.properties"})
 @EnableTransactionManagement
-
 @MapperScan(basePackages = {"org.iebbuda.mozi.user.mapper", "org.iebbuda.mozi.policy.mapper"})
 @ComponentScan(basePackages = {"org.iebbuda.mozi.user.service", "org.iebbuda.mozi.policy.service"})
-
 
 public class RootConfig {
     @Value("${jdbc.driver}") String driver;

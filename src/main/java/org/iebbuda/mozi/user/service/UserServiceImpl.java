@@ -6,6 +6,7 @@ import org.iebbuda.mozi.security.account.domain.AuthVO;
 import org.iebbuda.mozi.security.account.domain.UserRole;
 import org.iebbuda.mozi.user.domain.UserVO;
 
+
 import org.iebbuda.mozi.user.dto.response.LoginIdFindResponseDTO;
 import org.iebbuda.mozi.user.dto.response.UserDTO;
 import org.iebbuda.mozi.user.dto.response.UserJoinResponseDTO;
@@ -49,7 +50,9 @@ public class UserServiceImpl implements UserService{
 //            throw new DuplicateLoginIdException("이미 존재하는 아이디입니다.");
 //        }
 
+
         UserVO user = dto.toVO(passwordEncoder);
+
         mapper.insert(user);
 
         AuthVO auth = new AuthVO(user.getUserId(), UserRole.ROLE_USER);
@@ -58,6 +61,7 @@ public class UserServiceImpl implements UserService{
         log.info("회원가입 완료: userId = " + user.getUserId());
         return UserJoinResponseDTO.of(user);
     }
+
 
     @Override
     public LoginIdFindResponseDTO findLoginIdByEmail(String username, String email) {
