@@ -154,4 +154,5 @@ build/test-results/
 !**/*Mapper.java
 !**/*Service.java
 !**/*Mapper.xml
+!**/*VO.java
 
