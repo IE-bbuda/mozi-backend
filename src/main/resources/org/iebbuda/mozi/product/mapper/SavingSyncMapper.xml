@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.iebbuda.mozi.product.mapper.SavingSyncMapper">
+
+    <select id="findByProductCode" resultType="org.iebbuda.mozi.product.domain.SavingProduct">
+        SELECT *
+        FROM saving_product
+        WHERE fin_prdt_cd = #{finPrdtCd}
+    </select>
+
+    <insert id="insertProduct" parameterType="org.iebbuda.mozi.product.domain.SavingProduct" useGeneratedKeys="true" keyProperty="savingId">
+        INSERT INTO saving_product (
+            fin_prdt_cd, fin_co_no, kor_co_nm, fin_prdt_nm, join_way,
+            join_deny, join_member, spcl_cnd, etc_note, max_limit,
+            dcls_month, dcls_strt_day, dcls_end_day, fin_co_subm_day
+        ) VALUES (
+                     #{finPrdtCd}, #{finCoNo}, #{korCoNm}, #{finPrdtNm}, #{joinWay},
+                     #{joinDeny}, #{joinMember}, #{spclCnd}, #{etcNote}, #{maxLimit},
+                     #{dclsMonth}, #{dclsStrtDay}, #{dclsEndDay}, #{finCoSubmDay}
+                 )
+    </insert>
+
+    <update id="updateProduct" parameterType="org.iebbuda.mozi.product.domain.SavingProduct">
+        UPDATE saving_product
+        SET
+            kor_co_nm = #{korCoNm},
+            fin_prdt_nm = #{finPrdtNm},
+            join_way = #{joinWay},
+            join_deny = #{joinDeny},
+            join_member = #{joinMember},
+            spcl_cnd = #{spclCnd},
+            etc_note = #{etcNote},
+            max_limit = #{maxLimit},
+            dcls_month = #{dclsMonth},
+            dcls_strt_day = #{dclsStrtDay},
+            dcls_end_day = #{dclsEndDay},
+            fin_co_subm_day = #{finCoSubmDay},
+            updated_at = NOW()
+        WHERE fin_prdt_cd = #{finPrdtCd}
+    </update>
+
+    <delete id="deleteOptionsByProductId" parameterType="long">
+        DELETE FROM saving_option
+        WHERE saving_id = #{savingId}
+    </delete>
+
+    <insert id="insertOption" parameterType="org.iebbuda.mozi.product.domain.SavingOption" useGeneratedKeys="true" keyProperty="optionId">
+        INSERT INTO saving_option (
+            saving_id, intr_rate_type, intr_rate_type_nm, rsrv_type, rsrv_type_nm,
+            save_trm, intr_rate, intr_rate2
+        ) VALUES (
+                     #{savingId}, #{intrRateType}, #{intrRateTypeNm}, #{rsrvType}, #{rsrvTypeNm},
+                     #{saveTrm}, #{intrRate}, #{intrRate2}
+                 )
+    </insert>
+
+</mapper>
