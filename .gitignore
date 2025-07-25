@@ -145,3 +145,6 @@ build/test-results/
 # 개발자 개인 메모
 **/personal-notes.md
 **/todo-private.txt
+
+#vue build 파일 제외
+/src/main/webapp/resources/
