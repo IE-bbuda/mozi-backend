@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.iebbuda.mozi.product.mapper.DepositSyncMapper">
+
+    <!-- 상품코드로 기존 상품 조회 -->
+    <select id="findByProductCode" resultType="org.iebbuda.mozi.product.domain.DepositProduct">
+        SELECT *
+        FROM deposit_product
+        WHERE fin_prdt_cd = #{finPrdtCd}
+    </select>
+
+    <!-- 신규 상품 삽입 -->
+    <insert id="insertProduct" parameterType="org.iebbuda.mozi.product.domain.DepositProduct" useGeneratedKeys="true" keyProperty="depositId">
+        INSERT INTO deposit_product (
+            fin_prdt_cd, fin_co_no, kor_co_nm, fin_prdt_nm, join_way,
+            join_deny, join_member, spcl_cnd, etc_note, max_limit,
+            dcls_month, dcls_strt_day, dcls_end_day, fin_co_subm_day
+        ) VALUES (
+                     #{finPrdtCd}, #{finCoNo}, #{korCoNm}, #{finPrdtNm}, #{joinWay},
+                     #{joinDeny}, #{joinMember}, #{spclCnd}, #{etcNote}, #{maxLimit},
+                     #{dclsMonth}, #{dclsStrtDay}, #{dclsEndDay}, #{finCoSubmDay}
+                 )
+    </insert>
+
+    <!-- 기존 상품 업데이트 -->
+    <update id="updateProduct" parameterType="org.iebbuda.mozi.product.domain.DepositProduct">
+        UPDATE deposit_product
+        SET
+            kor_co_nm = #{korCoNm},
+            fin_prdt_nm = #{finPrdtNm},
+            join_way = #{joinWay},
+            join_deny = #{joinDeny},
+            join_member = #{joinMember},
+            spcl_cnd = #{spclCnd},
+            etc_note = #{etcNote},
+            max_limit = #{maxLimit},
+            dcls_month = #{dclsMonth},
+            dcls_strt_day = #{dclsStrtDay},
+            dcls_end_day = #{dclsEndDay},
+            fin_co_subm_day = #{finCoSubmDay},
+            updated_at = NOW()
+        WHERE fin_prdt_cd = #{finPrdtCd}
+    </update>
+
+    <!-- 옵션 삭제 -->
+    <delete id="deleteOptionsByProductId" parameterType="long">
+        DELETE FROM deposit_option
+        WHERE deposit_id = #{depositId}
+    </delete>
+
+    <!-- 옵션 삽입 -->
+    <insert id="insertOption" parameterType="org.iebbuda.mozi.product.domain.DepositProduct" useGeneratedKeys="true" keyProperty="optionId">
+        INSERT INTO deposit_option (
+            deposit_id, intr_rate_type, intr_rate_type_nm,
+            save_trm, intr_rate, intr_rate2
+        ) VALUES (
+                     #{depositId}, #{intrRateType}, #{intrRateTypeNm},
+                     #{saveTrm}, #{intrRate}, #{intrRate2}
+                 )
+    </insert>
+
+</mapper>

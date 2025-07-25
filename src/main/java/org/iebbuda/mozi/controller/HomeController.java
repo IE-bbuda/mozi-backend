@@ -9,10 +9,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Log4j2
 public class HomeController {
-
-    @GetMapping("/")
-    public String home() {
-        log.info("================> HomController /");
-        return "index"; // View의 이름
-    }
+//
+//    @GetMapping("/")
+//    public String home() {
+//        log.info("================> HomController /");
+//        return "index"; // View의 이름
+//    }
 }
