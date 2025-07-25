@@ -7,12 +7,12 @@
 
     <select id="findByProductCode" resultType="org.iebbuda.mozi.product.domain.SavingProduct">
         SELECT *
-        FROM saving_product
+        FROM SavingProduct
         WHERE fin_prdt_cd = #{finPrdtCd}
     </select>
 
     <insert id="insertProduct" parameterType="org.iebbuda.mozi.product.domain.SavingProduct" useGeneratedKeys="true" keyProperty="savingId">
-        INSERT INTO saving_product (
+        INSERT INTO SavingProduct (
             fin_prdt_cd, fin_co_no, kor_co_nm, fin_prdt_nm, join_way,
             join_deny, join_member, spcl_cnd, etc_note, max_limit,
             dcls_month, dcls_strt_day, dcls_end_day, fin_co_subm_day
@@ -24,7 +24,7 @@
     </insert>
 
     <update id="updateProduct" parameterType="org.iebbuda.mozi.product.domain.SavingProduct">
-        UPDATE saving_product
+        UPDATE SavingProduct
         SET
             kor_co_nm = #{korCoNm},
             fin_prdt_nm = #{finPrdtNm},
@@ -43,12 +43,12 @@
     </update>
 
     <delete id="deleteOptionsByProductId" parameterType="long">
-        DELETE FROM saving_option
+        DELETE FROM SavingOption
         WHERE saving_id = #{savingId}
     </delete>
 
     <insert id="insertOption" parameterType="org.iebbuda.mozi.product.domain.SavingOption" useGeneratedKeys="true" keyProperty="optionId">
-        INSERT INTO saving_option (
+        INSERT INTO SavingOption (
             saving_id, intr_rate_type, intr_rate_type_nm, rsrv_type, rsrv_type_nm,
             save_trm, intr_rate, intr_rate2
         ) VALUES (
