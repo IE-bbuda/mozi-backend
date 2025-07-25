@@ -4,10 +4,15 @@ import lombok.extern.log4j.Log4j2;
 import org.iebbuda.mozi.config.RootConfig;
 import org.iebbuda.mozi.security.config.SecurityConfig;
 
-import org.iebbuda.mozi.user.dto.UserDTO;
-import org.iebbuda.mozi.user.dto.UserJoinRequestDTO;
 
-import org.iebbuda.mozi.user.dto.UserJoinResponseDTO;
+
+import org.iebbuda.mozi.user.dto.response.LoginIdFindResponseDTO;
+import org.iebbuda.mozi.user.dto.response.UserDTO;
+import org.iebbuda.mozi.user.dto.request.UserJoinRequestDTO;
+
+import org.iebbuda.mozi.user.dto.response.UserJoinResponseDTO;
+
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -93,10 +98,44 @@ class UserServiceImplTest {
         Optional<UserDTO> result = userService.get(userId);
 
         assertTrue(result.isPresent());
-        assertNotNull(result.map(UserDTO::getUpdateAt));
-        assertNotNull(result.map(UserDTO::getCreateAt));
+
+        assertNotNull(result.map(UserDTO::getUpdatedAt));
+        assertNotNull(result.map(UserDTO::getCreatedAt));
         log.info("result={}",result.get());
     }
+
+    @Test
+    @DisplayName("이메일로 로그인ID 찾기")
+    void findLoginIdByEmail(){
+        UserJoinResponseDTO join = userService.join(joinRequest);
+        LoginIdFindResponseDTO result = userService.findLoginIdByEmail(join.getUsername(), join.getEmail());
+
+        assertNotNull(result);
+        assertTrue(result.isFound());
+        log.info("result={}", result.getMaskedLoginId());
+    }
+
+    @Test
+    @DisplayName("이메일로 로그인ID 찾기 실패 - 존재하지 않는 사용자")
+    void findLoginIdByEmailNotFound() {
+        // Given: 존재하지 않는 사용자 정보
+        String nonExistentUsername = "존재하지않는사용자";
+        String nonExistentEmail = "notfound@email.com";
+
+        // When: 존재하지 않는 정보로 로그인ID 찾기
+        LoginIdFindResponseDTO result = userService.findLoginIdByEmail(
+                nonExistentUsername,
+                nonExistentEmail
+        );
+
+        // Then: 찾지 못함 결과 검증
+        assertNotNull(result);
+        assertFalse(result.isFound());
+        assertNull(result.getMaskedLoginId());
+
+        log.info("로그인ID 찾기 실패 (정상): {}", result.getMaskedLoginId());
+    }
+
 
 
     private UserJoinRequestDTO createTestJoinRequest() {
@@ -106,7 +145,8 @@ class UserServiceImplTest {
                 .password("password123")
                 .email("test" + randomNumber + "@email.com")
                 .phoneNumber("010-1234-5678")
-                .birthDate("1990-01-15")
+                .birthDate("010607")
+
                 .build();
     }
 }

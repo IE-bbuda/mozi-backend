@@ -8,21 +8,22 @@
         <result property="auth" column="auth"/>
     </resultMap>
 
-    <resultMap id="userMap" type="org.iebbuda.mozi.user.domain.UserVO">
+    <resultMap id="userMap" type="UserVO">
         <id property="userId" column="user_id"/>
         <result property="username" column="username"/>
         <result property="loginId" column="login_id"/>
-        <result property="password" column="password"/>
-        <result property="email" column="email"/>
-        <result property="createAt" column="create_at"/>
-        <result property="updateAt" column="updated_at"/>
+        <result property="password" column="password" />
+        <result property="phoneNumber" column="phone_number"/>
+        <result property="email" column="email" />
+        <result property="createdAt" column="created_at" />
+        <result property="updatedAt" column="updated_at" />
         <result property="mainBank" column="main_bank"/>
-
-        <collection property="authList" resultMap="authMap"/>
+        <result property="birthDate" column="birth_date"/>
+        <collection property="authList" resultMap="authMap" />
     </resultMap>
 
     <select id="get" resultMap="userMap">
-        select u.user_id, u.login_id, u.password, u.email, u.create_at, u.updated_at, a.auth
+        select u.user_id, u.login_id, u.password, u.email, u.created_at, u.updated_at, a.auth
         from User u
         left outer join Auth a
         on u.user_id = a.user_id

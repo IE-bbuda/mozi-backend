@@ -5,9 +5,13 @@ import lombok.extern.log4j.Log4j2;
 import org.iebbuda.mozi.security.account.domain.AuthVO;
 import org.iebbuda.mozi.security.account.domain.UserRole;
 import org.iebbuda.mozi.user.domain.UserVO;
-import org.iebbuda.mozi.user.dto.UserDTO;
-import org.iebbuda.mozi.user.dto.UserJoinResponseDTO;
-import org.iebbuda.mozi.user.dto.UserJoinRequestDTO;
+
+
+import org.iebbuda.mozi.user.dto.response.LoginIdFindResponseDTO;
+import org.iebbuda.mozi.user.dto.response.UserDTO;
+import org.iebbuda.mozi.user.dto.response.UserJoinResponseDTO;
+import org.iebbuda.mozi.user.dto.request.UserJoinRequestDTO;
+
 import org.iebbuda.mozi.user.mapper.UserMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -45,8 +49,10 @@ public class UserServiceImpl implements UserService{
 //            log.warn("중복된 아이디로 가입 시도: " + dto.getLoginId());
 //            throw new DuplicateLoginIdException("이미 존재하는 아이디입니다.");
 //        }
-        dto.setPassword(passwordEncoder.encode(dto.getPassword()));
-        UserVO user = dto.toVO();
+
+
+        UserVO user = dto.toVO(passwordEncoder);
+
         mapper.insert(user);
 
         AuthVO auth = new AuthVO(user.getUserId(), UserRole.ROLE_USER);
@@ -55,4 +61,35 @@ public class UserServiceImpl implements UserService{
         log.info("회원가입 완료: userId = " + user.getUserId());
         return UserJoinResponseDTO.of(user);
     }
+
+
+    @Override
+    public LoginIdFindResponseDTO findLoginIdByEmail(String username, String email) {
+        Optional<String> loginId = Optional.ofNullable(mapper.findLoginIdByEmail(username, email));
+        return loginId
+                .map(this::maskLoginId)
+                .map(LoginIdFindResponseDTO::success)
+                .orElse(LoginIdFindResponseDTO.notFound());
+    }
+
+    @Override
+    public LoginIdFindResponseDTO findLoginIdByPhoneNumber(String username, String phoneNumber) {
+        Optional<String> loginId = Optional.ofNullable(mapper.findLoginIdByPhoneNumber(username, phoneNumber));
+        return loginId
+                .map(this::maskLoginId)
+                .map(LoginIdFindResponseDTO::success)
+                .orElse(LoginIdFindResponseDTO.notFound());
+    }
+
+    private String maskLoginId(String loginId) {
+        if (loginId.length() <= 2) {
+            return "*".repeat(loginId.length());
+        }
+        if (loginId.length() <= 6) {
+            return loginId.substring(0, 2) + "***";
+        }
+        // 긴 아이디는 앞 4글자 + *** + 끝 1글자
+        return loginId.substring(0, 4) + "***" + loginId.charAt(loginId.length() - 1);
+    }
+
 }

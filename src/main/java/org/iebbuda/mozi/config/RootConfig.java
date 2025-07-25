@@ -25,6 +25,7 @@ import javax.sql.DataSource;
 @ComponentScan(basePackages = {"org.iebbuda.mozi.user.service", "org.iebbuda.mozi.policy.service", "org.iebbuda.mozi.product.scheduler",
         "org.iebbuda.mozi.product.service"})
 
+
 public class RootConfig {
     @Value("${jdbc.driver}") String driver;
     @Value("${jdbc.url}") String url;
