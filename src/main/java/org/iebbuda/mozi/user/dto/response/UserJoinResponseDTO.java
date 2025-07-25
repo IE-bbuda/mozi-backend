@@ -1,31 +1,32 @@
-package org.iebbuda.mozi.user.dto;
+package org.iebbuda.mozi.user.dto.response;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.iebbuda.mozi.security.account.domain.AuthVO;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.*;
+
 import org.iebbuda.mozi.user.domain.UserVO;
 
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
-import java.util.List;
 
-@Data
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class UserJoinResponseDTO {
+
+    @JsonProperty("user_id")
     private int userId;
+
+    @JsonProperty("login_id")
     private String loginId;
+
     private String username;
     private String email;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private String createAt;
+    @JsonProperty("created_at")
+    private String createdAt;
 
     public static UserJoinResponseDTO of(UserVO vo){
         return UserJoinResponseDTO.builder()
@@ -33,7 +34,7 @@ public class UserJoinResponseDTO {
                 .loginId(vo.getLoginId())
                 .username(vo.getUsername())
                 .email(vo.getEmail())
-                .createAt(vo.getCreateAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+                .createdAt(vo.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
                 .build();
 
     }

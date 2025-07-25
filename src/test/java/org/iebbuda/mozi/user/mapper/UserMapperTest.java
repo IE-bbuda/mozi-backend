@@ -18,7 +18,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Date;
+
+import java.time.LocalDateTime;
+
 import java.util.UUID;
 
 
@@ -42,8 +44,8 @@ class UserMapperTest {
 
     @BeforeEach
     void setUp(){
-        testUser =createTestUser();
         randomNumber = UUID.randomUUID().toString().substring(0, 8);
+        testUser =createTestUser();
     }
 
     @Test
@@ -66,8 +68,9 @@ class UserMapperTest {
         log.info("found ={}", found);
 
         assertEquals(testUser.getLoginId(), found.getLoginId());
-        assertNotNull(found.getCreateAt());
-        assertNotNull(found.getUpdateAt());
+        assertNotNull(found.getCreatedAt());
+        assertNotNull(found.getUpdatedAt());
+
     }
 
     @Test
@@ -106,15 +109,44 @@ class UserMapperTest {
     }
 
 
+
+    @Test
+    @DisplayName("이메일로 로그인ID 찾기")
+    void findLoginIdByEmail(){
+        mapper.insert(testUser);
+
+        String loginIdByEmail = mapper.findLoginIdByEmail(testUser.getUsername(),testUser.getEmail());
+
+        assertNotNull(loginIdByEmail);
+        assertEquals(testUser.getLoginId(), loginIdByEmail);
+        log.info("loginId={}", loginIdByEmail);
+    }
+
+    @Test
+    @DisplayName("전화번호로 로그인ID 찾기")
+    void findLoginIdByPhoneNumber(){
+        mapper.insert(testUser);
+
+        String loginIdByPhoneNumber = mapper.findLoginIdByPhoneNumber(testUser.getUsername(),testUser.getPhoneNumber());
+
+        assertNotNull(loginIdByPhoneNumber);
+        assertEquals(testUser.getLoginId(), loginIdByPhoneNumber);
+        log.info("loginId={}", loginIdByPhoneNumber);
+    }
+
     private UserVO createTestUser() {
-        UserVO user = UserVO.builder()
-                .username("테스트유저" + randomNumber)
-                .loginId("testuser" + randomNumber)
-                .password(passwordEncoder.encode("password123"))
-                .phoneNumber("010-1234-5678")
-                .email("test" + randomNumber + "@email.com")
-                .birthDate(Date.valueOf("1990-01-15"))
-                .build();
+        LocalDateTime now = LocalDateTime.now();
+
+        UserVO user = new UserVO();
+        user.setUsername("테스트유저" + randomNumber);
+        user.setLoginId("testuser" + randomNumber);
+        user.setPassword(passwordEncoder.encode("password123"));
+        user.setPhoneNumber("010-1234-5678");
+        user.setEmail("test" + randomNumber + "@email.com");
+        user.setBirthDate("010203");
+        user.setCreatedAt(now);
+        user.setUpdatedAt(now);
+
         return user;
     }
 

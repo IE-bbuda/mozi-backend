@@ -15,8 +15,6 @@ import org.springframework.web.servlet.view.JstlView;
         "org.iebbuda.mozi.user.controller",
         "org.iebbuda.mozi.policy",
         "org.iebbuda.mozi.product.controller"})    // Spring MVC용 컴포넌트 등록을 위한 스캔 패키지
-
-
 public class ServletConfig implements WebMvcConfigurer {
     @Override
     public void addViewControllers(ViewControllerRegistry registry){
