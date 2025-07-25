@@ -146,6 +146,7 @@ build/test-results/
 **/personal-notes.md
 **/todo-private.txt
 
+
 # 예외: DTO 클래스들은 허용
 !**/*DTO.java
 !**/*dto*.java
@@ -155,4 +156,8 @@ build/test-results/
 !**/*Service.java
 !**/*Mapper.xml
 !**/*VO.java
+
+
+#vue build 파일 제외
+/src/main/webapp/resources/
 
