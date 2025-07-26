@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.iebbuda.mozi.goal.mapper.GoalMapper">
+
+    <!--   TABLE : UserGoal
+           goal_id(pk), user_id(fk), goal_name, keyword, target_amount,
+           goal_date, memo, goal_status, created_at, updated_at -->
+
+    <select id="getList" resultType="GoalVO">
+        select * from usergoal
+    </select>
+
+    <select id="get" resultType="org.iebbuda.mozi.goal.domain.GoalVO">
+        select * from usergoal
+        where goal_id = #{goalId}
+    </select>
+
+    <insert id="create">
+        insert into usergoal (user_id, goal_name, keyword, target_amount, goal_date, memo, goal_status)
+        values (#{userId}, #{goalName}, #{keyword}, #{targetAmount}, #{goalDate}, #{memo}, #{goalStatus});
+
+        <selectKey keyProperty="goalId" keyColumn="goal_id" resultType="int" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <update id="update">
+        update usergoal
+        set
+            goal_name = #{goalName},
+            keyword = #{keyword},
+            target_amount = #{targetAmount},
+            goal_date = #{goalDate},
+            memo = #{memo},
+            goal_status = #{goalStatus},
+            updated_at = now()
+        where goal_id = #{goalId}
+    </update>
+
+    <delete id="delete">
+        delete from usergoal
+        where goal_id = #{goalId}
+    </delete>
+
+</mapper>
