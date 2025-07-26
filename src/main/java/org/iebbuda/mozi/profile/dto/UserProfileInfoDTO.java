@@ -14,7 +14,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PersonalInfoDTO {
+public class UserProfileInfoDTO {
     private Region region;              // enum 직접 사용
     private Integer age;
 
@@ -33,10 +33,10 @@ public class PersonalInfoDTO {
     private Major major;
     private Specialty specialty;
 
-    public static PersonalInfoDTO of(UserProfileVO vo) {
+    public static UserProfileInfoDTO of(UserProfileVO vo) {
         if (vo == null) return null;
 
-        return PersonalInfoDTO.builder()
+        return UserProfileInfoDTO.builder()
                 .region(vo.getRegion())
                 .age(vo.getAge())
                 .maritalStatus(vo.getMaritalStatus())
@@ -48,28 +48,17 @@ public class PersonalInfoDTO {
                 .build();
     }
 
-    // 유효성 검증 메서드들
-    public boolean isStep1Valid() {
-        return region != null && age != null && maritalStatus != null && annualIncome != null;
-    }
-
-    public boolean isStep2Valid() {
-        return educationLevel != null;
-    }
-
-    public boolean isStep3Valid() {
-        return employmentStatus != null;
-    }
-
-    public boolean isStep4Valid() {
-        return major != null;
-    }
-
-    public boolean isStep5Valid() {
-        return specialty != null;
-    }
-
-    public boolean isCompletelyValid() {
-        return isStep1Valid() && isStep2Valid() && isStep3Valid() && isStep4Valid() && isStep5Valid();
+    public UserProfileVO toVO(int userId){
+        UserProfileVO vo = new UserProfileVO();
+        vo.setUserId(userId);
+        vo.setRegion(region);           // this 사용
+        vo.setAge(age);
+        vo.setMaritalStatus(maritalStatus);
+        vo.setAnnualIncome(annualIncome); // this 사용
+        vo.setEducationLevel(educationLevel);
+        vo.setEmploymentStatus(employmentStatus);
+        vo.setMajor(major);
+        vo.setSpecialty(specialty);
+        return vo;
     }
 }
