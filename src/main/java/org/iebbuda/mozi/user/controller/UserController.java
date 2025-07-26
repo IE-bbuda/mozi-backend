@@ -41,7 +41,7 @@ public class UserController {
     }
 
 
-    @PostMapping("/find-id/email")
+    @PostMapping("/find-id")
     public ResponseEntity<LoginIdFindResponseDTO> findLoginIdByEmail(
             @RequestBody LoginIdFindByEmailRequestDTO request) {
 
@@ -53,7 +53,7 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/find-password/verify")
+    @PostMapping("/password/verify")
     public ResponseEntity<PasswordResetVerifyResponseDTO> verifyAccount(
             @RequestBody PasswordResetVerifyRequestDTO request) {
 
@@ -65,7 +65,7 @@ public class UserController {
      * 2단계: 새 비밀번호 설정
      * POST /api/password-reset/reset
      */
-    @PostMapping("/find-password/reset")
+    @PostMapping("/password/reset")
     public ResponseEntity<PasswordResetResponseDTO> resetPassword(
             @RequestBody PasswordResetRequestDTO request) {
 

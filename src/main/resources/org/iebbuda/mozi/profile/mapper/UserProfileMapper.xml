@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.iebbuda.mozi.profile.mapper.UserProfileMapper">
+    <select id="hasPersonalInfo" resultType="Boolean">
+        <![CDATA[
+        SELECT COUNT(*) > 0 FROM personal_info WHERE user_id = #{userId}
+        ]]>
+        </select>
+    <select id="findByUserId" resultType="UserProfileVO">
+        SELECT * FROM UserProFile
+        WHERE user_id =#{userId}
+    </select>
+</mapper>

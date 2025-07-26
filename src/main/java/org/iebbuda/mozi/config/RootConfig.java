@@ -21,11 +21,14 @@ import javax.sql.DataSource;
 @Configuration
 @PropertySource({"classpath:/application.properties"})
 @EnableTransactionManagement
+@ComponentScan(basePackages = {"org.iebbuda.mozi.user.service", "org.iebbuda.mozi.policy.service", "org.iebbuda.mozi.product.scheduler",
+        "org.iebbuda.mozi.product.service"})
 @MapperScan(basePackages = {
         "org.iebbuda.mozi.user.mapper",
         "org.iebbuda.mozi.policy.mapper",
         "org.iebbuda.mozi.product.mapper",
-        "org.iebbuda.mozi.goal.mapper"
+        "org.iebbuda.mozi.goal.mapper",
+        "org.iebbuda.mozi.profile.mapper"
 })
 @ComponentScan(basePackages = {
         "org.iebbuda.mozi.user.service",
