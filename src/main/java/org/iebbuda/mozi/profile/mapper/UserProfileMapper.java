@@ -11,4 +11,7 @@ public interface UserProfileMapper {
     boolean hasPersonalInfo(@Param("userId") int userId);
 
     UserProfileVO findByUserId(@Param("userId") int userId);
+
+    int updateUserProfile(UserProfileVO userProfile);
+    int insertUserProfile(UserProfileVO userProfile);
 }

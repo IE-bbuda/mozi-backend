@@ -23,7 +23,7 @@ import javax.sql.DataSource;
 @EnableTransactionManagement
 @MapperScan(basePackages = {"org.iebbuda.mozi.user.mapper", "org.iebbuda.mozi.policy.mapper", "org.iebbuda.mozi.product.mapper","org.iebbuda.mozi.profile.mapper"})
 @ComponentScan(basePackages = {"org.iebbuda.mozi.user.service", "org.iebbuda.mozi.policy.service", "org.iebbuda.mozi.product.scheduler",
-        "org.iebbuda.mozi.product.service"})
+        "org.iebbuda.mozi.product.service","org.iebbuda.mozi.profile.service"})
 
 
 public class RootConfig {
