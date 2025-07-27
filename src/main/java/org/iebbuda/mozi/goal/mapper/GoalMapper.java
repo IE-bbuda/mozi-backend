@@ -1,5 +1,6 @@
 package org.iebbuda.mozi.goal.mapper;
 
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.iebbuda.mozi.goal.domain.GoalVO;
 
@@ -10,6 +11,8 @@ public interface GoalMapper {
 //    @Select("select * from UserGoal")
     public List<GoalVO> getList();
 
+    public List<GoalVO> getListByUserId(int userId);
+
     public GoalVO get(int goalId);
 
     public void create(GoalVO goal);
@@ -18,4 +21,5 @@ public interface GoalMapper {
 
     public int delete(int goalId);
 
+    public GoalVO getBillionGoal(@Param("userId") int userId);
 }

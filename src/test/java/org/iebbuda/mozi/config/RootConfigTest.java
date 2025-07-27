@@ -19,7 +19,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 @ExtendWith(SpringExtension.class)
-//@ContextConfiguration(classes = {RootConfig.class})
 @ContextConfiguration(classes = {RootConfig.class, SecurityConfig.class})  // SecurityConfig 추가
 @Log4j2
 class RootConfigTest {
