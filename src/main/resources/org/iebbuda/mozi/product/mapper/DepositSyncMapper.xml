@@ -3,17 +3,17 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="org.iebbuda.mozi.product.mapper.DepositSyncMapper">
+<mapper namespace="org.iebbuda.mozi.domain.product.mapper.DepositSyncMapper">
 
     <!-- 상품코드로 기존 상품 조회 -->
-    <select id="findByProductCode" resultType="org.iebbuda.mozi.product.domain.DepositProduct">
+    <select id="findByProductCode" resultType="org.iebbuda.mozi.domain.product.domain.DepositProduct">
         SELECT *
         FROM DepositProduct
         WHERE fin_prdt_cd = #{finPrdtCd}
     </select>
 
     <!-- 신규 상품 삽입 -->
-    <insert id="insertProduct" parameterType="org.iebbuda.mozi.product.domain.DepositProduct" useGeneratedKeys="true" keyProperty="depositId">
+    <insert id="insertProduct" parameterType="org.iebbuda.mozi.domain.product.domain.DepositProduct" useGeneratedKeys="true" keyProperty="depositId">
         INSERT INTO DepositProduct (
             fin_prdt_cd, fin_co_no, kor_co_nm, fin_prdt_nm, join_way,
             join_deny, join_member, spcl_cnd, etc_note, max_limit,
@@ -26,7 +26,7 @@
     </insert>
 
     <!-- 기존 상품 업데이트 -->
-    <update id="updateProduct" parameterType="org.iebbuda.mozi.product.domain.DepositProduct">
+    <update id="updateProduct" parameterType="org.iebbuda.mozi.domain.product.domain.DepositProduct">
         UPDATE DepositProduct
         SET
             kor_co_nm = #{korCoNm},
@@ -52,7 +52,7 @@
     </delete>
 
     <!-- 옵션 삽입 -->
-    <insert id="insertOption" parameterType="org.iebbuda.mozi.product.domain.DepositProduct" useGeneratedKeys="true" keyProperty="optionId">
+    <insert id="insertOption" parameterType="org.iebbuda.mozi.domain.product.domain.DepositProduct" useGeneratedKeys="true" keyProperty="optionId">
         INSERT INTO DepositOption (
             deposit_id, intr_rate_type, intr_rate_type_nm,
             save_trm, intr_rate, intr_rate2

@@ -3,15 +3,15 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="org.iebbuda.mozi.product.mapper.SavingSyncMapper">
+<mapper namespace="org.iebbuda.mozi.domain.product.mapper.SavingSyncMapper">
 
-    <select id="findByProductCode" resultType="org.iebbuda.mozi.product.domain.SavingProduct">
+    <select id="findByProductCode" resultType="org.iebbuda.mozi.domain.product.domain.SavingProduct">
         SELECT *
         FROM SavingProduct
         WHERE fin_prdt_cd = #{finPrdtCd}
     </select>
 
-    <insert id="insertProduct" parameterType="org.iebbuda.mozi.product.domain.SavingProduct" useGeneratedKeys="true" keyProperty="savingId">
+    <insert id="insertProduct" parameterType="org.iebbuda.mozi.domain.product.domain.SavingProduct" useGeneratedKeys="true" keyProperty="savingId">
         INSERT INTO SavingProduct (
             fin_prdt_cd, fin_co_no, kor_co_nm, fin_prdt_nm, join_way,
             join_deny, join_member, spcl_cnd, etc_note, max_limit,
@@ -23,7 +23,7 @@
                  )
     </insert>
 
-    <update id="updateProduct" parameterType="org.iebbuda.mozi.product.domain.SavingProduct">
+    <update id="updateProduct" parameterType="org.iebbuda.mozi.domain.product.domain.SavingProduct">
         UPDATE SavingProduct
         SET
             kor_co_nm = #{korCoNm},
@@ -47,7 +47,7 @@
         WHERE saving_id = #{savingId}
     </delete>
 
-    <insert id="insertOption" parameterType="org.iebbuda.mozi.product.domain.SavingOption" useGeneratedKeys="true" keyProperty="optionId">
+    <insert id="insertOption" parameterType="org.iebbuda.mozi.domain.product.domain.SavingOption" useGeneratedKeys="true" keyProperty="optionId">
         INSERT INTO SavingOption (
             saving_id, intr_rate_type, intr_rate_type_nm, rsrv_type, rsrv_type_nm,
             save_trm, intr_rate, intr_rate2

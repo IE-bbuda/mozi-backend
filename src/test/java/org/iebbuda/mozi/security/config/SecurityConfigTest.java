@@ -2,7 +2,7 @@ package org.iebbuda.mozi.security.config;
 
 import lombok.extern.log4j.Log4j2;
 import org.iebbuda.mozi.config.RootConfig;
-import org.junit.jupiter.api.Assertions;
+import org.iebbuda.mozi.domain.security.config.SecurityConfig;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;

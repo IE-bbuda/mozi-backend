@@ -2,7 +2,7 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="org.iebbuda.mozi.security.account.mapper.UserDetailsMapper">
+<mapper namespace="org.iebbuda.mozi.domain.security.account.mapper.UserDetailsMapper">
     <resultMap id="authMap" type="AuthVO">
         <result property="userId" column="user_id"/>
         <result property="auth" column="auth"/>

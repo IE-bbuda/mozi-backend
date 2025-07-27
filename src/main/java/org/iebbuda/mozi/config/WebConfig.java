@@ -1,6 +1,6 @@
 package org.iebbuda.mozi.config;
 
-import org.iebbuda.mozi.security.config.SecurityConfig;
+import org.iebbuda.mozi.domain.security.config.SecurityConfig;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 import javax.servlet.Filter;

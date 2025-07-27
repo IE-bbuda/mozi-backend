@@ -2,9 +2,9 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="org.iebbuda.mozi.policy.mapper.PolicyMapper">
+<mapper namespace="org.iebbuda.mozi.domain.policy.mapper.PolicyMapper">
 
-    <select id="findAll" resultType="org.iebbuda.mozi.policy.domain.PolicyVO">
+    <select id="findAll" resultType="org.iebbuda.mozi.domain.policy.domain.PolicyVO">
         SELECT * FROM YouthPolicy
     </select>
 
@@ -13,7 +13,7 @@
         SELECT COUNT(*) FROM YouthPolicy WHERE plcyNo = #{plcyNo}
     </select>
 
-    <insert id="insertPolicy" parameterType="org.iebbuda.mozi.policy.domain.PolicyVO">
+    <insert id="insertPolicy" parameterType="org.iebbuda.mozi.domain.policy.domain.PolicyVO">
         INSERT INTO YouthPolicy (
             plcyNm,
             plcyNo,
@@ -65,7 +65,7 @@
     </insert>
 
 
-    <select id="selectPolicyById" parameterType="int" resultType="org.iebbuda.mozi.policy.domain.PolicyVO">
+    <select id="selectPolicyById" parameterType="int" resultType="org.iebbuda.mozi.domain.policy.domain.PolicyVO">
         SELECT *
         FROM YouthPolicy
         WHERE policy_id = #{id}

@@ -2,7 +2,7 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="org.iebbuda.mozi.profile.mapper.UserProfileMapper">
+<mapper namespace="org.iebbuda.mozi.domain.profile.mapper.UserProfileMapper">
     <select id="hasPersonalInfo" resultType="Boolean">
         <![CDATA[
         SELECT COUNT(*) > 0 FROM personal_info WHERE user_id = #{userId}
