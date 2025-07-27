@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.iebbuda.mozi.domain.profile.domain.UserProfileVO;
 import org.iebbuda.mozi.domain.profile.domain.enums.*;
-import org.iebbuda.mozi.profile.domain.enums.*;
+
 
 import java.math.BigDecimal;
 

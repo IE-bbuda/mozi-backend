@@ -36,8 +36,8 @@ import org.springframework.web.filter.CorsFilter;
 @Configuration
 @EnableWebSecurity
 @Log4j2
-@MapperScan(basePackages = {"org.iebbuda.mozi.security.account.mapper"})
-@ComponentScan(basePackages = {"org.iebbuda.mozi.security"})
+@MapperScan(basePackages = {"org.iebbuda.mozi.domain.security.account.mapper"})
+@ComponentScan(basePackages = {"org.iebbuda.mozi.domain.security"})
 @RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final UserDetailsService userDetailsService;

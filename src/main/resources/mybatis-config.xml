@@ -8,8 +8,8 @@
     </settings>
 
     <typeAliases>
-        <package name="org.iebbuda.mozi.security.account.domain"/>
-        <package name="org.iebbuda.mozi.user.domain"/>
-        <package name="org.iebbuda.mozi.profile.domain"/>
+        <package name="org.iebbuda.mozi.domain.security.account.domain"/>
+        <package name="org.iebbuda.mozi.domain.user.domain"/>
+        <package name="org.iebbuda.mozi.domain.profile.domain"/>
     </typeAliases>
 </configuration>
