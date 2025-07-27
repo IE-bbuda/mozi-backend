@@ -12,10 +12,10 @@ import org.springframework.web.servlet.view.JstlView;
 @ComponentScan(basePackages = {
         "org.iebbuda.mozi.controller",
         "org.iebbuda.mozi.exception",
-        "org.iebbuda.mozi.user.controller",
-        "org.iebbuda.mozi.policy",
-        "org.iebbuda.mozi.product.controller",
-        "org.iebbuda.mozi.profile.controller"
+        "org.iebbuda.mozi.domain.user.controller",
+        "org.iebbuda.mozi.domain.policy",
+        "org.iebbuda.mozi.domain.product.controller",
+        "org.iebbuda.mozi.domain.profile.controller"
 })    // Spring MVC용 컴포넌트 등록을 위한 스캔 패키지
 public class ServletConfig implements WebMvcConfigurer {
     @Override

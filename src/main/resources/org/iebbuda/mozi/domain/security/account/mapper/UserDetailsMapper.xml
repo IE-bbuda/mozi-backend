@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.iebbuda.mozi.domain.security.account.mapper.UserDetailsMapper">
+    <resultMap id="authMap" type="AuthVO">
+        <result property="userId" column="user_id"/>
+        <result property="auth" column="auth"/>
+    </resultMap>
+
+    <resultMap id="userMap" type="UserVO">
+        <id property="userId" column="user_id"/>
+        <result property="username" column="username"/>
+        <result property="loginId" column="login_id"/>
+        <result property="password" column="password" />
+        <result property="phoneNumber" column="phone_number"/>
+        <result property="email" column="email" />
+        <result property="createdAt" column="created_at" />
+        <result property="updatedAt" column="updated_at" />
+        <result property="mainBank" column="main_bank"/>
+        <result property="birthDate" column="birth_date"/>
+        <collection property="authList" resultMap="authMap" />
+    </resultMap>
+
+    <select id="get" resultMap="userMap">
+        select u.user_id, u.login_id, u.password, u.email, u.created_at, u.updated_at, a.auth
+        from User u
+        left outer join Auth a
+        on u.user_id = a.user_id
+        where u.login_id=#{LoginId};
+    </select>
+</mapper>

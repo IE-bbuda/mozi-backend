@@ -2,10 +2,11 @@ package org.iebbuda.mozi.user.mapper;
 
 import lombok.extern.log4j.Log4j2;
 import org.iebbuda.mozi.config.RootConfig;
-import org.iebbuda.mozi.security.account.domain.AuthVO;
-import org.iebbuda.mozi.security.account.domain.UserRole;
-import org.iebbuda.mozi.security.config.SecurityConfig;
-import org.iebbuda.mozi.user.domain.UserVO;
+import org.iebbuda.mozi.domain.security.account.domain.AuthVO;
+import org.iebbuda.mozi.domain.security.account.domain.UserRole;
+import org.iebbuda.mozi.domain.security.config.SecurityConfig;
+import org.iebbuda.mozi.domain.user.domain.UserVO;
+import org.iebbuda.mozi.domain.user.mapper.UserMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
