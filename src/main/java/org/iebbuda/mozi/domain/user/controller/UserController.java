@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 
+import org.iebbuda.mozi.common.response.BaseResponse;
 import org.iebbuda.mozi.domain.user.dto.request.LoginIdFindByEmailRequestDTO;
 import org.iebbuda.mozi.domain.user.dto.request.PasswordResetRequestDTO;
 import org.iebbuda.mozi.domain.user.dto.request.PasswordResetVerifyRequestDTO;
@@ -31,8 +32,10 @@ public class UserController {
 
 
     @GetMapping("/check-username/{loginId}")
-    public ResponseEntity<Boolean> checkUsername(@PathVariable String loginId){
-        return ResponseEntity.ok().body(userService.checkDuplicate(loginId));
+    public BaseResponse<Boolean> checkUsername(@PathVariable String loginId){
+        boolean result = userService.checkDuplicate(loginId);
+        return new BaseResponse<>(result);
+
     }
 
     @PostMapping("/signup")
