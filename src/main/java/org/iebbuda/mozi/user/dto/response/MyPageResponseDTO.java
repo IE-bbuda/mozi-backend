@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.iebbuda.mozi.profile.domain.UserProfileVO;
-import org.iebbuda.mozi.profile.dto.PersonalInfoDTO;
+import org.iebbuda.mozi.profile.dto.UserProfileInfoDTO;
 import org.iebbuda.mozi.user.domain.UserVO;
 
 
@@ -28,7 +28,7 @@ public class MyPageResponseDTO {
     private boolean hasPersonalInfo;
 
     @JsonProperty("personal_info")
-    private PersonalInfoDTO personalInfo;
+    private UserProfileInfoDTO personalInfo;
 
     public static MyPageResponseDTO of(UserVO userVO, UserProfileVO userProfileVO) {
         return MyPageResponseDTO.builder()
@@ -41,10 +41,10 @@ public class MyPageResponseDTO {
                 .build();
     }
 
-    private static PersonalInfoDTO createPersonalInfo(UserProfileVO userProfileVO) {
+    private static UserProfileInfoDTO createPersonalInfo(UserProfileVO userProfileVO) {
         if (userProfileVO == null) {
             return null;
         }
-        return PersonalInfoDTO.of(userProfileVO);
+        return UserProfileInfoDTO.of(userProfileVO);
     }
 }
