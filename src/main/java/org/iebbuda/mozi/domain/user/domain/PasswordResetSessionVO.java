@@ -12,5 +12,4 @@ public class PasswordResetSessionVO {
     private int userId;
     private LocalDateTime expiresAt;
     private boolean completed;
-    private LocalDateTime createdAt;
 }
