@@ -2,6 +2,8 @@ package org.iebbuda.mozi.domain.profile.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.iebbuda.mozi.common.response.BaseException;
+import org.iebbuda.mozi.common.response.BaseResponseStatus;
 import org.iebbuda.mozi.domain.profile.domain.UserProfileVO;
 import org.iebbuda.mozi.domain.profile.dto.UserProfileInfoDTO;
 import org.iebbuda.mozi.domain.profile.mapper.UserProfileMapper;
@@ -23,72 +25,99 @@ public class UserProfileServiceImpl implements UserProfileService {
 
     // 저장 (검증 로직 제거)
     @Transactional
-    public Map<String, Object> saveProfile(String loginId, UserProfileInfoDTO dto) {
-        try {
-            // 기존 데이터 확인
-            UserVO user = userMapper.findByLoginId(loginId);
-            UserProfileVO  currentProfile= userProfileMapper.findByUserId(user.getUserId());
-            UserProfileVO  insertedProfile = dto.toVO(user.getUserId());
-            if (currentProfile != null) {
-                // 수정
-                int result = userProfileMapper.updateUserProfile(insertedProfile);
-                if(result==0){
-                    return Map.of("success", false, "message", "수정에 실패했습니다.");
-                }
-                log.info("사용자 {} 프로필 수정 완료", loginId);
-
-                return Map.of(
-                        "success", true,
-                        "message", "프로필이 수정되었습니다."
-                );
-            } else {
-                int result = userProfileMapper.insertUserProfile(insertedProfile);
-                if(result ==0){
-                    return Map.of("success", false, "message", "저장에 실패했습니다.");
-                }
-
-                log.info("사용자 {} 프로필 생성 완료", loginId);
-                return Map.of(
-                        "success", true,
-                        "message", "프로필이 저장되었습니다."
-                );
-            }
-
-        } catch (Exception e) {
-            log.error("설문 저장 실패: userId={}", loginId, e);
-            return Map.of(
-                    "success", false,
-                    "message", "저장에 실패했습니다."
-            );
-        }
-    }
-
     @Override
-    public Map<String, Object> getUserProfile(String loginId) {
-        try {
-            UserVO user = userMapper.findByLoginId(loginId);
-            UserProfileVO userProfile = userProfileMapper.findByUserId(user.getUserId());
-            UserProfileInfoDTO userProfileInfoDTO = UserProfileInfoDTO.of(userProfile);
-            boolean hasExistingData = isNotEmpty(userProfileInfoDTO);
+    public void saveProfile(String loginId, UserProfileInfoDTO dto) {
+        log.info("프로필 저장 시작: loginId={}", loginId);
 
-            return Map.of(
-                    "success", true,
-                    "data", getProfileDTO(hasExistingData, userProfileInfoDTO),
-                    "hasExistingData", hasExistingData
-            );
-        } catch (Exception e) {
-            log.error("프로필 조회 실패: userId={}", loginId, e);
-            throw new RuntimeException("프로필 조회에 실패했습니다.", e);
+        // 받아온 DTO 값 확인
+        log.info("받아온 DTO: region={}, age={}, maritalStatus={}, annualIncome={}, educationLevel={}, employmentStatus={}, major={}, specialty={}",
+                dto.getRegion(), dto.getAge(), dto.getMaritalStatus(),
+                dto.getAnnualIncome(), dto.getEducationLevel(), dto.getEmploymentStatus(),
+                dto.getMajor(), dto.getSpecialty());
+
+        // 1. 사용자 검증
+        UserVO user = findUserByLoginId(loginId);
+
+        // 2. 기존 프로필 확인
+        UserProfileVO currentProfile = userProfileMapper.findByUserId(user.getUserId());
+        UserProfileVO profileToSave = dto.toVO(user.getUserId());
+
+        // 변환된 VO 값 확인
+        log.info("변환된 VO: region={}, age={}, maritalStatus={}, annualIncome={}, educationLevel={}, employmentStatus={}, major={}, specialty={}",
+                profileToSave.getRegion(), profileToSave.getAge(), profileToSave.getMaritalStatus(),
+                profileToSave.getAnnualIncome(), profileToSave.getEducationLevel(), profileToSave.getEmploymentStatus(),
+                profileToSave.getMajor(), profileToSave.getSpecialty());
+
+        // 3. 저장 또는 수정
+        if (currentProfile != null) {
+            updateProfile(loginId, profileToSave);
+        } else {
+            insertProfile(loginId, profileToSave);
         }
+
+        log.info("프로필 저장 완료: loginId={}", loginId);
     }
 
+    /**
+     * 사용자 프로필 조회
+     */
+    @Override
+    public UserProfileInfoDTO getUserProfile(String loginId) {
+        log.info("프로필 조회 시작: loginId={}", loginId);
 
-    private Object getProfileDTO(boolean hasExistingData, UserProfileInfoDTO userProfileInfoDTO) {
-        if(hasExistingData) return userProfileInfoDTO;
-        return new UserProfileInfoDTO(); // 빈 객체 반환
+        // 1. 사용자 검증
+        UserVO user = findUserByLoginId(loginId);
+
+        // 2. 프로필 조회
+        UserProfileVO userProfile = userProfileMapper.findByUserId(user.getUserId());
+        UserProfileInfoDTO userProfileInfoDTO = UserProfileInfoDTO.of(userProfile);
+
+        // 3. 빈 프로필인 경우 기본 객체 반환
+        if (!hasProfileData(userProfileInfoDTO)) {
+            log.debug("빈 프로필 반환: loginId={}", loginId);
+            return UserProfileInfoDTO.builder().build();
+        }
+
+        log.info("프로필 조회 완료: loginId={}, hasData=true", loginId);
+        return userProfileInfoDTO;
     }
 
-    private boolean isNotEmpty(UserProfileInfoDTO dto) {
+    // ========== Private Methods ==========
+
+    /**
+     * 사용자 조회 및 검증
+     */
+    private UserVO findUserByLoginId(String loginId) {
+        UserVO user = userMapper.findByLoginId(loginId);
+
+        if (user == null) {
+            log.error("사용자를 찾을 수 없습니다: loginId={}", loginId);
+            throw new BaseException(BaseResponseStatus.INVALID_MEMBER);
+        }
+
+        return user;
+    }
+
+    /**
+     * 프로필 신규 저장
+     */
+    private void insertProfile(String loginId, UserProfileVO profile) {
+        userProfileMapper.insertUserProfile(profile);
+        log.info("사용자 {} 프로필 생성 완료", loginId);
+    }
+
+    /**
+     * 프로필 업데이트
+     */
+    private void updateProfile(String loginId, UserProfileVO profile) {
+        userProfileMapper.updateUserProfile(profile);
+        log.info("사용자 {} 프로필 수정 완료", loginId);
+    }
+
+    /**
+     * 프로필 데이터가 비어있는지 확인
+     */
+    private boolean hasProfileData(UserProfileInfoDTO dto) {
         if (dto == null) return false;
 
         return dto.getRegion() != null ||
