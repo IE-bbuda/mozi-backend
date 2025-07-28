@@ -22,8 +22,26 @@ public enum BaseResponseStatus {
     PROFILE_SAVE_FAILED(false, HttpStatus.INTERNAL_SERVER_ERROR.value(), "프로필 저장에 실패했습니다."),
     INVALID_PROFILE_DATA(false, HttpStatus.BAD_REQUEST.value(), "잘못된 프로필 데이터입니다."),
 
+    // 회원가입 관련
+    DUPLICATE_LOGIN_ID(false, HttpStatus.CONFLICT.value(), "이미 존재하는 로그인 ID입니다."),
+
+    // 본인 확인 관련
+    USER_VERIFICATION_SUCCESS(true, HttpStatus.OK.value(), "본인 확인이 완료되었습니다. 새 비밀번호를 설정해주세요."),
+    USER_NOT_FOUND_FOR_RESET(false, HttpStatus.NOT_FOUND.value(), "입력하신 정보로 가입된 계정이 없습니다."),
+
+    //비밀번호 재설정
+    SESSION_CREATE_FAILED(false, HttpStatus.INTERNAL_SERVER_ERROR.value(), "세션 생성에 실패했습니다. 잠시 후 다시 시도해주세요."),
+    ACCOUNT_VERIFICATION_SUCCESS(true, HttpStatus.OK.value(), "본인 확인이 완료되었습니다. 새 비밀번호를 설정해주세요."),
+    // 비밀번호 관련
+    PASSWORD_RESET_SUCCESS(true, HttpStatus.OK.value(), "비밀번호가 성공적으로 변경되었습니다."),
+    PASSWORD_RESET_FAILED(false, HttpStatus.BAD_REQUEST.value(), "비밀번호 변경에 실패했습니다."),
+    INVALID_RESET_TOKEN(false, HttpStatus.BAD_REQUEST.value(), "유효하지 않거나 만료된 토큰입니다."),
+    PASSWORD_RESET_EMAIL_SENT(true, HttpStatus.OK.value(), "비밀번호 재설정 이메일이 발송되었습니다."),
+
     // 공통 에러
-    DATABASE_INSERT_ERROR(false, HttpStatus.INTERNAL_SERVER_ERROR.value(), "데이터베이스 입력에 실패했습니다."),
+    DATABASE_CONSTRAINT_ERROR(false, HttpStatus.BAD_REQUEST.value(), "데이터 제약조건 위반입니다."),
+    DATABASE_ERROR(false, HttpStatus.INTERNAL_SERVER_ERROR.value(), "데이터베이스 오류가 발생했습니다."),
+    DATABASE_CONNECTION_ERROR(false, HttpStatus.INTERNAL_SERVER_ERROR.value(), "데이터베이스 연결에 실패했습니다."),
     INTERNAL_SERVER_ERROR(false, HttpStatus.INTERNAL_SERVER_ERROR.value(), "서버 내부 오류가 발생했습니다."),
     FAIL_IMAGE_CONVERT(false, HttpStatus.INTERNAL_SERVER_ERROR.value(), "Multipart 파일 전환에 실패했습니다.");
     private final boolean isSuccess;
