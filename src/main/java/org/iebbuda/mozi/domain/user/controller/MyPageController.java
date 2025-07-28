@@ -2,11 +2,11 @@ package org.iebbuda.mozi.domain.user.controller;
 
 
 import lombok.RequiredArgsConstructor;
+import org.iebbuda.mozi.common.response.BaseResponse;
 import org.iebbuda.mozi.domain.user.dto.request.MyPageUpdateRequestDTO;
 import org.iebbuda.mozi.domain.user.dto.response.MyPageEditResponseDTO;
 import org.iebbuda.mozi.domain.user.dto.response.MyPageResponseDTO;
 import org.iebbuda.mozi.domain.user.service.MyPageService;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -23,12 +23,11 @@ public class MyPageController {
      * GET /api/mypage
      */
     @GetMapping
-    public ResponseEntity<MyPageResponseDTO> getMyPage(
+    public BaseResponse<MyPageResponseDTO> getMyPage(
             @AuthenticationPrincipal UserDetails userDetails) {
         String loginId = userDetails.getUsername();
-
         MyPageResponseDTO response = myPageService.getMyPageInfo(loginId);
-        return ResponseEntity.ok(response);
+        return new BaseResponse<>(response);
     }
 
     /**
@@ -36,13 +35,11 @@ public class MyPageController {
      * GET /api/mypage/edit
      */
     @GetMapping("/edit")
-    public ResponseEntity<MyPageEditResponseDTO> getMyPageEdit(
+    public BaseResponse<MyPageEditResponseDTO> getMyPageEdit(
             @AuthenticationPrincipal UserDetails userDetails) {
-
         String loginId = userDetails.getUsername();
-
         MyPageEditResponseDTO response = myPageService.getMyPageEditInfo(loginId);
-        return ResponseEntity.ok(response);
+        return new BaseResponse<>(response);
     }
 
     /**
@@ -50,12 +47,11 @@ public class MyPageController {
      * PUT /api/mypage/edit
      */
     @PutMapping("/edit")
-    public ResponseEntity<MyPageResponseDTO> updateMyPage(
+    public BaseResponse<MyPageResponseDTO> updateMyPage(
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestBody MyPageUpdateRequestDTO request) {
         String loginId = userDetails.getUsername();
         MyPageResponseDTO response = myPageService.updateMyPageInfo(loginId, request);
-
-        return ResponseEntity.ok(response);
+        return new BaseResponse<>(response);
     }
 }
