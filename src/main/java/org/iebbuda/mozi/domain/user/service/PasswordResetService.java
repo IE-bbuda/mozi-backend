@@ -3,12 +3,12 @@ package org.iebbuda.mozi.domain.user.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.iebbuda.mozi.common.response.BaseException;
+import org.iebbuda.mozi.common.response.BaseResponseStatus;
 import org.iebbuda.mozi.domain.user.domain.PasswordResetSessionVO;
 import org.iebbuda.mozi.domain.user.domain.UserVO;
 import org.iebbuda.mozi.domain.user.dto.request.PasswordResetRequestDTO;
 import org.iebbuda.mozi.domain.user.dto.request.PasswordResetVerifyRequestDTO;
-import org.iebbuda.mozi.domain.user.dto.response.PasswordResetResponseDTO;
-import org.iebbuda.mozi.domain.user.dto.response.PasswordResetVerifyResponseDTO;
 import org.iebbuda.mozi.domain.user.mapper.PasswordResetSessionMapper;
 import org.iebbuda.mozi.domain.user.mapper.UserMapper;
 
@@ -36,98 +36,112 @@ public class PasswordResetService {
      * 1단계: 계정 확인 및 세션 생성
      */
     @Transactional
-    public PasswordResetVerifyResponseDTO verifyAccount(PasswordResetVerifyRequestDTO request) {
+    public String verifyAccount(PasswordResetVerifyRequestDTO request) {
         log.info("비밀번호 재설정 계정 확인 시작 - 로그인ID: {}", request.getLoginId());
 
-        try {
-            // 1. 사용자 조회 (기존 UserMapper 활용)
-            UserVO user = userMapper.findByLoginIdAndEmail(request.getLoginId(), request.getEmail());
+        // 1. 사용자 조회 및 검증
+        UserVO user = findAndValidateUser(request.getLoginId(), request.getEmail());
 
-            if (user == null) {
-                log.warn("일치하는 계정 없음 - 로그인ID: {}, 이메일: {}", request.getLoginId(), request.getEmail());
-                return PasswordResetVerifyResponseDTO.failed();
-            }
+        // 2. 기존 세션 정리
+        cleanupExistingSessions(user.getUserId());
 
-            // 3. 기존 세션 정리 (동일 사용자의 이전 요청들 삭제)
-            int deletedSessions = sessionMapper.deleteSessionsByUserId(user.getUserId());
-            log.info("기존 세션 삭제 완료 - 사용자ID: {}, 삭제된 세션 수: {}", user.getUserId(), deletedSessions);
+        // 3. 새 세션 생성 및 저장
+        String token = createPasswordResetSession(user);
 
-            // 4. 새 세션 생성
-            String token = generateToken();
-            LocalDateTime expiresAt = LocalDateTime.now().plusMinutes(SESSION_EXPIRY_MINUTES);
+        log.info("비밀번호 재설정 세션 생성 완료 - 사용자ID: {}, 토큰: {}",
+                user.getUserId(), maskToken(token));
 
-            PasswordResetSessionVO session = getSession(token, user, expiresAt);
-
-            // 5. 세션 저장 및 결과 검증
-            int insertResult = sessionMapper.insertPasswordResetSession(session);
-            if (insertResult != 1) {
-                log.error("세션 생성 실패 - 사용자ID: {}, 영향받은 행: {}", user.getUserId(), insertResult);
-                return PasswordResetVerifyResponseDTO.failed("시스템 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
-            }
-
-            log.info("비밀번호 재설정 세션 생성 완료 - 사용자ID: {}, 토큰: {}, 만료시간: {}",
-                    user.getUserId(), maskToken(token), expiresAt);
-
-            return PasswordResetVerifyResponseDTO.success(token);
-
-        } catch (Exception e) {
-            log.error("계정 확인 중 오류 발생 - 로그인ID: {}", request.getLoginId(), e);
-            return PasswordResetVerifyResponseDTO.failed("시스템 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
-        }
+        return token;
     }
 
     /**
      * 2단계: 비밀번호 재설정
      */
     @Transactional
-    public PasswordResetResponseDTO resetPassword(PasswordResetRequestDTO request) {
+    public void resetPassword(PasswordResetRequestDTO request) {
         log.info("비밀번호 재설정 시작 - 토큰: {}", maskToken(request.getToken()));
 
-        try {
-            // 1. 세션 유효성 검사
-            PasswordResetSessionVO session = sessionMapper.findValidSession(
-                    request.getToken(),
-                    LocalDateTime.now()
-            );
+        // 1. 세션 유효성 검사
+        PasswordResetSessionVO session = validateResetSession(request.getToken());
 
-            if (session == null) {
-                log.warn("유효하지 않은 세션 - 토큰: {}", maskToken(request.getToken()));
-                return PasswordResetResponseDTO.failed("유효하지 않거나 만료된 요청입니다.");
-            }
+        // 2. 비밀번호 업데이트
+        updateUserPassword(session.getUserId(), request.getNewPassword(), request.getToken());
 
-            log.info("세션 검증 성공 - 사용자ID: {}, 세션ID: {}", session.getUserId(), session.getId());
+        // 3. 세션 완료 처리
+        completeResetSession(request.getToken());
 
-            // 2. 비밀번호 업데이트 (기존 UserMapper 활용)
-            int updateResult = userMapper.updateUserPassword(
-                    session.getUserId(),
-                    passwordEncoder.encode(request.getNewPassword()), //암호화된 비밀번호
-                    LocalDateTime.now()
-            );
+        log.info("비밀번호 재설정 완료 - 사용자ID: {}, 세션ID: {}", session.getUserId(), session.getId());
+    }
 
-            if (updateResult != 1) {
-                log.error("비밀번호 업데이트 실패 - 사용자ID: {}, 토큰: {}, 영향받은 행: {}",
-                        session.getUserId(), maskToken(request.getToken()), updateResult);
-                return PasswordResetResponseDTO.failed("비밀번호 변경 중 오류가 발생했습니다.");
-            }
+    /**
+     * 사용자 조회 및 검증
+     */
+    private UserVO findAndValidateUser(String loginId, String email) {
+        UserVO user = userMapper.findByLoginIdAndEmail(loginId, email);
 
-            log.info("비밀번호 업데이트 성공 - 사용자ID: {}", session.getUserId());
-
-            // 3. 세션 완료 처리
-            int completeResult = sessionMapper.markSessionAsCompleted(request.getToken());
-            if (completeResult != 1) {
-                log.warn("세션 완료 처리 실패 - 토큰: {}, 영향받은 행: {}",
-                        maskToken(request.getToken()), completeResult);
-                // 비밀번호는 이미 변경됐으므로 경고만 로그
-            }
-
-            log.info("비밀번호 재설정 완료 - 사용자ID: {}, 세션ID: {}", session.getUserId(), session.getId());
-
-            return PasswordResetResponseDTO.success();
-
-        } catch (Exception e) {
-            log.error("비밀번호 재설정 중 오류 발생 - 토큰: {}", maskToken(request.getToken()), e);
-            return PasswordResetResponseDTO.failed("비밀번호 재설정 중 오류가 발생했습니다.");
+        if (user == null) {
+            log.warn("일치하는 계정 없음 - 로그인ID: {}, 이메일: {}", loginId, email);
+            throw new BaseException(BaseResponseStatus.USER_NOT_FOUND_FOR_RESET);
         }
+
+        log.debug("사용자 조회 성공 - 사용자ID: {}", user.getUserId());
+        return user;
+    }
+
+    /**
+     * 기존 세션 정리
+     */
+    private void cleanupExistingSessions(int userId) {
+        sessionMapper.deleteSessionsByUserId(userId);
+        log.info("기존 세션 삭제 완료 - 사용자ID: {}", userId);
+    }
+
+    /**
+     * 새 비밀번호 재설정 세션 생성
+     */
+    private String createPasswordResetSession(UserVO user) {
+        String token = generateToken();
+        LocalDateTime expiresAt = LocalDateTime.now().plusMinutes(SESSION_EXPIRY_MINUTES);
+
+        PasswordResetSessionVO session = getSession(token, user, expiresAt);
+
+        sessionMapper.insertPasswordResetSession(session);
+
+        log.debug("세션 저장 성공 - 사용자ID: {}, 만료시간: {}", user.getUserId(), expiresAt);
+        return token;
+    }
+
+    /**
+     * 비밀번호 재설정 세션 유효성 검사
+     */
+    private PasswordResetSessionVO validateResetSession(String token) {
+        PasswordResetSessionVO session = sessionMapper.findValidSession(token, LocalDateTime.now());
+
+        if (session == null) {
+            log.warn("유효하지 않은 세션 - 토큰: {}", maskToken(token));
+            throw new BaseException(BaseResponseStatus.INVALID_RESET_TOKEN);
+        }
+
+        log.info("세션 검증 성공 - 사용자ID: {}, 세션ID: {}", session.getUserId(), session.getId());
+        return session;
+    }
+
+    /**
+     * 사용자 비밀번호 업데이트
+     */
+    private void updateUserPassword(int userId, String newPassword, String token) {
+        String encodedPassword = passwordEncoder.encode(newPassword);
+       userMapper.updateUserPassword(userId, encodedPassword, LocalDateTime.now());
+
+        log.info("비밀번호 업데이트 성공 - 사용자ID: {}", userId);
+    }
+
+    /**
+     * 비밀번호 재설정 세션 완료 처리
+     */
+    private void completeResetSession(String token) {
+        sessionMapper.markSessionAsCompleted(token); // 실패시 DB에서 예외 발생
+        log.debug("세션 완료 처리 요청 - 토큰: {}", maskToken(token));
     }
 
     private PasswordResetSessionVO getSession(String token, UserVO user, LocalDateTime expiresAt) {
@@ -137,50 +151,10 @@ public class PasswordResetService {
         session.setUserId(user.getUserId());
         session.setExpiresAt(expiresAt);
         session.setCompleted(false);
-        session.setCreatedAt(LocalDateTime.now());
+
         return session;
     }
 
-    /**
-     * 토큰 유효성 검사
-     */
-    public boolean validateToken(String token) {
-        try {
-            PasswordResetSessionVO session = sessionMapper.findValidSession(
-                    token,
-                    LocalDateTime.now()
-            );
-
-            boolean isValid = session != null;
-            log.info("토큰 유효성 검사 결과 - 토큰: {}, 유효성: {}", maskToken(token), isValid);
-
-            return isValid;
-
-        } catch (Exception e) {
-            log.error("토큰 유효성 검사 중 오류 발생 - 토큰: {}", maskToken(token), e);
-            return false;
-        }
-    }
-
-    /**
-     * 만료된 세션 정리 (스케줄러에서 호출)
-     */
-    @Transactional
-    public void cleanupExpiredSessions() {
-        try {
-            LocalDateTime now = LocalDateTime.now();
-            int deletedCount = sessionMapper.deleteExpiredSessions(now);
-
-            if (deletedCount > 0) {
-                log.info("만료된 세션 정리 완료 - 삭제된 세션 수: {}, 기준시간: {}", deletedCount, now);
-            } else {
-                log.debug("만료된 세션 없음 - 기준시간: {}", now);
-            }
-
-        } catch (Exception e) {
-            log.error("만료된 세션 정리 중 오류 발생", e);
-        }
-    }
 
     /**
      * 랜덤 토큰 생성
