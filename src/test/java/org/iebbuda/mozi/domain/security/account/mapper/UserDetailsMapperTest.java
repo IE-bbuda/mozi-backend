@@ -1,4 +1,4 @@
-package org.iebbuda.mozi.security.account.mapper;
+package org.iebbuda.mozi.domain.security.account.mapper;
 
 import lombok.extern.log4j.Log4j2;
 import org.iebbuda.mozi.config.RootConfig;

@@ -1,4 +1,4 @@
-package org.iebbuda.mozi.user.service;
+package org.iebbuda.mozi.domain.user.service;
 
 import lombok.extern.log4j.Log4j2;
 import org.iebbuda.mozi.config.RootConfig;
@@ -9,8 +9,6 @@ import org.iebbuda.mozi.domain.security.config.SecurityConfig;
 import org.iebbuda.mozi.domain.user.dto.response.LoginIdFindResponseDTO;
 import org.iebbuda.mozi.domain.user.dto.response.UserDTO;
 import org.iebbuda.mozi.domain.user.dto.request.UserJoinRequestDTO;
-
-import org.iebbuda.mozi.domain.user.dto.response.UserJoinResponseDTO;
 
 
 import org.iebbuda.mozi.domain.user.service.UserService;
@@ -81,19 +79,17 @@ class UserServiceImplTest {
     @Test
     @DisplayName("회원가입")
     void join() {
-        UserJoinResponseDTO joinResult = userService.join(joinRequest);
-        int userId = joinResult.getUserId();
+        int userId =userService.join(joinRequest);
 
-        assertNotNull(joinResult);
+        assertNotNull(userService.get(userId));
         assertTrue(userId > 0);
-        log.info("joinResult={}", joinResult);
+        log.info("joinResult={}", userService.get(userId));
     }
 
     @Test
     @DisplayName("userId로 사용자 조회")
     void get(){
-        UserJoinResponseDTO joinResult = userService.join(joinRequest);
-        int userId = joinResult.getUserId();
+        int userId= userService.join(joinRequest);
 
         // when
         Optional<UserDTO> result = userService.get(userId);
@@ -108,12 +104,22 @@ class UserServiceImplTest {
     @Test
     @DisplayName("이메일로 로그인ID 찾기")
     void findLoginIdByEmail(){
-        UserJoinResponseDTO join = userService.join(joinRequest);
-        LoginIdFindResponseDTO result = userService.findLoginIdByEmail(join.getUsername(), join.getEmail());
+            int userId = userService.join(joinRequest);
+            log.info("userId: {}", userId);
 
-        assertNotNull(result);
-        assertTrue(result.isFound());
-        log.info("result={}", result.getMaskedLoginId());
+            Optional<UserDTO> user = userService.get(userId);
+
+            // Optional이 존재하는지 확인
+            assertTrue(user.isPresent(), "사용자가 존재해야 합니다");
+
+            UserDTO userDto = user.get();
+            LoginIdFindResponseDTO result = userService
+                    .findLoginIdByEmail(userDto.getUsername(), userDto.getEmail());
+
+            assertNotNull(result);
+            assertTrue(result.isFound());
+            log.info("result={}", result.getMaskedLoginId());
+
     }
 
     @Test
@@ -143,7 +149,7 @@ class UserServiceImplTest {
         return UserJoinRequestDTO.builder()
                 .loginId("testuser" + randomNumber)
                 .username("테스트유저" + randomNumber)
-                .password("password123")
+                .password(passwordEncoder.encode("password123"))
                 .email("test" + randomNumber + "@email.com")
                 .phoneNumber("010-1234-5678")
                 .birthDate("010607")
