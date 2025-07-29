@@ -7,8 +7,9 @@ import org.iebbuda.mozi.common.response.BaseException;
 import org.iebbuda.mozi.common.response.BaseResponseStatus;
 import org.iebbuda.mozi.domain.user.domain.PasswordResetSessionVO;
 import org.iebbuda.mozi.domain.user.domain.UserVO;
+import org.iebbuda.mozi.domain.user.dto.request.AccountVerificationRequestDTO;
 import org.iebbuda.mozi.domain.user.dto.request.PasswordResetRequestDTO;
-import org.iebbuda.mozi.domain.user.dto.request.PasswordResetVerifyRequestDTO;
+import org.iebbuda.mozi.domain.user.dto.request.EmailCodeVerifyRequestDTO;
 import org.iebbuda.mozi.domain.user.mapper.PasswordResetSessionMapper;
 import org.iebbuda.mozi.domain.user.mapper.UserMapper;
 
@@ -27,35 +28,76 @@ public class PasswordResetService {
     private final UserMapper userMapper;  // 기존 사용자 매퍼 활용
     private final PasswordResetSessionMapper sessionMapper;  // 세션 전용 매퍼
     private final PasswordEncoder passwordEncoder;
+    private final EmailVerificationService emailVerificationService;
 
     // 세션 유효 시간 (분)
     private static final int SESSION_EXPIRY_MINUTES = 30;
 
 
     /**
-     * 1단계: 계정 확인 및 세션 생성
+     * 1단계: 이메일 인증번호 발송
+     * @param email 인증번호를 받을 이메일 주소
      */
     @Transactional
-    public String verifyAccount(PasswordResetVerifyRequestDTO request) {
-        log.info("비밀번호 재설정 계정 확인 시작 - 로그인ID: {}", request.getLoginId());
+    public void sendEmailVerificationCode(String email) {
+        log.info("이메일 인증번호 발송 시작 - 이메일: {}", email);
+
+        // 이메일 인증번호 발송 (계정 존재 여부는 확인하지 않음 - 보안상 이유)
+        emailVerificationService.sendVerificationCode(email);
+
+        log.info("이메일 인증번호 발송 완료 - 이메일: {}", email);
+    }
+
+    /**
+     * 2단계: 이메일 인증번호 확인
+     * @param request 이메일과 인증번호
+     */
+    @Transactional
+    public void verifyEmailCode(EmailCodeVerifyRequestDTO request) {
+        log.info("이메일 인증번호 확인 시작 - 이메일: {}", request.getEmail());
+
+        if (!emailVerificationService.verifyCode(request.getEmail(), request.getVerificationCode())) {
+            log.warn("이메일 인증번호 확인 실패 - 이메일: {}", request.getEmail());
+            throw new BaseException(BaseResponseStatus.INVALID_VERIFICATION_CODE);
+        }
+
+        log.info("이메일 인증번호 확인 완료 - 이메일: {}", request.getEmail());
+    }
+
+    /**
+     * 3단계: 계정 확인 및 토큰 발급
+     * @param request 로그인ID와 이메일
+     * @return 비밀번호 재설정용 토큰
+     */
+    @Transactional
+    public String verifyAccountAndIssueToken(AccountVerificationRequestDTO request) {
+        log.info("계정 확인 및 토큰 발급 시작 - 로그인ID: {}, 이메일: {}",
+                request.getLoginId(), request.getEmail());
 
         // 1. 사용자 조회 및 검증
         UserVO user = findAndValidateUser(request.getLoginId(), request.getEmail());
 
-        // 2. 기존 세션 정리
+        // 2. 이메일 인증 여부 확인 (이 부분이 빠져있음!)
+        if (!emailVerificationService.isEmailVerified(request.getEmail())) {
+            log.warn("이메일 인증 미완료로 계정 확인 시도: {}", request.getEmail());
+            throw new BaseException(BaseResponseStatus.EMAIL_NOT_VERIFIED);
+        }
+
+        // 3. 기존 세션 정리
         cleanupExistingSessions(user.getUserId());
 
-        // 3. 새 세션 생성 및 저장
+        // 4. 새 세션 생성 및 토큰 발급
         String token = createPasswordResetSession(user);
 
-        log.info("비밀번호 재설정 세션 생성 완료 - 사용자ID: {}, 토큰: {}",
+        log.info("토큰 발급 완료 - 사용자ID: {}, 토큰: {}",
                 user.getUserId(), maskToken(token));
 
         return token;
     }
 
     /**
-     * 2단계: 비밀번호 재설정
+     * 4단계: 비밀번호 재설정 (기존 메서드 그대로)
+     * @param request 토큰과 새 비밀번호
      */
     @Transactional
     public void resetPassword(PasswordResetRequestDTO request) {
@@ -72,6 +114,7 @@ public class PasswordResetService {
 
         log.info("비밀번호 재설정 완료 - 사용자ID: {}, 세션ID: {}", session.getUserId(), session.getId());
     }
+
 
     /**
      * 사용자 조회 및 검증

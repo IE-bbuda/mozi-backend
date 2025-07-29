@@ -52,4 +52,6 @@ public interface UserMapper {
                        @Param("email") String email,
                        @Param("phoneNumber") String phoneNumber);
 
+
+    UserVO findByEmail(String email);  // 이메일 중복 확인용
 }

@@ -63,6 +63,20 @@
         WHERE user_id = #{userId}
     </update>
 
+    <!-- 이메일로 사용자 조회 (중복 확인용) -->
+    <select id="findByEmail" resultType="UserVO">
+        SELECT user_id AS userId,
+               login_id AS loginId,
+               username,
+               email,
+               phone_number AS phoneNumber,
+               created_at AS createdAt,
+               updated_at AS updatedAt,
+               birth_date AS birthDate
+        FROM User
+        WHERE email = #{email}
+    </select>
+
     <!-- 로그인ID와 이메일로 사용자 찾기 -->
     <select id="findByLoginIdAndEmail" resultType="UserVO">
         SELECT

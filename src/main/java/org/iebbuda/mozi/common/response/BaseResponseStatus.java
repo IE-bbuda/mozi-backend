@@ -24,7 +24,7 @@ public enum BaseResponseStatus {
 
     // 회원가입 관련
     DUPLICATE_LOGIN_ID(false, HttpStatus.CONFLICT.value(), "이미 존재하는 로그인 ID입니다."),
-
+    DUPLICATE_EMAIL(false, HttpStatus.CONFLICT.value(), "이미 사용 중인 이메일입니다."),
     // 본인 확인 관련
     USER_VERIFICATION_SUCCESS(true, HttpStatus.OK.value(), "본인 확인이 완료되었습니다. 새 비밀번호를 설정해주세요."),
     USER_NOT_FOUND_FOR_RESET(false, HttpStatus.NOT_FOUND.value(), "입력하신 정보로 가입된 계정이 없습니다."),
@@ -38,6 +38,14 @@ public enum BaseResponseStatus {
     INVALID_RESET_TOKEN(false, HttpStatus.BAD_REQUEST.value(), "유효하지 않거나 만료된 토큰입니다."),
     PASSWORD_RESET_EMAIL_SENT(true, HttpStatus.OK.value(), "비밀번호 재설정 이메일이 발송되었습니다."),
 
+    // 마이페이지 정보입력
+    INVALID_PASSWORD(false, HttpStatus.BAD_REQUEST.value(), "비밀번호가 올바르지 않습니다."),
+
+    // 이메일 인증 관련 (400 BAD_REQUEST 사용)
+    EMAIL_SEND_FAILED(false, HttpStatus.INTERNAL_SERVER_ERROR.value(), "이메일 발송에 실패했습니다."),
+    INVALID_VERIFICATION_CODE(false, HttpStatus.BAD_REQUEST.value(), "인증번호가 올바르지 않습니다."),
+    VERIFICATION_CODE_EXPIRED(false, HttpStatus.BAD_REQUEST.value(), "인증번호가 만료되었습니다."),
+    EMAIL_NOT_VERIFIED(false, HttpStatus.BAD_REQUEST.value(), "이메일 인증이 완료되지 않았습니다."),
     // 공통 에러
     DATABASE_CONSTRAINT_ERROR(false, HttpStatus.BAD_REQUEST.value(), "데이터 제약조건 위반입니다."),
     DATABASE_ERROR(false, HttpStatus.INTERNAL_SERVER_ERROR.value(), "데이터베이스 오류가 발생했습니다."),

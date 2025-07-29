@@ -105,6 +105,16 @@ dependencies {
 
     // 정책 API 파싱
     implementation 'com.google.code.gson:gson:2.10.1'
+
+
+    //email
+    implementation 'javax.mail:mail:1.4.7'
+    implementation 'org.springframework:spring-context-support:4.3.30.RELEASE'
+
+    // Jackson
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.2'
+
+
 }
 
 

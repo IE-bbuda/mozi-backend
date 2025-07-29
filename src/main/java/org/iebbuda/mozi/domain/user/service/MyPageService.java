@@ -3,6 +3,8 @@ package org.iebbuda.mozi.domain.user.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.iebbuda.mozi.common.response.BaseException;
+import org.iebbuda.mozi.common.response.BaseResponseStatus;
 import org.iebbuda.mozi.domain.profile.domain.UserProfileVO;
 import org.iebbuda.mozi.domain.profile.mapper.UserProfileMapper;
 import org.iebbuda.mozi.domain.user.domain.UserVO;
@@ -23,6 +25,31 @@ public class MyPageService {
     private final UserProfileMapper userProfileMapper;
     private final PasswordEncoder passwordEncoder;
 
+
+    /**
+     * 마이페이지 수정 전 비밀번호 확인
+     * @param loginId 로그인 ID
+     * @param inputPassword 입력된 비밀번호
+     * @throws BaseException 비밀번호가 일치하지 않을 경우
+     */
+    public void confirmPassword(String loginId, String inputPassword) {
+        log.info("비밀번호 확인 요청 - 로그인ID: {}", loginId);
+
+        UserVO user = userMapper.findByLoginId(loginId);
+        if (user == null) {
+            log.warn("사용자를 찾을 수 없음 - 로그인ID: {}", loginId);
+            throw new BaseException(BaseResponseStatus.INVALID_MEMBER);
+        }
+
+        boolean matches = passwordEncoder.matches(inputPassword, user.getPassword());
+        if (!matches) {
+            log.warn("비밀번호 불일치 - 로그인ID: {}", loginId);
+            throw new BaseException(BaseResponseStatus.INVALID_PASSWORD);
+        }
+
+        log.info("비밀번호 확인 성공 - 로그인ID: {}", loginId);
+    }
+
     /**
      * 마이페이지 정보 조회 - 기본 정보 + 프로필 정보 통합
      */
@@ -30,11 +57,7 @@ public class MyPageService {
         log.info("마이페이지 정보 조회 시작: loginId={}", loginId);
 
         // 1. 기본 사용자 정보 조회
-        UserVO userVO = userMapper.findByLoginId(loginId);
-        if (userVO == null) {
-            log.error("사용자를 찾을 수 없습니다: loginId={}", loginId);
-            throw new RuntimeException("사용자를 찾을 수 없습니다.");
-        }
+        UserVO userVO = findUserByLoginId(loginId);
 
         // 2. 사용자 프로필 정보 조회
         UserProfileVO userProfileVO = getUserProfile(userVO.getUserId());
@@ -46,6 +69,18 @@ public class MyPageService {
     }
 
     /**
+     * 마이페이지 수정 화면용 정보 조회 (기본 정보만)
+     */
+    public MyPageEditResponseDTO getMyPageEditInfo(String loginId) {
+        log.info("마이페이지 수정 화면 정보 조회: loginId={}", loginId);
+
+        UserVO userVO = findUserByLoginId(loginId);
+
+        log.info("마이페이지 수정 화면 정보 조회 완료: loginId={}", loginId);
+        return MyPageEditResponseDTO.of(userVO);
+    }
+
+    /**
      * 마이페이지 기본 정보 수정
      */
     @Transactional
@@ -53,7 +88,7 @@ public class MyPageService {
         log.info("마이페이지 정보 수정 시작: loginId={}", loginId);
 
         // 1. 사용자 존재 여부 확인
-        UserVO userVO = getUserVO(loginId);
+        UserVO userVO = findUserByLoginId(loginId);
 
         // 2. 기본 정보 수정 처리
         updateBasicInfoIfChanged(loginId, userVO, request);
@@ -69,43 +104,30 @@ public class MyPageService {
     // ========== Private Methods ==========
 
     /**
-     * 사용자 기본 정보 조회 (공통 메서드)
+     * 사용자 기본 정보 조회 및 검증
      */
-    private UserVO getUserVO(String loginId) {
+    private UserVO findUserByLoginId(String loginId) {
         UserVO userVO = userMapper.findByLoginId(loginId);
+
         if (userVO == null) {
             log.error("사용자를 찾을 수 없습니다: loginId={}", loginId);
-            throw new IllegalArgumentException("사용자를 찾을 수 없습니다.");
+            throw new BaseException(BaseResponseStatus.INVALID_MEMBER);
         }
+
         return userVO;
-    }
-
-    /**
-     * 마이페이지 수정 화면용 정보 조회 (기본 정보만)
-     */
-    public MyPageEditResponseDTO getMyPageEditInfo(String loginId) {
-        log.info("마이페이지 수정 화면 정보 조회: loginId={}", loginId);
-
-        UserVO userVO = getUserVO(loginId);
-
-        log.info("마이페이지 수정 화면 정보 조회 완료: loginId={}", loginId);
-        return MyPageEditResponseDTO.of(userVO);
     }
 
     /**
      * 사용자 프로필 정보 조회 (private 메서드)
      */
     private UserProfileVO getUserProfile(int userId) {
-        try {
             UserProfileVO userProfileVO = userProfileMapper.findByUserId(userId);
             log.debug("프로필 정보 조회 결과: userId={}, hasProfile={}",
                     userId, userProfileVO != null);
             return userProfileVO;
-        } catch (Exception e) {
-            log.warn("프로필 정보 조회 실패: userId={}, error={}", userId, e.getMessage());
-            return null;
-        }
     }
+
+
 
 
     /**
@@ -120,15 +142,13 @@ public class MyPageService {
             String finalEmail = getFinalValue(emailToUpdate, userVO.getEmail());
             String finalPhone = getFinalValue(phoneToUpdate, userVO.getPhoneNumber());
 
-            int result = userMapper.updateUserInfo(loginId, finalEmail, finalPhone);
-
-            if (result == 0) {
-                log.error("기본 정보 수정 실패: loginId={}", loginId);
-                throw new RuntimeException("정보 수정에 실패했습니다.");
-            }
+            // DB 업데이트 수행 - DB 예외는 자동으로 전파됨
+            userMapper.updateUserInfo(loginId, finalEmail, finalPhone);
 
             log.info("기본 정보 수정 완료: loginId={}, emailChanged={}, phoneChanged={}",
                     loginId, emailToUpdate != null, phoneToUpdate != null);
+        } else {
+            log.debug("기본 정보 변경사항 없음: loginId={}", loginId);
         }
     }
 
@@ -137,16 +157,12 @@ public class MyPageService {
      */
     private void updatePasswordIfProvided(String loginId, MyPageUpdateRequestDTO request) {
         if (request.getPassword() == null || request.getPassword().trim().isEmpty()) {
+            log.debug("비밀번호 변경 요청 없음: loginId={}", loginId);
             return;
         }
 
         String encodedPassword = passwordEncoder.encode(request.getPassword().trim());
         int result = userMapper.updatePasswordByLoginId(loginId, encodedPassword);
-
-        if (result == 0) {
-            log.error("비밀번호 변경 실패: loginId={}", loginId);
-            throw new RuntimeException("비밀번호 변경에 실패했습니다.");
-        }
 
         log.info("비밀번호 변경 완료: loginId={}", loginId);
     }
