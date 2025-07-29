@@ -36,12 +36,14 @@ import static org.junit.jupiter.api.Assertions.*;
 @Transactional
 @Rollback
 class UserServiceImplTest {
-
     @Autowired
     private UserService userService;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private EmailVerificationService emailVerificationService; // 추가
 
     private UserJoinRequestDTO joinRequest;
     private String randomNumber;
@@ -52,11 +54,9 @@ class UserServiceImplTest {
         joinRequest = createTestJoinRequest();
     }
 
-
     @Test
     @DisplayName("로그인 ID 중복 체크 - 중복되지 않은 경우")
     void checkDuplicate_WhenNoExists() {
-
         String loginId = "newUser"+randomNumber;
 
         boolean result = userService.checkDuplicate(loginId);
@@ -67,6 +67,9 @@ class UserServiceImplTest {
     @Test
     @DisplayName("로그인 ID 중복 체크 - 중복된 경우")
     void checkDuplicate_WhenExists() {
+        // 테스트용 이메일 인증 상태 설정
+        emailVerificationService.setEmailVerifiedForTest(joinRequest.getEmail());
+
         userService.join(joinRequest);
 
         String existingLoginId = joinRequest.getLoginId();
@@ -79,7 +82,10 @@ class UserServiceImplTest {
     @Test
     @DisplayName("회원가입")
     void join() {
-        int userId =userService.join(joinRequest);
+        // 테스트용 이메일 인증 상태 설정
+        emailVerificationService.setEmailVerifiedForTest(joinRequest.getEmail());
+
+        int userId = userService.join(joinRequest);
 
         assertNotNull(userService.get(userId));
         assertTrue(userId > 0);
@@ -89,6 +95,9 @@ class UserServiceImplTest {
     @Test
     @DisplayName("userId로 사용자 조회")
     void get(){
+        // 테스트용 이메일 인증 상태 설정
+        emailVerificationService.setEmailVerifiedForTest(joinRequest.getEmail());
+
         int userId= userService.join(joinRequest);
 
         // when
@@ -104,22 +113,24 @@ class UserServiceImplTest {
     @Test
     @DisplayName("이메일로 로그인ID 찾기")
     void findLoginIdByEmail(){
-            int userId = userService.join(joinRequest);
-            log.info("userId: {}", userId);
+        // 테스트용 이메일 인증 상태 설정
+        emailVerificationService.setEmailVerifiedForTest(joinRequest.getEmail());
 
-            Optional<UserDTO> user = userService.get(userId);
+        int userId = userService.join(joinRequest);
+        log.info("userId: {}", userId);
 
-            // Optional이 존재하는지 확인
-            assertTrue(user.isPresent(), "사용자가 존재해야 합니다");
+        Optional<UserDTO> user = userService.get(userId);
 
-            UserDTO userDto = user.get();
-            LoginIdFindResponseDTO result = userService
-                    .findLoginIdByEmail(userDto.getUsername(), userDto.getEmail());
+        // Optional이 존재하는지 확인
+        assertTrue(user.isPresent(), "사용자가 존재해야 합니다");
 
-            assertNotNull(result);
-            assertTrue(result.isFound());
-            log.info("result={}", result.getMaskedLoginId());
+        UserDTO userDto = user.get();
+        LoginIdFindResponseDTO result = userService
+                .findLoginIdByEmail(userDto.getUsername(), userDto.getEmail());
 
+        assertNotNull(result);
+        assertTrue(result.isFound());
+        log.info("result={}", result.getMaskedLoginId());
     }
 
     @Test
@@ -143,8 +154,6 @@ class UserServiceImplTest {
         log.info("로그인ID 찾기 실패 (정상): {}", result.getMaskedLoginId());
     }
 
-
-
     private UserJoinRequestDTO createTestJoinRequest() {
         return UserJoinRequestDTO.builder()
                 .loginId("testuser" + randomNumber)
@@ -153,7 +162,6 @@ class UserServiceImplTest {
                 .email("test" + randomNumber + "@email.com")
                 .phoneNumber("010-1234-5678")
                 .birthDate("010607")
-
                 .build();
     }
 }

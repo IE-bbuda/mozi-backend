@@ -8,7 +8,7 @@ import org.iebbuda.mozi.domain.security.config.SecurityConfig;
 import org.iebbuda.mozi.domain.user.domain.PasswordResetSessionVO;
 import org.iebbuda.mozi.domain.user.domain.UserVO;
 import org.iebbuda.mozi.domain.user.dto.request.PasswordResetRequestDTO;
-import org.iebbuda.mozi.domain.user.dto.request.PasswordResetVerifyRequestDTO;
+import org.iebbuda.mozi.domain.user.dto.request.AccountVerificationRequestDTO;
 import org.iebbuda.mozi.domain.user.mapper.PasswordResetSessionMapper;
 import org.iebbuda.mozi.domain.user.mapper.UserMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,7 +26,6 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
-
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {RootConfig.class, SecurityConfig.class})
@@ -47,6 +46,9 @@ class PasswordResetServiceTest {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private EmailVerificationService emailVerificationService; // 추가
+
     private UserVO testUser;
     private String randomNumber;
 
@@ -61,41 +63,67 @@ class PasswordResetServiceTest {
 
     @Test
     @DisplayName("계정 확인 및 세션 생성 - 성공")
-    void verifyAccount_ValidUser_Success() {
+    void verifyAccountAndIssueToken_ValidUser_Success() {
         log.info("=== 계정 확인 및 세션 생성 테스트 시작 ===");
 
         // given
-        PasswordResetVerifyRequestDTO request = PasswordResetVerifyRequestDTO.builder()
+        // 테스트용 이메일 인증 상태 설정
+        emailVerificationService.setEmailVerifiedForTest(testUser.getEmail());
+
+        AccountVerificationRequestDTO request = AccountVerificationRequestDTO.builder()
                 .loginId(testUser.getLoginId())
                 .email(testUser.getEmail())
                 .build();
 
-
         // when
-        String token = passwordResetService.verifyAccount(request);
-
+        String token = passwordResetService.verifyAccountAndIssueToken(request);
 
         // then
         assertNotNull(token);
         assertEquals(32, token.length()); // UUID에서 '-' 제거한 길이
         log.info("토큰 ={}", token);
+        log.info("=== 계정 확인 및 세션 생성 테스트 완료 ===");
+    }
+
+    @Test
+    @DisplayName("계정 확인 - 이메일 인증 미완료")
+    void verifyAccountAndIssueToken_EmailNotVerified_ThrowsException() {
+        log.info("=== 이메일 인증 미완료 계정 확인 테스트 시작 ===");
+
+        // given - 이메일 인증 상태 설정하지 않음
+        AccountVerificationRequestDTO request = AccountVerificationRequestDTO.builder()
+                .loginId(testUser.getLoginId())
+                .email(testUser.getEmail())
+                .build();
+
+        // when & then
+        BaseException exception = assertThrows(BaseException.class, () -> {
+            passwordResetService.verifyAccountAndIssueToken(request);
+        });
+
+        assertEquals(BaseResponseStatus.EMAIL_NOT_VERIFIED, exception.getStatus());
+        log.info("예외 상태 = {}", exception.getStatus());
+        log.info("예외 메시지 = {}", exception.getMessage());
+        log.info("=== 이메일 인증 미완료 계정 확인 테스트 완료 ===");
     }
 
     @Test
     @DisplayName("계정 확인 - 존재하지 않는 사용자")
-    void verifyAccount_UserNotFound_ThrowsException() {
+    void verifyAccountAndIssueToken_UserNotFound_ThrowsException() {
         log.info("=== 존재하지 않는 사용자 계정 확인 테스트 시작 ===");
 
-
         // given
-        PasswordResetVerifyRequestDTO request = PasswordResetVerifyRequestDTO.builder()
+        // 테스트용 이메일 인증 상태 설정 (존재하지 않는 이메일이지만 테스트용)
+        emailVerificationService.setEmailVerifiedForTest("nonexistent@email.com");
+
+        AccountVerificationRequestDTO request = AccountVerificationRequestDTO.builder()
                 .loginId("nonexistent")
                 .email("nonexistent@email.com")
                 .build();
 
         // when & then
         BaseException exception = assertThrows(BaseException.class, () -> {
-            passwordResetService.verifyAccount(request);
+            passwordResetService.verifyAccountAndIssueToken(request);
         });
 
         assertEquals(BaseResponseStatus.USER_NOT_FOUND_FOR_RESET, exception.getStatus());
@@ -106,18 +134,21 @@ class PasswordResetServiceTest {
 
     @Test
     @DisplayName("계정 확인 - 이메일 불일치")
-    void verifyAccount_EmailMismatch_ThrowsException() {
+    void verifyAccountAndIssueToken_EmailMismatch_ThrowsException() {
         log.info("=== 이메일 불일치 계정 확인 테스트 시작 ===");
 
         // given
-        PasswordResetVerifyRequestDTO request = PasswordResetVerifyRequestDTO.builder()
+        // 테스트용 이메일 인증 상태 설정 (잘못된 이메일이지만 테스트용)
+        emailVerificationService.setEmailVerifiedForTest("wrong@email.com");
+
+        AccountVerificationRequestDTO request = AccountVerificationRequestDTO.builder()
                 .loginId(testUser.getLoginId())
                 .email("wrong@email.com")
                 .build();
 
         // when & then
         BaseException exception = assertThrows(BaseException.class, () -> {
-            passwordResetService.verifyAccount(request);
+            passwordResetService.verifyAccountAndIssueToken(request);
         });
 
         assertEquals(BaseResponseStatus.USER_NOT_FOUND_FOR_RESET, exception.getStatus());
@@ -128,21 +159,24 @@ class PasswordResetServiceTest {
 
     @Test
     @DisplayName("기존 세션 정리 기능 확인")
-    void verifyAccount_CleanupExistingSessions() {
+    void verifyAccountAndIssueToken_CleanupExistingSessions() {
         log.info("=== 기존 세션 정리 기능 테스트 시작 ===");
 
         // given
-        PasswordResetVerifyRequestDTO request = PasswordResetVerifyRequestDTO.builder()
+        // 테스트용 이메일 인증 상태 설정
+        emailVerificationService.setEmailVerifiedForTest(testUser.getEmail());
+
+        AccountVerificationRequestDTO request = AccountVerificationRequestDTO.builder()
                 .loginId(testUser.getLoginId())
                 .email(testUser.getEmail())
                 .build();
 
-        String firstToken = passwordResetService.verifyAccount(request);
+        String firstToken = passwordResetService.verifyAccountAndIssueToken(request);
         assertNotNull(sessionMapper.findValidSession(firstToken, LocalDateTime.now()));
         log.info("첫번째 토큰: {}", firstToken);
 
         // when - 새로운 세션 생성 (기존 세션 정리됨)
-        String secondToken = passwordResetService.verifyAccount(request);
+        String secondToken = passwordResetService.verifyAccountAndIssueToken(request);
         log.info("두번째 토큰: {}", secondToken);
 
         // then
@@ -162,19 +196,21 @@ class PasswordResetServiceTest {
         log.info("=== 비밀번호 재설정 테스트 시작 ===");
 
         // given - 세션 생성
-        PasswordResetVerifyRequestDTO verifyRequest = PasswordResetVerifyRequestDTO.builder()
+        // 테스트용 이메일 인증 상태 설정
+        emailVerificationService.setEmailVerifiedForTest(testUser.getEmail());
+
+        AccountVerificationRequestDTO verifyRequest = AccountVerificationRequestDTO.builder()
                 .loginId(testUser.getLoginId())
                 .email(testUser.getEmail())
                 .build();
 
-        String token = passwordResetService.verifyAccount(verifyRequest);
+        String token = passwordResetService.verifyAccountAndIssueToken(verifyRequest);
 
         // 비밀번호 재설정 요청
         PasswordResetRequestDTO resetRequest = PasswordResetRequestDTO.builder()
                 .token(token)
                 .newPassword("newPassword123")
                 .build();
-
 
         String oldPassword = testUser.getPassword();
 
@@ -196,19 +232,16 @@ class PasswordResetServiceTest {
         log.info("=== 비밀번호 재설정 테스트 완료 ===");
     }
 
-
     @Test
     @DisplayName("비밀번호 재설정 - 유효하지 않은 토큰")
     void resetPassword_InvalidToken_ThrowsException() {
         log.info("=== 유효하지 않은 토큰 비밀번호 재설정 테스트 시작 ===");
 
         // given
-        // 비밀번호 재설정 요청
         PasswordResetRequestDTO resetRequest = PasswordResetRequestDTO.builder()
                 .token("invalid-token")
                 .newPassword("newPassword123")
                 .build();
-
 
         // when & then
         BaseException exception = assertThrows(BaseException.class, () -> {
@@ -238,14 +271,12 @@ class PasswordResetServiceTest {
                 .newPassword("newPassword123")
                 .build();
 
-
         // when & then
         BaseException exception = assertThrows(BaseException.class, () -> {
             passwordResetService.resetPassword(resetRequest);
         });
 
         assertEquals(BaseResponseStatus.INVALID_RESET_TOKEN, exception.getStatus());
-
         log.info("예외 상태: {}", exception.getStatus());
         log.info("=== 만료된 토큰 비밀번호 재설정 테스트 완료 ===");
     }
@@ -256,12 +287,15 @@ class PasswordResetServiceTest {
         log.info("=== 이미 완료된 토큰 비밀번호 재설정 테스트 시작 ===");
 
         // given - 세션 생성 후 완료 처리
-        // given - 세션 생성
-        PasswordResetVerifyRequestDTO verifyRequest = PasswordResetVerifyRequestDTO.builder()
+        // 테스트용 이메일 인증 상태 설정
+        emailVerificationService.setEmailVerifiedForTest(testUser.getEmail());
+
+        AccountVerificationRequestDTO verifyRequest = AccountVerificationRequestDTO.builder()
                 .loginId(testUser.getLoginId())
                 .email(testUser.getEmail())
                 .build();
-        String token = passwordResetService.verifyAccount(verifyRequest);
+
+        String token = passwordResetService.verifyAccountAndIssueToken(verifyRequest);
 
         // 세션을 완료 처리
         sessionMapper.markSessionAsCompleted(token);
@@ -271,14 +305,12 @@ class PasswordResetServiceTest {
                 .newPassword("newPassword123")
                 .build();
 
-
         // when & then
         BaseException exception = assertThrows(BaseException.class, () -> {
             passwordResetService.resetPassword(resetRequest);
         });
 
         assertEquals(BaseResponseStatus.INVALID_RESET_TOKEN, exception.getStatus());
-
         log.info("=== 이미 완료된 토큰 비밀번호 재설정 테스트 완료 ===");
     }
 
