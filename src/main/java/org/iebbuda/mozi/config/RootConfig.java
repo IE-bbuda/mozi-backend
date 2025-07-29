@@ -21,9 +21,9 @@ import javax.sql.DataSource;
 @Configuration
 @PropertySource({"classpath:/application.properties"})
 @EnableTransactionManagement
-@MapperScan(basePackages = {"org.iebbuda.mozi.domain.user.mapper", "org.iebbuda.mozi.domain.policy.mapper", "org.iebbuda.mozi.domain.product.mapper","org.iebbuda.mozi.domain.profile.mapper"})
+@MapperScan(basePackages = {"org.iebbuda.mozi.domain.user.mapper", "org.iebbuda.mozi.domain.policy.mapper", "org.iebbuda.mozi.domain.product.mapper","org.iebbuda.mozi.domain.profile.mapper", "org.iebbuda.mozi.domain.goal.mapper"})
 @ComponentScan(basePackages = {"org.iebbuda.mozi.domain.user.service", "org.iebbuda.mozi.domain.policy.service", "org.iebbuda.mozi.domain.product.scheduler",
-        "org.iebbuda.mozi.domain.product.service","org.iebbuda.mozi.domain.profile.service"})
+        "org.iebbuda.mozi.domain.product.service","org.iebbuda.mozi.domain.profile.service","org.iebbuda.mozi.domain.goal.service"})
 
 
 public class RootConfig {
