@@ -2,6 +2,7 @@ package org.iebbuda.mozi.domain.policy.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.iebbuda.mozi.domain.policy.dto.PolicyDTO;
+import org.iebbuda.mozi.domain.policy.dto.PolicyFilterDTO;
 import org.iebbuda.mozi.domain.policy.service.PolicyService;
 import org.iebbuda.mozi.domain.policy.util.ApiCaller;
 import org.springframework.http.ResponseEntity;
@@ -43,5 +44,12 @@ public class PolicyController {
         PolicyDTO dto = policyService.findById(id);
         return ResponseEntity.ok(dto);
     }
+
+    @PostMapping("/filter")
+    public List<PolicyDTO> getFilteredPolicies(@RequestBody PolicyFilterDTO filters) {
+        return policyService.getPoliciesByFilters(filters);
+    }
+
+
 
 }
