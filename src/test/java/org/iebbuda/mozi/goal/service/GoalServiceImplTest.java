@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -39,9 +40,15 @@ class GoalServiceImplTest {
         goals.forEach(g -> log.info("- " + g.getGoalName() + ": " + g.getTargetAmount() + "원"));
     }
 
+
     @Test
     @DisplayName("목표 생성 - 새로운 목표 추가")
     void createGoal() {
+        // 생성 전 목표 개수 확인
+        List<GoalDTO> goalsBefore = goalService.getGoalListByUserId(1);
+        int countBefore = goalsBefore.size();
+        log.info("목표 생성 전 개수: " + countBefore);
+
         // 김케비에게 새 목표 추가
         GoalDTO newGoal = GoalDTO.builder()
                 .userId(1)
@@ -59,13 +66,21 @@ class GoalServiceImplTest {
         assertNotNull(created.getGoalId());
         assertEquals("결혼자금", created.getGoalName());
 
-        // 생성 후 목표 개수 확인
-        List<GoalDTO> goals = goalService.getGoalListByUserId(1);
-        assertEquals(3, goals.size());
+        // 생성 후 목표 개수 확인 - 이전 개수 + 1개여야 함
+        List<GoalDTO> goalsAfter = goalService.getGoalListByUserId(1);
+        int countAfter = goalsAfter.size();
+        log.info("목표 생성 후 개수: " + countAfter);
+
+        assertEquals(countBefore + 1, countAfter, "목표 생성 후 개수가 1 증가해야 함");
+
+        // 생성된 목표가 목록에 포함되어 있는지 확인
+        boolean goalExists = goalsAfter.stream()
+                .anyMatch(goal -> "결혼자금".equals(goal.getGoalName()) &&
+                        Objects.equals(goal.getGoalId(), created.getGoalId()));
+        assertTrue(goalExists, "생성된 목표가 목록에 포함되어야 함");
 
         log.info("새로 생성된 목표 ID: " + created.getGoalId());
     }
-
     @Test
     @DisplayName("목표 달성률 계산")// 이부분은 나중에 계좌 api 추가후 변경
     void calculateAchievementRate() {
