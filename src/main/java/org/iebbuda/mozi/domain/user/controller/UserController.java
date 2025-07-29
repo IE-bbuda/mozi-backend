@@ -7,10 +7,12 @@ import lombok.extern.log4j.Log4j2;
 
 import org.iebbuda.mozi.common.response.BaseResponse;
 import org.iebbuda.mozi.common.response.BaseResponseStatus;
+import org.iebbuda.mozi.domain.user.dto.request.AccountVerificationRequestDTO;
 import org.iebbuda.mozi.domain.user.dto.request.PasswordResetRequestDTO;
-import org.iebbuda.mozi.domain.user.dto.request.PasswordResetVerifyRequestDTO;
+import org.iebbuda.mozi.domain.user.dto.request.EmailCodeVerifyRequestDTO;
 import org.iebbuda.mozi.domain.user.dto.response.LoginIdFindResponseDTO;
 import org.iebbuda.mozi.domain.user.dto.request.UserJoinRequestDTO;
+
 
 import org.iebbuda.mozi.domain.user.service.PasswordResetService;
 
@@ -27,6 +29,7 @@ public class UserController {
     private final UserService userService;
     private final PasswordResetService passwordResetService;
 
+
     /**
      * 로그인 ID 중복 확인
      * @param loginId 확인할 로그인 ID
@@ -36,6 +39,29 @@ public class UserController {
     public BaseResponse<Boolean> checkUsername(@PathVariable String loginId){
         boolean result = userService.checkDuplicate(loginId);
         return new BaseResponse<>(result);
+    }
+
+
+    /**
+     * 회원가입용 이메일 인증번호 발송
+     * @param email 인증번호를 받을 이메일 주소
+     * @return 발송 결과 메시지
+     */
+    @PostMapping("/signup/send-email-code")
+    public BaseResponse<String> sendSignupEmailCode(@RequestParam String email) {
+        userService.sendSignupEmailVerification(email);
+        return new BaseResponse<>(true, 200,"인증번호가 발송되었습니다.");
+    }
+
+    /**
+     * 회원가입용 이메일 인증번호 확인
+     * @param request 이메일과 인증번호 정보
+     * @return 인증 결과 메시지
+     */
+    @PostMapping("/signup/verify-email-code")
+    public BaseResponse<String> verifySignupEmailCode(@RequestBody EmailCodeVerifyRequestDTO request) {
+        userService.verifySignupEmailCode(request);
+        return new BaseResponse<>(true, 200, "이메일 인증이 완료되었습니다.");
     }
 
     /**
@@ -48,6 +74,7 @@ public class UserController {
         userService.join(userJoinRequestDTO);
         return new BaseResponse<>(BaseResponseStatus.SUCCESS);
     }
+
 
     /**
      * 로그인 ID 찾기
@@ -63,29 +90,50 @@ public class UserController {
         return new BaseResponse<>(response);
     }
 
-    /**
-     * 비밀번호 재설정 1단계: 계정 검증 및 토큰 발급
-     * @param request 로그인 ID와 이메일 정보
-     * @return 검증 결과 및 재설정 토큰
-     */
-    @PostMapping("/password/verify")
-    public BaseResponse<String> verifyAccount(
-            @RequestBody PasswordResetVerifyRequestDTO request) {
+    // UserController의 비밀번호 재설정 관련 메서드들
 
-       String token = passwordResetService.verifyAccount(request);
+    /**
+     * 1단계: 이메일 인증번호 발송
+     * @param email 인증번호를 받을 이메일 주소
+     * @return 발송 결과 메시지
+     */
+    @PostMapping("/password/send-email-code")
+    public BaseResponse<String> sendEmailCode(@RequestParam String email) {
+        passwordResetService.sendEmailVerificationCode(email);
+        return new BaseResponse<>(true, 200,"인증번호가 발송되었습니다.");
+    }
+
+    /**
+     * 2단계: 이메일 인증번호 확인
+     * @param request 이메일과 인증번호 정보
+     * @return 인증 결과 메시지
+     */
+    @PostMapping("/password/verify-email-code")
+    public BaseResponse<String> verifyEmailCode(@RequestBody EmailCodeVerifyRequestDTO request) {
+        passwordResetService.verifyEmailCode(request);
+        return new BaseResponse<>(true, 200, "이메일 인증이 완료되었습니다.");
+    }
+
+
+    /**
+     * 3단계: 계정 확인 및 토큰 발급
+     * @param request 로그인ID와 이메일 정보
+     * @return 비밀번호 재설정용 토큰
+     */
+    @PostMapping("/password/verify-account")
+    public BaseResponse<String> verifyAccount(@RequestBody AccountVerificationRequestDTO request) {
+        String token = passwordResetService.verifyAccountAndIssueToken(request);
         return new BaseResponse<>(token);
     }
 
     /**
-     * 비밀번호 재설정 2단계: 새 비밀번호 설정
-     * @param request 재설정 토큰과 새 비밀번호 정보
-     * @return 비밀번호 변경 결과
+     * 4단계: 비밀번호 변경
+     * @param request 토큰과 새 비밀번호 정보
+     * @return 변경 결과
      */
     @PostMapping("/password/reset")
-    public BaseResponse<BaseResponseStatus> resetPassword(
-            @RequestBody PasswordResetRequestDTO request) {
-
-       passwordResetService.resetPassword(request);
+    public BaseResponse<BaseResponseStatus> resetPassword(@RequestBody PasswordResetRequestDTO request) {
+        passwordResetService.resetPassword(request);
         return new BaseResponse<>(BaseResponseStatus.PASSWORD_RESET_SUCCESS);
     }
 }
