@@ -5,7 +5,7 @@
 <mapper namespace="org.iebbuda.mozi.domain.profile.mapper.UserProfileMapper">
     <select id="hasPersonalInfo" resultType="Boolean">
         <![CDATA[
-        SELECT COUNT(*) > 0 FROM personal_info WHERE user_id = #{userId}
+        SELECT COUNT(*) > 0 FROM UserProfile WHERE user_id = #{userId}
         ]]>
         </select>
     <select id="findByUserId" resultType="UserProfileVO">
@@ -14,7 +14,7 @@
     </select>
 
     <!-- 프로필 신규 생성 -->
-    <insert id="insertUserProfile" parameterType="UserProfileVO">
+    <insert id="insertUserProfile" parameterType="UserProfileVO" useGeneratedKeys="true" keyProperty="userId">
         INSERT INTO UserProfile (
             user_id, region, age, marital_status, annual_income,
             education_level, employment_status, major, specialty
@@ -25,7 +25,7 @@
     </insert>
 
     <!-- 프로필 업데이트 -->
-    <update id="updateUserProfile" parameterType="UserProfileVO">
+    <update id="updateUserProfile" parameterType="UserProfileVO" >
         UPDATE UserProfile
         SET
             region = #{region},

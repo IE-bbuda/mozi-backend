@@ -2,14 +2,15 @@ package org.iebbuda.mozi.domain.profile.controller;
 
 
 import lombok.RequiredArgsConstructor;
+import org.iebbuda.mozi.common.response.BaseResponse;
+import org.iebbuda.mozi.common.response.BaseResponseStatus;
 import org.iebbuda.mozi.domain.profile.dto.UserProfileInfoDTO;
 import org.iebbuda.mozi.domain.profile.service.UserProfileService;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
+
 
 
 @RestController
@@ -20,21 +21,21 @@ public class ProfileController {
     private final UserProfileService userProfileService;
 
     @GetMapping
-    public ResponseEntity<Map<String, Object>> getUserProfile(@AuthenticationPrincipal UserDetails userDetails){
+    public BaseResponse<UserProfileInfoDTO> getUserProfile(@AuthenticationPrincipal UserDetails userDetails){
         String loginId = userDetails.getUsername();
-        Map<String, Object> userProfile = userProfileService.getUserProfile(loginId);
-        return ResponseEntity.ok(userProfile);
+        UserProfileInfoDTO userProfile = userProfileService.getUserProfile(loginId);
+        return new BaseResponse<>(userProfile);
     }
 
     // 최종 추천 코드
-    @PostMapping()
-    public ResponseEntity<Map<String, Object>> saveProfile(
+    @PostMapping
+    public BaseResponse<BaseResponseStatus> saveProfile(
             @RequestBody  UserProfileInfoDTO data,
             @AuthenticationPrincipal UserDetails userDetails) {
 
         String userId = userDetails.getUsername();
-        Map<String, Object> response = userProfileService.saveProfile(userId, data);
-        return ResponseEntity.ok(response);
+        userProfileService.saveProfile(userId, data);
+        return new BaseResponse<>(BaseResponseStatus.SUCCESS);
     }
 
 }

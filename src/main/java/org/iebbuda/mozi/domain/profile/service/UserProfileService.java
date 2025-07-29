@@ -5,7 +5,7 @@ import org.iebbuda.mozi.domain.profile.dto.UserProfileInfoDTO;
 import java.util.Map;
 
 public interface UserProfileService {
-    Map<String, Object> saveProfile(String loginId, UserProfileInfoDTO dto);
-    Map<String, Object> getUserProfile(String userId);
+    void saveProfile(String loginId, UserProfileInfoDTO dto);
+    UserProfileInfoDTO getUserProfile(String userId);
 
 }
