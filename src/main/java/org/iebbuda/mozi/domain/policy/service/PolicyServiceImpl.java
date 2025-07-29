@@ -3,6 +3,7 @@ package org.iebbuda.mozi.domain.policy.service;
 import lombok.RequiredArgsConstructor;
 import org.iebbuda.mozi.domain.policy.domain.PolicyVO;
 import org.iebbuda.mozi.domain.policy.dto.PolicyDTO;
+import org.iebbuda.mozi.domain.policy.dto.PolicyFilterDTO;
 import org.iebbuda.mozi.domain.policy.mapper.PolicyMapper;
 import org.springframework.stereotype.Service;
 
@@ -38,6 +39,13 @@ public class PolicyServiceImpl implements PolicyService {
         PolicyVO vo = policyMapper.selectPolicyById(id);
         return toDTO(vo);
     }
+
+    @Override
+    public List<PolicyDTO> getPoliciesByFilters(PolicyFilterDTO filters) {
+        return policyMapper.findByFilters(filters);
+    }
+
+
 
     private PolicyDTO toDTO(PolicyVO vo) {
         PolicyDTO dto = new PolicyDTO();

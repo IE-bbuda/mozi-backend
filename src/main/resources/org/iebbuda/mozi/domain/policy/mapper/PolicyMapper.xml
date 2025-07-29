@@ -72,4 +72,66 @@
     </select>
 
 
+    <select id="findByFilters" resultType="org.iebbuda.mozi.domain.policy.dto.PolicyDTO">
+        SELECT * FROM YouthPolicy
+        WHERE 1=1
+
+        <!-- 혼인 여부 -->
+        <if test="marital_status != null and marital_status != '0055003'">
+            AND mrgSttsCd = #{marital_status}
+        </if>
+
+        <!-- 지역 필터 -->
+        <if test="region != null and region.size > 0">
+            AND (
+            <foreach collection="region" item="zip" separator=" OR ">
+                zipCd LIKE CONCAT('%', #{zip}, '%')
+            </foreach>
+            )
+        </if>
+
+        <!-- 취업 상태 -->
+        <if test="job != null and job.size > 0">
+            AND jobCd IN
+            <foreach collection="job" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+
+        <!-- 학력 -->
+        <if test="education != null and education.size > 0">
+            AND schoolCd IN
+            <foreach collection="education" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+
+        <!-- 전공 -->
+        <if test="major != null and major.size > 0">
+            AND plcyMajorCd IN
+            <foreach collection="major" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+
+        <!-- 특화 분야 -->
+        <if test="specialty != null and specialty.size > 0">
+            AND sBizCd IN
+            <foreach collection="specialty" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+
+        <if test="age != null">
+            AND (
+            (sprtTrgtMinAge = 0 OR sprtTrgtMinAge &lt;= #{age})
+            AND
+            (sprtTrgtMaxAge = 0 OR sprtTrgtMaxAge &gt;= #{age})
+            )
+        </if>
+
+
+    </select>
+
+
 </mapper>

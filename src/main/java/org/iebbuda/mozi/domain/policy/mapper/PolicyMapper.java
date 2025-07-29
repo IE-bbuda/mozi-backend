@@ -1,6 +1,8 @@
 package org.iebbuda.mozi.domain.policy.mapper;
 
 import org.iebbuda.mozi.domain.policy.domain.PolicyVO;
+import org.iebbuda.mozi.domain.policy.dto.PolicyDTO;
+import org.iebbuda.mozi.domain.policy.dto.PolicyFilterDTO;
 import org.mapstruct.Mapper;
 
 import java.util.List;
@@ -12,5 +14,5 @@ public interface PolicyMapper {
     void insertPolicy(PolicyVO policyVO);
 
     PolicyVO selectPolicyById(int id);
-
+    List<PolicyDTO> findByFilters(PolicyFilterDTO filters);
 }

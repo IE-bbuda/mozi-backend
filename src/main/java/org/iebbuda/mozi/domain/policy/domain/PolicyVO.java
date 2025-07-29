@@ -26,8 +26,8 @@ public class PolicyVO {
     private String plcyKywdNm;         // 키워드
     private Integer sprtTrgtMinAge;    // 최소 나이
     private Integer sprtTrgtMaxAge;    // 최대 나이
-    private String earnCndSeCd;
-    private Integer earnMinAmt;
-    private Integer earnMaxAmt;
-    private String earnEtcCn;
+    private String earnCndSeCd;        // 소득조건
+    private Integer earnMinAmt;         //최소 소득
+    private Integer earnMaxAmt;         // 최대소득
+    private String earnEtcCn;           //소득 기타
 }

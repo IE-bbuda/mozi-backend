@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.iebbuda.mozi.domain.policy.mapper.RegionCodeMapper">
+
+    <insert id="insertRegionCode" parameterType="org.iebbuda.mozi.domain.policy.domain.RegionCodeVO">
+        INSERT INTO RegionCode (sido, sigungu, zip_code)
+        VALUES (#{sido}, #{sigungu}, #{zipCode})
+    </insert>
+
+    <select id="findZipCodesByRegionNames" resultType="String" parameterType="list">
+        SELECT zip_code
+        FROM RegionCode
+        WHERE CONCAT(sido, ' ', sigungu) IN
+        <foreach item="name" collection="list" open="(" separator="," close=")">
+            #{name}
+        </foreach>
+    </select>
+
+    <select id="findRegionNamesByZipCodes" resultType="String" parameterType="list">
+        SELECT CONCAT(sido, ' ', sigungu)
+        FROM RegionCode
+        WHERE zip_code IN
+        <foreach item="zip" collection="list" open="(" separator="," close=")">
+            #{zip}
+        </foreach>
+    </select>
+
+
+    <select id="findAll" resultType="org.iebbuda.mozi.domain.policy.domain.RegionCodeVO">
+        SELECT * FROM RegionCode
+    </select>
+
+    <delete id="truncateTable">
+        TRUNCATE TABLE RegionCode
+    </delete>
+</mapper>

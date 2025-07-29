@@ -21,7 +21,7 @@ public class ApiCaller {
     private String apiKey;
 
     public String getRequestUrl() {
-        return apiUrl + "?apiKeyNm=" + apiKey + "&rtnType=json&pageNum=1&pageSize=100";
+        return apiUrl + "?apiKeyNm=" + apiKey + "&rtnType=json&pageNum=1&pageSize=200";
     }
 
     public String getJsonResponse() {
