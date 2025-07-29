@@ -13,10 +13,13 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.client.RestTemplate;
 
 import javax.sql.DataSource;
+import java.util.Properties;
 
 @Configuration
 @PropertySource({"classpath:/application.properties"})
@@ -31,6 +34,18 @@ public class RootConfig {
     @Value("${jdbc.url}") String url;
     @Value("${jdbc.username}") String username;
     @Value("${jdbc.password}") String password;
+
+    @Value("${mail.smtp.host}")
+    private String mailHost;
+
+    @Value("${mail.smtp.port}")
+    private int mailPort;
+
+    @Value("${mail.username}")
+    private String mailUsername;
+
+    @Value("${mail.password}")
+    private String mailPassword;
 
     @Autowired
     ApplicationContext applicationContext;
@@ -69,6 +84,27 @@ public class RootConfig {
         return new RestTemplate();
     }
 
+
+    // 메일 센더 빈 추가
+    @Bean
+    public JavaMailSender javaMailSender() {
+        JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+        mailSender.setHost(mailHost);
+        mailSender.setPort(mailPort);
+        mailSender.setUsername(mailUsername);
+        mailSender.setPassword(mailPassword);
+
+        Properties props = mailSender.getJavaMailProperties();
+        props.put("mail.transport.protocol", "smtp");
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.starttls.required", "true");  // 추가
+        props.put("mail.smtp.ssl.protocols", "TLSv1.2");   // 추가
+        props.put("mail.smtp.ssl.trust", "smtp.gmail.com"); // 추가
+        props.put("mail.debug", "true");
+
+        return mailSender;
+    }
 }
 
 

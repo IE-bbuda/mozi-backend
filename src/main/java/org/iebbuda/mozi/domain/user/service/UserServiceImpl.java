@@ -9,6 +9,7 @@ import org.iebbuda.mozi.domain.security.account.domain.UserRole;
 import org.iebbuda.mozi.domain.user.domain.UserVO;
 
 
+import org.iebbuda.mozi.domain.user.dto.request.EmailCodeVerifyRequestDTO;
 import org.iebbuda.mozi.domain.user.dto.response.LoginIdFindResponseDTO;
 import org.iebbuda.mozi.domain.user.dto.response.UserDTO;
 import org.iebbuda.mozi.domain.user.dto.request.UserJoinRequestDTO;
@@ -27,7 +28,7 @@ public class UserServiceImpl implements UserService{
 
     private final UserMapper mapper;
     private final PasswordEncoder passwordEncoder;
-
+    private final EmailVerificationService emailVerificationService;
 
     //로그인Id 중복 체크
     @Override
@@ -37,6 +38,54 @@ public class UserServiceImpl implements UserService{
         log.info("중복 확인 결과 - 로그인ID: {}, 사용가능: {}", loginId, available);
         return available;
     }
+
+    // 이메일 중복 체크 추가
+    @Override
+    public boolean checkEmailDuplicate(String email) {
+        log.info("이메일 중복 확인 요청 - 이메일: {}", email);
+        boolean available = mapper.findByEmail(email) == null;
+        log.info("이메일 중복 확인 결과 - 이메일: {}, 사용가능: {}", email, available);
+        return available;
+    }
+
+    /**
+     * 회원가입용 이메일 인증번호 발송
+     * @param email 인증번호를 받을 이메일 주소
+     */
+    @Override
+    @Transactional
+    public void sendSignupEmailVerification(String email) {
+        log.info("회원가입 이메일 인증번호 발송 시작 - 이메일: {}", email);
+
+        // 이메일 중복 체크 먼저 수행
+        if (!checkEmailDuplicate(email)) {
+            log.warn("중복된 이메일로 인증번호 발송 시도: {}", email);
+            throw new BaseException(BaseResponseStatus.DUPLICATE_EMAIL);
+        }
+
+        // 인증번호 발송
+        emailVerificationService.sendSignupVerificationCode(email);
+
+        log.info("회원가입 이메일 인증번호 발송 완료 - 이메일: {}", email);
+    }
+
+    /**
+     * 회원가입용 이메일 인증번호 확인
+     * @param request 이메일과 인증번호 정보
+     */
+    @Override
+    @Transactional
+    public void verifySignupEmailCode(EmailCodeVerifyRequestDTO request) {
+        log.info("회원가입 이메일 인증번호 확인 시작 - 이메일: {}", request.getEmail());
+
+        if (!emailVerificationService.verifyCode(request.getEmail(), request.getVerificationCode())) {
+            log.warn("회원가입 이메일 인증번호 확인 실패 - 이메일: {}", request.getEmail());
+            throw new BaseException(BaseResponseStatus.INVALID_VERIFICATION_CODE);
+        }
+
+        log.info("회원가입 이메일 인증번호 확인 완료 - 이메일: {}", request.getEmail());
+    }
+
 
     @Override
     public Optional<UserDTO> get(int userId) {
@@ -50,17 +99,34 @@ public class UserServiceImpl implements UserService{
     public int join(UserJoinRequestDTO dto) {
         log.info("회원가입 시작 - 로그인 ID: {}", dto.getLoginId());
 
-        // 중복 체크
+        // 로그인 ID 중복 체크
         if (!checkDuplicate(dto.getLoginId())) {
             log.warn("중복된 아이디로 가입 시도: {}", dto.getLoginId());
             throw new BaseException(BaseResponseStatus.DUPLICATE_LOGIN_ID);
         }
+
+        // 이메일 중복 체크
+        if (!checkEmailDuplicate(dto.getEmail())) {
+            log.warn("중복된 이메일로 가입 시도: {}", dto.getEmail());
+            throw new BaseException(BaseResponseStatus.DUPLICATE_EMAIL);
+        }
+
+        // 이메일 인증 여부 체크
+        if (!emailVerificationService.isEmailVerified(dto.getEmail())) {
+            log.warn("이메일 인증 미완료로 가입 시도: {}", dto.getEmail());
+            throw new BaseException(BaseResponseStatus.EMAIL_NOT_VERIFIED);
+        }
+
+        // 추가 검증: 이메일 인증 여부는 프론트엔드에서 체크 후 넘어온다고 가정
 
         UserVO user = dto.toVO(passwordEncoder);
         mapper.insert(user);
 
         AuthVO auth = new AuthVO(user.getUserId(), UserRole.ROLE_USER);
         mapper.insertAuth(auth);
+
+        // 회원가입 완료 후 인증 상태 제거
+        emailVerificationService.clearVerifiedStatus(dto.getEmail());
 
         log.info("회원가입 완료 - userId: {}, loginId: {}", user.getUserId(), dto.getLoginId());
         return user.getUserId();
