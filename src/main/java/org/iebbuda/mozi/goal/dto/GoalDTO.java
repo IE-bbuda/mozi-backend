@@ -1,5 +1,6 @@
 package org.iebbuda.mozi.goal.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,10 +21,13 @@ public class GoalDTO {
     private String goalName;            // 목표명
     private GoalVO.GoalKeyword keyword;        // 목표키워드 (결혼, 취업, 내집마련, 여행, 학자금, 취미)
     private BigDecimal targetAmount;    // 목표금액
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime goalDate;     // 목표날짜
     private String memo;                // 메모
     private boolean goalStatus;         // 목표상태
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;    // 생성날짜
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updatedAt;    // 수정날짜
 
     public enum GoalKeyword {
