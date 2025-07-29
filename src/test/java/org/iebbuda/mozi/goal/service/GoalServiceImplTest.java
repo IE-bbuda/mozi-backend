@@ -2,9 +2,10 @@ package org.iebbuda.mozi.goal.service;
 
 import lombok.extern.log4j.Log4j2;
 import org.iebbuda.mozi.config.RootConfig;
-import org.iebbuda.mozi.goal.dto.GoalDTO;
-import org.iebbuda.mozi.goal.domain.GoalVO;
-import org.iebbuda.mozi.security.config.SecurityConfig;
+import org.iebbuda.mozi.domain.goal.dto.GoalDTO;
+import org.iebbuda.mozi.domain.goal.domain.GoalVO;
+import org.iebbuda.mozi.domain.goal.service.GoalService;
+import org.iebbuda.mozi.domain.security.config.SecurityConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

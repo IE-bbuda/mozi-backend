@@ -2,16 +2,15 @@ package org.iebbuda.mozi.domain.goal.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.iebbuda.mozi.goal.dto.GoalDTO;
-import org.iebbuda.mozi.goal.domain.GoalVO;
-import org.iebbuda.mozi.goal.mapper.GoalMapper;
+import org.iebbuda.mozi.domain.goal.dto.GoalDTO;
+import org.iebbuda.mozi.domain.goal.domain.GoalVO;
+import org.iebbuda.mozi.domain.goal.mapper.GoalMapper;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 

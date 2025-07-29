@@ -1,11 +1,11 @@
-package org.iebbuda.mozi.goal.dto;
+package org.iebbuda.mozi.domain.goal.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.iebbuda.mozi.goal.domain.GoalVO;
+import org.iebbuda.mozi.domain.goal.domain.GoalVO;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

@@ -2,8 +2,9 @@ package org.iebbuda.mozi.goal.mapper;
 
 import lombok.extern.log4j.Log4j2;
 import org.iebbuda.mozi.config.RootConfig;
-import org.iebbuda.mozi.goal.domain.GoalVO;
-import org.iebbuda.mozi.security.config.SecurityConfig;
+import org.iebbuda.mozi.domain.goal.domain.GoalVO;
+import org.iebbuda.mozi.domain.goal.mapper.GoalMapper;
+import org.iebbuda.mozi.domain.security.config.SecurityConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,8 +14,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 //@ContextConfiguration(classes = { RootConfig.class })
