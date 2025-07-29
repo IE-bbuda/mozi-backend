@@ -25,6 +25,31 @@ public class MyPageService {
     private final UserProfileMapper userProfileMapper;
     private final PasswordEncoder passwordEncoder;
 
+
+    /**
+     * 마이페이지 수정 전 비밀번호 확인
+     * @param loginId 로그인 ID
+     * @param inputPassword 입력된 비밀번호
+     * @throws BaseException 비밀번호가 일치하지 않을 경우
+     */
+    public void confirmPassword(String loginId, String inputPassword) {
+        log.info("비밀번호 확인 요청 - 로그인ID: {}", loginId);
+
+        UserVO user = userMapper.findByLoginId(loginId);
+        if (user == null) {
+            log.warn("사용자를 찾을 수 없음 - 로그인ID: {}", loginId);
+            throw new BaseException(BaseResponseStatus.INVALID_MEMBER);
+        }
+
+        boolean matches = passwordEncoder.matches(inputPassword, user.getPassword());
+        if (!matches) {
+            log.warn("비밀번호 불일치 - 로그인ID: {}", loginId);
+            throw new BaseException(BaseResponseStatus.INVALID_PASSWORD);
+        }
+
+        log.info("비밀번호 확인 성공 - 로그인ID: {}", loginId);
+    }
+
     /**
      * 마이페이지 정보 조회 - 기본 정보 + 프로필 정보 통합
      */
