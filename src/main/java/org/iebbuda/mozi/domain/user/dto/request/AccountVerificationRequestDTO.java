@@ -9,7 +9,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PasswordResetVerifyRequestDTO {
+public class AccountVerificationRequestDTO {
+
     private String loginId;
     private String email;
 }
