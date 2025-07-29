@@ -11,5 +11,6 @@
         <package name="org.iebbuda.mozi.domain.security.account.domain"/>
         <package name="org.iebbuda.mozi.domain.user.domain"/>
         <package name="org.iebbuda.mozi.domain.profile.domain"/>
+        <package name="org.iebbuda.mozi.domain.goal.domain"/>
     </typeAliases>
 </configuration>
