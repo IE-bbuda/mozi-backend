@@ -156,6 +156,8 @@ build/test-results/
 !**/*Service.java
 !**/*Mapper.xml
 !**/*VO.java
+!**/filter/**
+!**/user/**
 
 
 #vue build 파일 제외

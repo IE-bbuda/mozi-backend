@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.iebbuda.mozi.domain.product.mapper.SavingMapper">
+
+    <!--적금 전체 조회 -->
+    <select id="findAll" resultType="org.iebbuda.mozi.domain.product.domain.SavingProduct">
+        SELECT * FROM SavingProduct
+    </select>
+
+    <!-- ✅ 특정 적금 상세조회 -->
+    <select id="findById" parameterType="long"
+            resultType="org.iebbuda.mozi.domain.product.domain.SavingProduct">
+        SELECT * FROM SavingProduct
+        WHERE saving_id = #{savingId}
+    </select>
+
+
+
+</mapper>
