@@ -5,16 +5,21 @@ import org.iebbuda.mozi.domain.policy.domain.PolicyVO;
 import org.iebbuda.mozi.domain.policy.dto.PolicyDTO;
 import org.iebbuda.mozi.domain.policy.dto.PolicyFilterDTO;
 import org.iebbuda.mozi.domain.policy.mapper.PolicyMapper;
+import org.iebbuda.mozi.domain.policy.util.ApiCaller;
 import org.springframework.stereotype.Service;
+import javax.annotation.PostConstruct;
 
 import java.util.ArrayList;
 import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class PolicyServiceImpl implements PolicyService {
 
     private final PolicyMapper policyMapper;
+    private final ApiCaller apiCaller;
 
+    // 전체 정책 조회(VO -> DTO 변환)
     @Override
     public List<PolicyDTO> findAll() {
         List<PolicyVO> voList = policyMapper.findAll();
@@ -25,6 +30,14 @@ public class PolicyServiceImpl implements PolicyService {
         return dtoList;
     }
 
+    // ID로 정책 상세 조회
+    @Override
+    public PolicyDTO findById(int id) {
+        PolicyVO vo = policyMapper.selectPolicyById(id);
+        return toDTO(vo);
+    }
+
+    // 정책 저장 (중복 정책 생략)
     @Override
     public void saveAll(List<PolicyDTO> dtoList) {
         for (PolicyDTO dto : dtoList) {
@@ -34,19 +47,31 @@ public class PolicyServiceImpl implements PolicyService {
         }
     }
 
-    @Override
-    public PolicyDTO findById(int id) {
-        PolicyVO vo = policyMapper.selectPolicyById(id);
-        return toDTO(vo);
-    }
-
+    // 필터 조건에 따른 정책 목록 조회
     @Override
     public List<PolicyDTO> getPoliciesByFilters(PolicyFilterDTO filters) {
         return policyMapper.findByFilters(filters);
     }
 
 
+    // 서버 실행 시 자동으로 정책 API에서 전체 fetch 후 DB에 저장
+    @PostConstruct
+    public void initPolicyIfNeeded() {
+        System.out.println("YouthPolicy DB 자동 fetch 시작");
 
+        String json = apiCaller.getJsonResponse();
+        List<PolicyDTO> dtoList = apiCaller.parseJsonToPolicies(json);
+
+        int before = policyMapper.count();
+        saveAll(dtoList);
+        int after = policyMapper.count();
+
+        int added = after - before;
+        System.out.printf("정책 자동 저장 완료: %d건 추가됨 (총 %d건)\n", added, after);
+    }
+
+
+    // 내부 변환 메서드
     private PolicyDTO toDTO(PolicyVO vo) {
         PolicyDTO dto = new PolicyDTO();
         dto.setPolicyId(vo.getPolicyId());
