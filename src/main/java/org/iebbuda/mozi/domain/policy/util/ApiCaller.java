@@ -14,14 +14,16 @@ import java.util.List;
 @Component
 public class ApiCaller {
 
+    // API 호출 URL과 인증키는 application.properties에서 주입받음
     @Value("${youth.api.url}")
     private String apiUrl;
 
     @Value("${youth.api.key}")
     private String apiKey;
 
+    // 실제 요청 최종 URL
     public String getRequestUrl() {
-        return apiUrl + "?apiKeyNm=" + apiKey + "&rtnType=json&pageNum=1&pageSize=200";
+        return apiUrl + "?apiKeyNm=" + apiKey + "&rtnType=json&pageNum=1&pageSize=300";
     }
 
     public String getJsonResponse() {
@@ -54,6 +56,7 @@ public class ApiCaller {
         return response.toString();
     }
 
+    // JSON 응답을 파싱하여 정책 DTO 리스트로 변환
     public List<PolicyDTO> parseJsonToPolicies(String json) {
         List<PolicyDTO> list = new ArrayList<>();
 
