@@ -15,29 +15,29 @@ public class RegionCodeController {
 
     private final RegionCodeService regionCodeService;
 
+    // zip 코드 리스트로 변환
     @PostMapping("/zipcodes")
     public List<String> getZipCodesByRegionNames(@RequestBody List<String> regionNames) {
         return regionCodeService.getZipCodesByRegionNames(regionNames);
     }
 
-    @PostMapping("/add")
-    public void insertRegionCode(@RequestBody RegionCodeVO regionCode) {
-        regionCodeService.saveRegionCode(regionCode);
-    }
-
-    @GetMapping("/all")
-    public List<RegionCodeVO> getAllRegionCodes() {
-        return regionCodeService.getAllRegionCodes();
-    }
-
+    // 지역명 리스트로 변환
     @PostMapping("/names")
     public List<String> getRegionNamesByZipCodes(@RequestBody List<String> zipCodes) {
         return regionCodeService.getRegionNamesByZipCodes(zipCodes);
     }
-    // zipCd DB에 저장
-    @PostMapping("/fetch")
-    public ResponseEntity<String> fetchAndSave() {
-        regionCodeService.fetchAndSaveFromApi();
-        return ResponseEntity.ok(" RegionCode DB 저장 완료");
+
+    // 전체 지역 반환
+    @GetMapping("/all")
+    public List<RegionCodeVO> getAllRegionCodes() {
+         return regionCodeService.getAllRegionCodes();
     }
+
+
+//    // zipCd DB에 저장
+//    @PostMapping("/fetch")
+//    public ResponseEntity<String> fetchAndSave() {
+//        regionCodeService.fetchAndSaveFromApi();
+//        return ResponseEntity.ok(" RegionCode DB 저장 완료");
+//    }
 }

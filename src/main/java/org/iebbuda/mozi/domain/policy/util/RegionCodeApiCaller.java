@@ -30,6 +30,7 @@ public class RegionCodeApiCaller {
     @Value("${zip.api.url}")
     private String apiUrl;
 
+    // 요청 URL 생성 (인증키 포함)
     public String getRequestUrl(int page, int perPage) {
         try {
             String encodedKey = URLEncoder.encode(apiKey, StandardCharsets.UTF_8);
@@ -39,12 +40,13 @@ public class RegionCodeApiCaller {
         }
     }
 
+    // 단일 페이지 zip 코드 목록 조회
     public Map<String, Map<String, String>> fetchZipCodes(int page, int perPage) {
         Map<String, Map<String, String>> regionMap = new HashMap<>();
 
         try {
             String fullUrl = getRequestUrl(page, perPage);
-            System.out.println("📡 요청 URL: " + fullUrl);
+            System.out.println("요청 URL: " + fullUrl);
 
             URL url = new URL(fullUrl);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -54,7 +56,7 @@ public class RegionCodeApiCaller {
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 StringBuilder response = new StringBuilder();
 
-                try (BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"))) {
+                try (BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8))) {
                     String line;
                     while ((line = br.readLine()) != null) {
                         response.append(line);
@@ -73,11 +75,13 @@ public class RegionCodeApiCaller {
         return regionMap;
     }
 
+    // 전체 페이지 zip 코드 목록 반복 조회 후 병합
     public Map<String, Map<String, String>> fetchAllZipCodes(int totalPages, int perPage) {
         Map<String, Map<String, String>> totalMap = new HashMap<>();
 
         for (int page = 1; page <= totalPages; page++) {
-            System.out.println("📄 " + page + "페이지 처리 중...");
+            System.out.printf("[ZipCd] (%d/%d) Page Procossing...\n", page, totalPages);
+
             Map<String, Map<String, String>> pageMap = fetchZipCodes(page, perPage);
 
             // merge
@@ -97,6 +101,7 @@ public class RegionCodeApiCaller {
         return totalMap;
     }
 
+    // JSON 응답을 파싱해 지역 Map에 저장
     private void parseJson(String json, Map<String, Map<String, String>> regionMap) {
         try {
             JsonObject root = JsonParser.parseString(json).getAsJsonObject();
@@ -134,7 +139,7 @@ public class RegionCodeApiCaller {
                     sigungu = parts[1];                      // ex: 고성군
                 }
 
-                // 읍/면/동 필터링
+                // 읍/면/동 저장 안 함
                 if (sigungu.endsWith("읍") || sigungu.endsWith("면") || sigungu.endsWith("동")) continue;
 
                 regionMap.computeIfAbsent(sido, k -> new TreeMap<>())
