@@ -1,4 +1,4 @@
-package org.iebbuda.mozi.domain.account.domain;
+package org.iebbuda.mozi.domain.account.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,13 +9,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class AccountVO {
-    private Integer accountId;
-    private Integer bankLoginId;
+public class AccountResponseDTO {
     private String accountNumber;
     private String accountName;
     private Double balance;
+    private String bankCode;
     private String currency;
-    private Integer productType;
-    private Boolean isMinus;
 }
