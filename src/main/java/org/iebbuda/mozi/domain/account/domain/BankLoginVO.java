@@ -9,13 +9,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class AccountVO {
-    private Integer accountId;
+public class BankLoginVO {
     private Integer bankLoginId;
-    private String accountNumber;
-    private String accountName;
-    private Double balance;
-    private String currency;
-    private Integer productType;
-    private Boolean isMinus;
+    private Integer userId;
+    private String bankCode;
+    private String connectedId;
 }

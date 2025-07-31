@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.iebbuda.mozi.domain.account.mapper.AccountMapper">
+    <insert id="add" useGeneratedKeys="true" keyProperty="accountId">
+        insert into account(bank_login_id,
+                            account_number,
+                            account_name,
+                            balance,
+                            currency,
+                            product_type,
+                            is_minus)
+        values (#{bankLoginId},
+                #{accountNumber},
+                #{accountName},
+                #{balance},
+                #{currency},
+                #{productType},
+                #{isMinus})
+    </insert>
+    <update id="updateBalance" >
+        update account
+        set balance=#{balance}
+        where account_number=#{accountNumber}
+    </update>
+    <update id="clearMainBankByUserId">
+        UPDATE user
+        SET main_bank = NULL  -- 국민은행 코드 예시
+        WHERE user_id = #{userId};
+    </update>
+    <update id="updateMainBankCodeByUserId">
+        update user
+        set main_bank=#{bankCode}
+        where user_id=#{userId}
+    </update>
+    <delete id="deleteByBankLoginId">
+        delete from account
+        where bank_login_id=#{bankLoginId}
+    </delete>
+
+
+
+    <select id="getAccountNumberByBankLoginId" resultType="java.lang.String">
+        select account_number from account
+        where bank_login_id=#{bankLoginId}
+    </select>
+    <select id="getBankSummaryByUserId" resultType="org.iebbuda.mozi.domain.account.dto.BankSummaryDTO">
+        SELECT
+            bl.bank_code AS bankCode,
+            COUNT(a.account_id) AS accountCount,
+            COALESCE(SUM(CASE WHEN a.is_minus = 1 THEN -a.balance ELSE a.balance END), 0.0) AS totalBalance,
+            COALESCE((
+                         SELECT a2.account_name
+                         FROM account a2
+                         WHERE a2.bank_login_id = bl.bank_login_id
+                         ORDER BY (CASE WHEN a2.is_minus = 1 THEN -a2.balance ELSE a2.balance END) DESC
+                     LIMIT 1
+                ), '') AS representativeAccountName
+        FROM banklogin bl
+                 LEFT JOIN account a ON a.bank_login_id = bl.bank_login_id
+        WHERE bl.user_id = #{userId}
+        GROUP BY bl.bank_code
+    </select>
+    <select id="getAccountsByUserIdAndBank" resultType="org.iebbuda.mozi.domain.account.domain.AccountVO">
+        SELECT
+            a.account_id AS accountId,
+            a.bank_login_id AS bankLoginId,
+            a.account_number AS accountNumber,
+            a.account_name AS accountName,
+            a.balance,
+            a.currency,
+            a.product_type AS productType,
+            a.is_minus AS isMinus
+        FROM account a
+                 JOIN banklogin bl ON a.bank_login_id = bl.bank_login_id
+        WHERE bl.user_id = #{userId}
+          AND bl.bank_code = #{bankCode}
+    </select>
+    <select id="getAccountByUserID" resultType="org.iebbuda.mozi.domain.account.dto.AccountResponseDTO">
+        SELECT
+            a.account_number,
+            a.account_name,
+            CASE
+                WHEN a.is_minus = TRUE THEN -a.balance
+                ELSE a.balance
+                END AS balance,
+            b.bank_code,
+            a.currency
+        FROM Account a
+                 INNER JOIN BankLogin b ON a.bank_login_id = b.bank_login_id
+        WHERE b.user_id = #{userId}
+    </select>
+    <select id="findAccountsByUserAndGoal" resultType="org.iebbuda.mozi.domain.account.dto.AccountResponseDTO">
+        SELECT
+            a.account_number AS accountNumber,
+            a.account_name AS accountName,
+            CASE
+                WHEN a.is_minus = TRUE THEN -a.balance
+                ELSE a.balance
+                END AS balance,
+            b.bank_code AS bankCode,
+            a.currency
+        FROM Account a
+                 INNER JOIN UserGoal u ON a.goal_id = u.goal_id
+                 INNER JOIN BankLogin b ON a.bank_login_id = b.bank_login_id
+        WHERE u.user_id = #{userId}
+          AND u.goal_id = #{goalId}
+    </select>
+    <select id="getMainBankCodeByUserId" resultType="java.lang.String">
+        SELECT IFNULL(main_bank, '') FROM user
+        where user_id=#{userId}
+    </select>
+
+</mapper>
