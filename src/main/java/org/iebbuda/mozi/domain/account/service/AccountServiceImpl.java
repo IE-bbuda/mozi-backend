@@ -185,6 +185,8 @@ public class AccountServiceImpl implements AccountService {
     //일단 "원"만 고려
     @Override
     public Map<String, Object> getBankSummary(Integer userId) {
+        String mainBankCode = accountMapper.getMainBankCodeByUserId(userId);
+
         List<BankSummaryDTO> list = accountMapper.getBankSummaryByUserId(userId);
         Double totalBalance=0.0;
         boolean isConnected = false;
@@ -203,7 +205,8 @@ public class AccountServiceImpl implements AccountService {
         return Map.of(
                 "totalBalance", totalBalance,
                 "BankSummaryList", list,
-                "isConnected", isConnected
+                "isConnected", isConnected,
+                "mainBankCode", mainBankCode
         );
     }
     @Override
