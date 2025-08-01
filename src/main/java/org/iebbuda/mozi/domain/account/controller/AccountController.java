@@ -45,7 +45,7 @@ public class AccountController {
     @DeleteMapping("/delete")
     public ResponseEntity<List<String>> deleteAccounts(
             @RequestBody List<String> bankCodeList
-    ){      //주거래 은행이면 삭제하는 것도 추가해야함userMapper에서 할일
+    ){
         Integer userId=1;
         List<String> deletedBankCode=accountService.deleteAccounts(bankCodeList, userId);
         return ResponseEntity.ok(deletedBankCode);
