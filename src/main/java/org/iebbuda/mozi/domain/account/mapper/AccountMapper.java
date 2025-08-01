@@ -30,4 +30,8 @@ public interface AccountMapper {
 
     int updateMainBankCodeByUserId(@Param("bankCode") String bankCode, @Param("userId") Integer userId);
 
+    int clearGoalFromAccounts(@Param("goalId")Integer goalId, @Param("userId") Integer userId);
+
+    int assignGoalToAccount(@Param("accountNumber")String accountNumber, @Param("goalId")Integer goalId, @Param("userId") Integer userId);
+
 }

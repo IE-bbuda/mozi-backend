@@ -45,7 +45,7 @@ public class AccountController {
     @DeleteMapping("/delete")
     public ResponseEntity<List<String>> deleteAccounts(
             @RequestBody List<String> bankCodeList
-    ){      //주거래 은행이면 삭제하는 것도 추가해야함userMapper에서 할일
+    ){
         Integer userId=1;
         List<String> deletedBankCode=accountService.deleteAccounts(bankCodeList, userId);
         return ResponseEntity.ok(deletedBankCode);
@@ -97,6 +97,17 @@ public class AccountController {
         Integer userId = 1;
         String bankCode = body.get("bankCode");
         Map<String, Object> result=accountService.updateMainBankCode(bankCode, userId);
+        return ResponseEntity.ok(result);
+    }
+
+    @PostMapping("/update-by-goal")
+    public ResponseEntity<Map<String, Object>> updateAccountsByGoal(
+            @RequestBody Map<String, Object> body
+    ){
+        Integer userId=1;
+        Integer goalId=Integer.parseInt(body.get("goalId").toString());
+        List<String> accountNumberList=(List<String>) body.get("accountNumberList");
+        Map<String, Object> result=accountService.updateAccountsByGoal(accountNumberList, goalId, userId);
         return ResponseEntity.ok(result);
     }
 

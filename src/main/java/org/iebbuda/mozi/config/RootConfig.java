@@ -22,11 +22,11 @@ import java.util.Properties;
 @Configuration
 @PropertySource({"classpath:/application.properties"})
 @EnableTransactionManagement
-@MapperScan(basePackages = {"org.iebbuda.mozi.domain.user.mapper", "org.iebbuda.mozi.domain.policy.mapper", "org.iebbuda.mozi.domain.product.mapper","org.iebbuda.mozi.domain.profile.mapper", "org.iebbuda.mozi.domain.goal.mapper","org.iebbuda.mozi.domain.account.mapper" })
+@MapperScan(basePackages = {"org.iebbuda.mozi.domain.user.mapper", "org.iebbuda.mozi.domain.policy.mapper", "org.iebbuda.mozi.domain.product.mapper","org.iebbuda.mozi.domain.profile.mapper", "org.iebbuda.mozi.domain.goal.mapper","org.iebbuda.mozi.domain.account.mapper", "org.iebbuda.mozi.domain.scrap.mapper"})
 @ComponentScan(basePackages = {
         "org.iebbuda.mozi.domain.user.service",
         "org.iebbuda.mozi.domain.policy.service","org.iebbuda.mozi.domain.policy.util", "org.iebbuda.mozi.domain.product.scheduler",
-        "org.iebbuda.mozi.domain.product.service","org.iebbuda.mozi.domain.profile.service","org.iebbuda.mozi.domain.goal.service", "org.iebbuda.mozi.domain.account.service", "org.iebbuda.mozi.domain.account.encrypt"})
+        "org.iebbuda.mozi.domain.product.service","org.iebbuda.mozi.domain.profile.service","org.iebbuda.mozi.domain.goal.service", "org.iebbuda.mozi.domain.account.service", "org.iebbuda.mozi.domain.account.encrypt", "org.iebbuda.mozi.domain.scrap"})
 @Import(ExternalApiClientConfig.class)
 
 public class RootConfig {
