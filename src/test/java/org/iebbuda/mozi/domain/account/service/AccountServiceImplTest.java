@@ -90,4 +90,9 @@ class AccountServiceImplTest {
         Map<String, Object> result=accountService.getAccounts(1);
         System.out.println(result);
     }
+
+    @Test
+    void updateAccountsByGoal() {
+        Map<String, Object> result=accountService.updateAccountsByGoal(List.of("854703-01-194182","1111-11"), 1, 1);
+    }
 }

@@ -100,5 +100,16 @@ public class AccountController {
         return ResponseEntity.ok(result);
     }
 
+    @PostMapping("/update-by-goal")
+    public ResponseEntity<Map<String, Object>> updateAccountsByGoal(
+            @RequestBody Map<String, Object> body
+    ){
+        Integer userId=1;
+        Integer goalId=Integer.parseInt(body.get("goalId").toString());
+        List<String> accountNumberList=(List<String>) body.get("accountNumberList");
+        Map<String, Object> result=accountService.updateAccountsByGoal(accountNumberList, goalId, userId);
+        return ResponseEntity.ok(result);
+    }
+
 
 }

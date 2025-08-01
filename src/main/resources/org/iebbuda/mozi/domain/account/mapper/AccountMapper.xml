@@ -34,6 +34,22 @@
         set main_bank=#{bankCode}
         where user_id=#{userId}
     </update>
+    <update id="clearGoalFromAccounts">
+        UPDATE account
+        SET goal_id = NULL
+        WHERE goal_id = #{goalId}
+          AND bank_login_id IN (
+            SELECT bank_login_id FROM banklogin WHERE user_id = #{userId}
+        )
+    </update>
+    <update id="assignGoalToAccount">
+        UPDATE account
+        SET goal_id = #{goalId}
+        WHERE account_number = #{accountNumber}
+          AND bank_login_id IN (
+            SELECT bank_login_id FROM banklogin WHERE user_id = #{userId}
+        )
+    </update>
     <delete id="deleteByBankLoginId">
         delete from account
         where bank_login_id=#{bankLoginId}
