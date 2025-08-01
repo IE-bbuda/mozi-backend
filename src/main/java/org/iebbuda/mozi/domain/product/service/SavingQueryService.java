@@ -22,8 +22,10 @@ public class SavingQueryService {
      * 모든 적금 상품 반환
      */
     public List<SavingResponse>getAllSavings(){
+        long start=System.currentTimeMillis();//⬅️ 시작 시간 측정
         List<SavingProduct>products=savingMapper.findAll();
-
+        long end=System.currentTimeMillis();
+        System.out.println("getAllSavings 실행시간 "+(end-start)+" ms");
         return products.stream()
                 .map(product->{
                     List<SavingOption>options=savingOptionMapper.findByProductId(product.getSavingId());
@@ -37,11 +39,15 @@ public class SavingQueryService {
      * 모든 적금 상품 반환
      */
     public SavingResponse getSavingById(Long id){
+        long start=System.currentTimeMillis();//⬅️ 시작 시간 측정
         SavingProduct product=savingMapper.findById(id);
         if(product==null){
             throw new RuntimeException("적금 상품을 찾을 수 없습니다. (id=" + id + ")");
         }
         List<SavingOption>options=savingOptionMapper.findByProductId(product.getSavingId());
+        long end=System.currentTimeMillis();
+        System.out.println("getAllSavings 실행시간 "+(end-start)+" ms");
+
         return toResponse(product,options);
     }
     private SavingResponse toResponse(SavingProduct product, List<SavingOption>options){
