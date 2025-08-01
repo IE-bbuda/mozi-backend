@@ -15,31 +15,30 @@ public class ScrapServiceImpl implements ScrapService {
     private final PolicyScrapMapper policyScrapMapper;
 
     @Override
-    public void scrapPolicy(int userId, int policyId) {
-        if (!policyScrapMapper.existsScrap(userId, policyId)) {
+    public void scrapPolicy(int userId, String plcyNo) {
+        if (!policyScrapMapper.existsScrap(userId, plcyNo)) {
             PolicyScrapVO vo = new PolicyScrapVO();
             vo.setUserId(userId);
-            vo.setPolicyId(policyId);
+            vo.setPlcyNo(plcyNo);
             policyScrapMapper.insertScrap(vo);
-            System.out.println("스크랩 시도: userId=" + userId + ", policyId=" + policyId);
-
+            System.out.println("스크랩 시도: userId=" + userId + ", plcyNo=" + plcyNo);
         }
     }
 
     @Override
-    public void cancelScrapPolicy(int userId, int policyId) {
-        policyScrapMapper.deleteScrap(userId, policyId);
+    public void cancelScrapPolicy(int userId, String plcyNo) {
+        policyScrapMapper.deleteScrap(userId, plcyNo);
     }
 
     @Override
-    public boolean isScrapedPolicy(int userId, int policyId) {
-        return policyScrapMapper.existsScrap(userId, policyId);
+    public boolean isScrapedPolicy(int userId, String plcyNo) {
+        return policyScrapMapper.existsScrap(userId, plcyNo);
     }
 
     @Override
-    public List<Integer> getScrapedPolicyIds(int userId) {
-        System.out.println("[DEBUG] getScrapedPolicyIds 호출됨 - userId = " + userId);
-        return policyScrapMapper.getScrapPolicyIds(userId);
+    public List<String> getScrapedPolicyNos(int userId) {
+        System.out.println("[DEBUG] getScrapedPolicyNos 호출됨 - userId = " + userId);
+        return policyScrapMapper.getScrapPlcyNos(userId);
     }
 
     @Override

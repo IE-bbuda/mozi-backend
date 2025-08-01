@@ -14,13 +14,13 @@ public interface PolicyScrapMapper {
     void insertScrap(PolicyScrapVO vo);
 
     // 스크랩 취소
-    void deleteScrap(@Param("userId") int userId, @Param("policyId") int policyId);
+    void deleteScrap(@Param("userId") int userId, @Param("plcyNo") String plcyNo);
 
     // 스크랩 여부 조회
-    boolean existsScrap(@Param("userId") int userId, @Param("policyId") int policyId);
+    boolean existsScrap(@Param("userId") int userId,  @Param("plcyNo") String plcyNo);
 
-    // 스크랩한 정책 ID 목록 조회
-    List<Integer> getScrapPolicyIds(@Param("userId") int userId);
+    // 스크랩한 정책 목록 조회
+    List<String> getScrapPlcyNos(@Param("userId") int userId);
 
     List<PolicyVO> getScrapedPolicies(int userId);
 
