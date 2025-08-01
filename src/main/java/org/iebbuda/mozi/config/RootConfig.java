@@ -3,6 +3,7 @@ package org.iebbuda.mozi.config;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.apache.ibatis.session.SqlSessionFactory;
+import org.iebbuda.mozi.domain.account.external.ExternalApiClientConfig;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,10 +12,7 @@ import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.*;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
@@ -28,10 +26,12 @@ import java.util.Properties;
 @EnableCaching
 @PropertySource({"classpath:/application.properties"})
 @EnableTransactionManagement
-@MapperScan(basePackages = {"org.iebbuda.mozi.domain.user.mapper", "org.iebbuda.mozi.domain.policy.mapper", "org.iebbuda.mozi.domain.product.mapper","org.iebbuda.mozi.domain.profile.mapper", "org.iebbuda.mozi.domain.goal.mapper"})
-@ComponentScan(basePackages = {"org.iebbuda.mozi.domain.user.service", "org.iebbuda.mozi.domain.policy.service","org.iebbuda.mozi.domain.policy.util", "org.iebbuda.mozi.domain.product.scheduler",
-        "org.iebbuda.mozi.domain.product.service","org.iebbuda.mozi.domain.profile.service","org.iebbuda.mozi.domain.goal.service"})
-
+@MapperScan(basePackages = {"org.iebbuda.mozi.domain.user.mapper", "org.iebbuda.mozi.domain.policy.mapper", "org.iebbuda.mozi.domain.product.mapper","org.iebbuda.mozi.domain.profile.mapper", "org.iebbuda.mozi.domain.goal.mapper","org.iebbuda.mozi.domain.account.mapper", "org.iebbuda.mozi.domain.scrap.mapper"})
+@ComponentScan(basePackages = {
+        "org.iebbuda.mozi.domain.user.service",
+        "org.iebbuda.mozi.domain.policy.service","org.iebbuda.mozi.domain.policy.util", "org.iebbuda.mozi.domain.product.scheduler",
+        "org.iebbuda.mozi.domain.product.service","org.iebbuda.mozi.domain.profile.service","org.iebbuda.mozi.domain.goal.service", "org.iebbuda.mozi.domain.account.service", "org.iebbuda.mozi.domain.account.encrypt", "org.iebbuda.mozi.domain.scrap"})
+@Import(ExternalApiClientConfig.class)
 
 public class RootConfig {
     @Value("${jdbc.driver}") String driver;

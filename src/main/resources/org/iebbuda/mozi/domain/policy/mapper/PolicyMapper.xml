@@ -13,6 +13,10 @@
         SELECT COUNT(*) FROM YouthPolicy WHERE plcyNo = #{plcyNo}
     </select>
 
+    <select id="count" resultType="int">
+        SELECT COUNT(*) FROM YouthPolicy
+    </select>
+
     <insert id="insertPolicy" parameterType="org.iebbuda.mozi.domain.policy.domain.PolicyVO">
         INSERT INTO YouthPolicy (
             plcyNm,
@@ -132,6 +136,7 @@
 
 
     </select>
+
 
 
 </mapper>

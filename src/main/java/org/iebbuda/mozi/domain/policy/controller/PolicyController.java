@@ -18,21 +18,9 @@ public class PolicyController {
     private final PolicyService policyService;
     private final ApiCaller apiCaller;
 
-    // 정책 API에서 받아와 DB에 저장
-    @PostMapping(value = "/fetch-and-save", produces = "text/plain; charset=UTF-8")
-    public ResponseEntity<String> fetchAndSave() {
-        String json = apiCaller.getJsonResponse();
-        List<PolicyDTO> dtoList = apiCaller.parseJsonToPolicies(json);
-        policyService.saveAll(dtoList);
-
-        return ResponseEntity.ok("정책 정보 DB 저장 완료됨!!");
-    }
-
     // 정책 전체 조회
     @GetMapping
     public ResponseEntity<List<PolicyDTO>> getAllPolicies() {
-//        List<PolicyDTO> list = policyService.findAll();
-//        return ResponseEntity.ok(list);
 
         List<PolicyDTO> list = policyService.findAll();
         return ResponseEntity.ok(list);
@@ -45,11 +33,21 @@ public class PolicyController {
         return ResponseEntity.ok(dto);
     }
 
+
+    // 필터 조건에 따른 정책 조회
     @PostMapping("/filter")
     public List<PolicyDTO> getFilteredPolicies(@RequestBody PolicyFilterDTO filters) {
         return policyService.getPoliciesByFilters(filters);
     }
 
 
-
+//    // 정책 API에서 받아와 DB에 저장(수동 버전.)
+//    @PostMapping(value = "/fetch-and-save", produces = "text/plain; charset=UTF-8")
+//    public ResponseEntity<String> fetchAndSave() {
+//        String json = apiCaller.getJsonResponse();
+//        List<PolicyDTO> dtoList = apiCaller.parseJsonToPolicies(json);
+//        policyService.saveAll(dtoList);
+//
+//        return ResponseEntity.ok("정책 정보 DB 저장 완료됨!!");
+//    }
 }

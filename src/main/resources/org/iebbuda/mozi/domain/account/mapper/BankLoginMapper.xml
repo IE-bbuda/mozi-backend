@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.iebbuda.mozi.domain.account.mapper.BankLoginMapper">
+
+    <insert id="add" useGeneratedKeys="true" keyProperty="bankLoginId">
+        insert into banklogin(user_id, bank_code, connected_id)
+        values (#{userId}, #{bankCode}, #{connectedId})
+    </insert>
+    <delete id="deleteById">
+        delete from banklogin
+        where bank_login_id=#{bankLoginId}
+    </delete>
+    <select id="getById" resultType="org.iebbuda.mozi.domain.account.domain.BankLoginVO">
+        select * from banklogin
+        where bank_login_id=#{bankLoginId}
+    </select>
+    <select id="getByUserID" resultType="org.iebbuda.mozi.domain.account.domain.BankLoginVO">
+        select * from banklogin
+        where user_id=#{userId}
+    </select>
+    <select id="getBankCodeByUserId" resultType="java.lang.String">
+        select bank_code from banklogin
+        where user_id=#{userId}
+    </select>
+</mapper>
