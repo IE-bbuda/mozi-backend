@@ -5,6 +5,8 @@ import lombok.Data;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 public class DepositProduct {
@@ -23,4 +25,6 @@ public class DepositProduct {
     private LocalDate dclsStrtDay;
     private LocalDate dclsEndDay;
     private LocalDateTime finCoSubmDay;
+
+    private List<DepositOption> options=new ArrayList<>();
 }

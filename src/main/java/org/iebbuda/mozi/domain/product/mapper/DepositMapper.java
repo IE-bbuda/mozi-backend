@@ -7,11 +7,6 @@ import java.util.List;
 
 @Mapper
 public interface DepositMapper {
-
-    //전체 정기예금 조회
-    List<DepositProduct> findAll();
-
-    DepositProduct findById(Long depositId);
-
-
+    List<DepositProduct> findAllWithOptions();
+    DepositProduct findByIdWithOptions(Long depositId);
 }
