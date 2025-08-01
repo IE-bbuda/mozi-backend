@@ -242,6 +242,7 @@ public class AccountServiceImpl implements AccountService {
 
         boolean success = (mainSummary != null);
         return Map.of(
+                "mainBankCode", mainBankCode,
                 "success", success,
                 "mainBankSummary", mainSummary
         );
