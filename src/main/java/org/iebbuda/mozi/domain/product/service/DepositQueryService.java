@@ -1,17 +1,16 @@
 package org.iebbuda.mozi.domain.product.service;
 
 import lombok.RequiredArgsConstructor;
-import org.iebbuda.mozi.domain.product.domain.DepositOption;
+
 import org.iebbuda.mozi.domain.product.domain.DepositProduct;
+import org.iebbuda.mozi.domain.product.dto.DepositOptionResponse;
 import org.iebbuda.mozi.domain.product.dto.DepositResponse;
 import org.iebbuda.mozi.domain.product.mapper.DepositMapper;
 
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.context.event.EventListener;
+
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
-import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -29,6 +28,7 @@ public class DepositQueryService {
         long start = System.currentTimeMillis(); // ⬅️ 시작 시간 측정
         System.out.println("DB or API 호출 발생");
         List<DepositProduct> products = depositMapper.findAllWithOptions();
+
         long end = System.currentTimeMillis();   // ⬅️ 종료 시간 측정
 
         System.out.println("getAllDeposits 실행 시간: " + (end - start) + "ms");
@@ -66,10 +66,10 @@ public class DepositQueryService {
                 .etcNote(product.getEtcNote())
                 .maxLimit(product.getMaxLimit())
                 .disclosureMonth(formatMonth(product.getDclsMonth()))
-                .disclosureStartDate(formatDate(product.getDclsStrtDay()))
-                .disclosureEndDate(formatDate(product.getDclsEndDay()))
+                .disclosureStartDate(product.getDclsStrtDay())
+                .disclosureEndDate(product.getDclsEndDay())
                 .options(product.getOptions().stream()
-                        .map(opt -> DepositResponse.OptionResponse.builder()
+                        .map(opt -> DepositOptionResponse.builder()
                                 .intrRateType(opt.getIntrRateType())
                                 .intrRateTypeNm(opt.getIntrRateTypeNm())
                                 .saveTrm(opt.getSaveTrm())
@@ -84,7 +84,5 @@ public class DepositQueryService {
         return yyyyMM != null ? yyyyMM.substring(0, 4) + "-" + yyyyMM.substring(4, 6) : null;
     }
 
-    private String formatDate(LocalDate date) {
-        return date != null ? date.toString() : null;
-    }
+
 }

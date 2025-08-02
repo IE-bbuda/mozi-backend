@@ -112,7 +112,7 @@ public class RootConfig {
 
     @Bean
     public CacheManager cacheManager(){
-        return new ConcurrentMapCacheManager("deposits", "deposit");
+        return new ConcurrentMapCacheManager("deposits", "deposit","savings","saving");
     }
 }
 

@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
@@ -20,21 +21,9 @@ public class SavingResponse {
     private String etcNote;
     private BigDecimal maxLimit;
     private String disclosureMonth;
-    private String disclosureStartDate;
-    private String disclosureEndDate;
+    private LocalDate disclosureStartDate;
+    private LocalDate disclosureEndDate;
 
-    private List<OptionResponse> options;
-
-    @Data
-    @Builder
-    public static class OptionResponse {
-        private String intrRateType;
-        private String intrRateTypeNm;
-        private String rsrvType;
-        private String rsrvTypeNm;
-        private int saveTrm;
-        private BigDecimal intrRate;
-        private BigDecimal intrRate2;
-    }
+    private List<SavingOptionResponse> options;
 
 }

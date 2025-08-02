@@ -1,14 +1,16 @@
 package org.iebbuda.mozi.domain.product.service;
 
 import lombok.RequiredArgsConstructor;
-import org.iebbuda.mozi.domain.product.domain.SavingOption;
+
 import org.iebbuda.mozi.domain.product.domain.SavingProduct;
+import org.iebbuda.mozi.domain.product.dto.SavingOptionResponse;
 import org.iebbuda.mozi.domain.product.dto.SavingResponse;
 import org.iebbuda.mozi.domain.product.mapper.SavingMapper;
-import org.iebbuda.mozi.domain.product.mapper.SavingOptionMapper;
+
+import org.springframework.cache.annotation.Cacheable;
+
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -16,41 +18,38 @@ import java.util.List;
 public class SavingQueryService {
 
     private final SavingMapper savingMapper;
-    private final SavingOptionMapper savingOptionMapper;
+
 
     /**
      * 모든 적금 상품 반환
      */
+    @Cacheable("savings")
     public List<SavingResponse>getAllSavings(){
         long start=System.currentTimeMillis();//⬅️ 시작 시간 측정
-        List<SavingProduct>products=savingMapper.findAll();
-        long end=System.currentTimeMillis();
+        List<SavingProduct>products=savingMapper.findAllWithOptions();
+        long end=System.currentTimeMillis();// ⬅️ 종료 시간 측정
         System.out.println("getAllSavings 실행시간 "+(end-start)+" ms");
-        return products.stream()
-                .map(product->{
-                    List<SavingOption>options=savingOptionMapper.findByProductId(product.getSavingId());
 
-                    return toResponse(product,options);
-                })
-                .toList();
+        return products.stream().map(this::toResponse).toList();
     }
 
     /**
      * 모든 적금 상품 반환
      */
+    @Cacheable(value = "saving", key ="#id")
     public SavingResponse getSavingById(Long id){
         long start=System.currentTimeMillis();//⬅️ 시작 시간 측정
-        SavingProduct product=savingMapper.findById(id);
-        if(product==null){
-            throw new RuntimeException("적금 상품을 찾을 수 없습니다. (id=" + id + ")");
-        }
-        List<SavingOption>options=savingOptionMapper.findByProductId(product.getSavingId());
+        SavingProduct product=savingMapper.findByIdWithOptions(id);
         long end=System.currentTimeMillis();
+
         System.out.println("getAllSavings 실행시간 "+(end-start)+" ms");
 
-        return toResponse(product,options);
+        if (product == null) {
+            throw new RuntimeException("예금 상품을 찾을 수 없습니다. (id=" + id + ")");
+        }
+        return toResponse(product);
     }
-    private SavingResponse toResponse(SavingProduct product, List<SavingOption>options){
+    private SavingResponse toResponse(SavingProduct product){
         return SavingResponse.builder()
                 .savingId(product.getSavingId())
                 .bankCode(product.getFinCoNo())
@@ -63,10 +62,10 @@ public class SavingQueryService {
                 .etcNote(product.getEtcNote())
                 .maxLimit(product.getMaxLimit())
                 .disclosureMonth(formatMonth(product.getDclsMonth()))
-                .disclosureStartDate(formatDate(product.getDclsStrtDay()))
-                .disclosureEndDate(formatDate(product.getDclsEndDay()))
-                .options(options.stream()
-                        .map(opt->SavingResponse.OptionResponse.builder()
+                .disclosureStartDate(product.getDclsStrtDay())
+                .disclosureEndDate(product.getDclsEndDay())
+                .options(product.getOptions().stream()
+                        .map(opt-> SavingOptionResponse.builder()
                                 .intrRateType(opt.getIntrRateType())
                                 .intrRateTypeNm(opt.getIntrRateTypeNm())
                                 .rsrvType(opt.getRsrvType())
@@ -83,7 +82,5 @@ public class SavingQueryService {
         return yyyyMM.substring(0, 4) + "-" + yyyyMM.substring(4, 6);
     }
 
-    private String formatDate(LocalDate date) {
-        return (date != null) ? date.toString() : null;
-    }
+
 }
