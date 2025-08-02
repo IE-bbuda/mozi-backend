@@ -84,7 +84,7 @@ public class PolicyServiceImpl implements PolicyService {
         dto.setSchoolCd(vo.getSchoolCd());
         dto.setJobCd(vo.getJobCd());
         dto.setPlcyMajorCd(vo.getPlcyMajorCd());
-        dto.setSBizCd(vo.getSBizCd());
+        dto.setSbizCd(vo.getSbizCd());
         dto.setAplyUrlAddr(vo.getAplyUrlAddr());
         dto.setBizPrdBgngYmd(vo.getBizPrdBgngYmd());
         dto.setBizPrdEndYmd(vo.getBizPrdEndYmd());
@@ -113,7 +113,7 @@ public class PolicyServiceImpl implements PolicyService {
         vo.setSchoolCd(dto.getSchoolCd());
         vo.setJobCd(dto.getJobCd());
         vo.setPlcyMajorCd(dto.getPlcyMajorCd());
-        vo.setSBizCd(dto.getSBizCd());
+        vo.setSbizCd(dto.getSbizCd());
         vo.setAplyUrlAddr(dto.getAplyUrlAddr());
 
         // 날짜 공백 처리 추가
