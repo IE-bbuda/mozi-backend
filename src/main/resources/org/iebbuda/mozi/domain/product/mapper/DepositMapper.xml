@@ -4,18 +4,92 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.iebbuda.mozi.domain.product.mapper.DepositMapper">
 
-    <!--정기예금 전체 조회 -->
-    <select id="findAll" resultType="org.iebbuda.mozi.domain.product.domain.DepositProduct">
-        SELECT * FROM DepositProduct
+    <!-- 예금 전체 조회 (상품 + 옵션) -->
+    <select id="findAllWithOptions" resultMap="DepositWithOptionsMap">
+        SELECT
+            dp.deposit_id,
+            dp.fin_prdt_cd,
+            dp.fin_co_no,
+            dp.kor_co_nm,
+            dp.fin_prdt_nm,
+            dp.join_way,
+            dp.join_deny,
+            dp.join_member,
+            dp.spcl_cnd,
+            dp.etc_note,
+            dp.max_limit,
+            dp.dcls_month,
+            dp.dcls_strt_day,
+            dp.dcls_end_day,
+            dp.fin_co_subm_day,
+            do.option_id,
+            do.deposit_id AS option_deposit_id,
+            do.intr_rate_type,
+            do.intr_rate_type_nm,
+            do.save_trm,
+            do.intr_rate,
+            do.intr_rate2
+        FROM DepositProduct dp
+                 LEFT JOIN DepositOption do ON dp.deposit_id = do.deposit_id
     </select>
 
-    <!-- ✅ 특정 정기예금 상세조회 -->
-    <select id="findById" parameterType="long"
-            resultType="org.iebbuda.mozi.domain.product.domain.DepositProduct">
-        SELECT * FROM DepositProduct
-        WHERE deposit_id = #{depositId}
+    <!-- 예금 단일 조회 (상품 + 옵션) -->
+    <select id="findByIdWithOptions" parameterType="long" resultMap="DepositWithOptionsMap">
+        SELECT
+            dp.deposit_id,
+            dp.fin_prdt_cd,
+            dp.fin_co_no,
+            dp.kor_co_nm,
+            dp.fin_prdt_nm,
+            dp.join_way,
+            dp.join_deny,
+            dp.join_member,
+            dp.spcl_cnd,
+            dp.etc_note,
+            dp.max_limit,
+            dp.dcls_month,
+            dp.dcls_strt_day,
+            dp.dcls_end_day,
+            dp.fin_co_subm_day,
+            do.option_id,
+            do.deposit_id AS option_deposit_id,
+            do.intr_rate_type,
+            do.intr_rate_type_nm,
+            do.save_trm,
+            do.intr_rate,
+            do.intr_rate2
+        FROM DepositProduct dp
+                 LEFT JOIN DepositOption do ON dp.deposit_id = do.deposit_id
+        WHERE dp.deposit_id = #{depositId}
     </select>
 
+    <!-- 결과 매핑 -->
+    <resultMap id="DepositWithOptionsMap" type="org.iebbuda.mozi.domain.product.domain.DepositProduct">
+        <id property="depositId" column="deposit_id"/>
+        <result property="finPrdtCd" column="fin_prdt_cd"/>
+        <result property="finCoNo" column="fin_co_no"/>
+        <result property="korCoNm" column="kor_co_nm"/>
+        <result property="finPrdtNm" column="fin_prdt_nm"/>
+        <result property="joinWay" column="join_way"/>
+        <result property="joinDeny" column="join_deny"/>
+        <result property="joinMember" column="join_member"/>
+        <result property="spclCnd" column="spcl_cnd"/>
+        <result property="etcNote" column="etc_note"/>
+        <result property="maxLimit" column="max_limit"/>
+        <result property="dclsMonth" column="dcls_month"/>
+        <result property="dclsStrtDay" column="dcls_strt_day"/>
+        <result property="dclsEndDay" column="dcls_end_day"/>
+        <result property="finCoSubmDay" column="fin_co_subm_day"/>
 
+        <collection property="options" ofType="org.iebbuda.mozi.domain.product.domain.DepositOption">
+            <result property="optionId" column="option_id"/>
+            <result property="depositId" column="deposit_id"/>
+            <result property="intrRateType" column="intr_rate_type"/>
+            <result property="intrRateTypeNm" column="intr_rate_type_nm"/>
+            <result property="saveTrm" column="save_trm"/>
+            <result property="intrRate" column="intr_rate"/>
+            <result property="intrRate2" column="intr_rate2"/>
+        </collection>
+    </resultMap>
 
 </mapper>

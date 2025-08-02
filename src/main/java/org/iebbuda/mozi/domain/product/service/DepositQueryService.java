@@ -1,14 +1,16 @@
 package org.iebbuda.mozi.domain.product.service;
 
 import lombok.RequiredArgsConstructor;
-import org.iebbuda.mozi.domain.product.domain.DepositOption;
+
 import org.iebbuda.mozi.domain.product.domain.DepositProduct;
+import org.iebbuda.mozi.domain.product.dto.DepositOptionResponse;
 import org.iebbuda.mozi.domain.product.dto.DepositResponse;
 import org.iebbuda.mozi.domain.product.mapper.DepositMapper;
-import org.iebbuda.mozi.domain.product.mapper.DepositOptionMapper;
+
+import org.springframework.cache.annotation.Cacheable;
+
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -16,36 +18,42 @@ import java.util.List;
 public class DepositQueryService {
 
     private final DepositMapper depositMapper;
-    private final DepositOptionMapper optionMapper;
+
 
     /**
-     * 모든 예금 상품 반환
+     * 모든 예금 상품 반환 (JOIN)
      */
+    @Cacheable("deposits")
     public List<DepositResponse> getAllDeposits() {
-        List<DepositProduct> products = depositMapper.findAll();
+        long start = System.currentTimeMillis(); // ⬅️ 시작 시간 측정
+        System.out.println("DB or API 호출 발생");
+        List<DepositProduct> products = depositMapper.findAllWithOptions();
 
-        return products.stream()
-                .map(product -> {
-                    List<DepositOption> options = optionMapper.findByProductId(product.getDepositId());
+        long end = System.currentTimeMillis();   // ⬅️ 종료 시간 측정
 
-                    return toResponse(product, options);
-                })
-                .toList();
+        System.out.println("getAllDeposits 실행 시간: " + (end - start) + "ms");
+
+        return products.stream().map(this::toResponse).toList();
     }
 
     /**
-     * 단일 예금 상품 반환
+     * 단일 예금 상품 반환 (JOIN)
      */
+    @Cacheable(value = "deposit", key = "#id")
     public DepositResponse getDepositById(Long id) {
-        DepositProduct product = depositMapper.findById(id);
+        long start = System.currentTimeMillis(); // 시작 시간 측정
+        DepositProduct product = depositMapper.findByIdWithOptions(id);
+        long end = System.currentTimeMillis();   // 종료 시간 측정
+
+        System.out.println("getDepositById 실행 시간: " + (end - start) + "ms");
+
         if (product == null) {
             throw new RuntimeException("예금 상품을 찾을 수 없습니다. (id=" + id + ")");
         }
-        List<DepositOption> options = optionMapper.findByProductId(product.getDepositId());
-        return toResponse(product, options);
+        return toResponse(product);
     }
 
-    private DepositResponse toResponse(DepositProduct product, List<DepositOption> options) {
+    private DepositResponse toResponse(DepositProduct product) {
         return DepositResponse.builder()
                 .depositId(product.getDepositId())
                 .bankCode(product.getFinCoNo())
@@ -58,10 +66,10 @@ public class DepositQueryService {
                 .etcNote(product.getEtcNote())
                 .maxLimit(product.getMaxLimit())
                 .disclosureMonth(formatMonth(product.getDclsMonth()))
-                .disclosureStartDate(formatDate(product.getDclsStrtDay()))
-                .disclosureEndDate(formatDate(product.getDclsEndDay()))
-                .options(options.stream()
-                        .map(opt -> DepositResponse.OptionResponse.builder()
+                .disclosureStartDate(product.getDclsStrtDay())
+                .disclosureEndDate(product.getDclsEndDay())
+                .options(product.getOptions().stream()
+                        .map(opt -> DepositOptionResponse.builder()
                                 .intrRateType(opt.getIntrRateType())
                                 .intrRateTypeNm(opt.getIntrRateTypeNm())
                                 .saveTrm(opt.getSaveTrm())
@@ -73,10 +81,8 @@ public class DepositQueryService {
     }
 
     private String formatMonth(String yyyyMM) {
-        return yyyyMM.substring(0, 4) + "-" + yyyyMM.substring(4, 6);
+        return yyyyMM != null ? yyyyMM.substring(0, 4) + "-" + yyyyMM.substring(4, 6) : null;
     }
 
-    private String formatDate(LocalDate date) {
-        return (date != null) ? date.toString() : null;
-    }
+
 }

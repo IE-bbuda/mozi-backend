@@ -52,7 +52,7 @@
     </delete>
 
     <!-- 옵션 삽입 -->
-    <insert id="insertOption" parameterType="org.iebbuda.mozi.domain.product.domain.DepositProduct" useGeneratedKeys="true" keyProperty="optionId">
+    <insert id="insertOption" parameterType="org.iebbuda.mozi.domain.product.domain.DepositOption" useGeneratedKeys="true" keyProperty="optionId">
         INSERT INTO DepositOption (
             deposit_id, intr_rate_type, intr_rate_type_nm,
             save_trm, intr_rate, intr_rate2

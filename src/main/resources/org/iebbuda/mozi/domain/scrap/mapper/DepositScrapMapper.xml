@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.iebbuda.mozi.domain.scrap.mapper.DepositScrapMapper">
+
+    <resultMap id="depositScrapMap" type="org.iebbuda.mozi.domain.scrap.domain.DepositScrap">
+        <id property="scrapId" column="scrap_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="depositId" column="deposit_id"/>
+        <result property="createdAt" column="created_at"/>
+
+        <!-- 상품 매핑 -->
+        <association property="depositProduct" javaType="org.iebbuda.mozi.domain.product.domain.DepositProduct">
+            <id property="depositId" column="deposit_id"/> <!-- 중복 방지 -->
+            <result property="finPrdtCd" column="fin_prdt_cd"/>
+            <result property="finCoNo" column="fin_co_no"/>
+            <result property="korCoNm" column="kor_co_nm"/>
+            <result property="finPrdtNm" column="fin_prdt_nm"/>
+            <result property="joinWay" column="join_way"/>
+            <result property="joinDeny" column="join_deny"/>
+            <result property="joinMember" column="join_member"/>
+            <result property="spclCnd" column="spcl_cnd"/>
+            <result property="etcNote" column="etc_note"/>
+            <result property="maxLimit" column="max_limit"/>
+            <result property="dclsMonth" column="dcls_month"/>
+            <result property="dclsStrtDay" column="dcls_strt_day"/>
+            <result property="dclsEndDay" column="dcls_end_day"/>
+            <result property="finCoSubmDay" column="fin_co_subm_day"/>
+
+            <!-- 옵션 리스트 -->
+            <collection property="options" ofType="org.iebbuda.mozi.domain.product.domain.DepositOption">
+                <result property="optionId" column="option_id"/> <!-- 옵션 중복 방지 -->
+                <result property="depositId" column="deposit_id"/>
+                <result property="intrRateType" column="intr_rate_type"/>
+                <result property="intrRateTypeNm" column="intr_rate_type_nm"/>
+                <result property="saveTrm" column="save_trm"/>
+                <result property="intrRate" column="intr_rate"/>
+                <result property="intrRate2" column="intr_rate2"/>
+            </collection>
+        </association>
+    </resultMap>
+
+    <!-- 스크랩 조회 -->
+    <select id="getUserScraps" resultMap="depositScrapMap">
+        SELECT ds.*, dp.*, do.*
+        FROM DepositScrap ds
+                 JOIN DepositProduct dp ON ds.deposit_id = dp.deposit_id
+                 LEFT JOIN DepositOption do ON dp.deposit_id = do.deposit_id
+        WHERE ds.user_id = #{userId}
+    </select>
+
+    <!-- 스크랩 추가 -->
+    <insert id="addScrap">
+        INSERT INTO DepositScrap (user_id, deposit_id)
+        VALUES (#{userId}, #{depositId})
+    </insert>
+
+    <!-- 스크랩 삭제 -->
+    <delete id="removeScrap">
+        DELETE FROM DepositScrap
+        WHERE user_id = #{userId} AND deposit_id = #{depositId}
+    </delete>
+
+</mapper>

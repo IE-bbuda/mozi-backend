@@ -4,18 +4,98 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.iebbuda.mozi.domain.product.mapper.SavingMapper">
 
-    <!--적금 전체 조회 -->
-    <select id="findAll" resultType="org.iebbuda.mozi.domain.product.domain.SavingProduct">
-        SELECT * FROM SavingProduct
+    <!-- 적금 전체 조회 (상품 + 옵션) -->
+    <select id="findAllWithOptions" resultMap="SavingWithOptionsMap">
+        SELECT
+            sp.saving_id,
+            sp.fin_prdt_cd,
+            sp.fin_co_no,
+            sp.kor_co_nm,
+            sp.fin_prdt_nm,
+            sp.join_way,
+            sp.join_deny,
+            sp.join_member,
+            sp.spcl_cnd,
+            sp.etc_note,
+            sp.max_limit,
+            sp.dcls_month,
+            sp.dcls_strt_day,
+            sp.dcls_end_day,
+            sp.fin_co_subm_day,
+            so.option_id,
+            so.saving_id AS option_saving_id,
+            so.intr_rate_type,
+            so.intr_rate_type_nm,
+            so.rsrv_type,
+            so.rsrv_type_nm,
+            so.save_trm,
+            so.intr_rate,
+            so.intr_rate2
+        FROM SavingProduct sp
+                 LEFT JOIN SavingOption so ON sp.saving_id = so.saving_id
     </select>
 
-    <!-- ✅ 특정 적금 상세조회 -->
-    <select id="findById" parameterType="long"
-            resultType="org.iebbuda.mozi.domain.product.domain.SavingProduct">
-        SELECT * FROM SavingProduct
-        WHERE saving_id = #{savingId}
+    <!-- 예금 단일 조회 (상품 + 옵션) -->
+    <select id="findByIdWithOptions" parameterType="long" resultMap="SavingWithOptionsMap">
+        SELECT
+            sp.saving_id,
+            sp.fin_prdt_cd,
+            sp.fin_co_no,
+            sp.kor_co_nm,
+            sp.fin_prdt_nm,
+            sp.join_way,
+            sp.join_deny,
+            sp.join_member,
+            sp.spcl_cnd,
+            sp.etc_note,
+            sp.max_limit,
+            sp.dcls_month,
+            sp.dcls_strt_day,
+            sp.dcls_end_day,
+            sp.fin_co_subm_day,
+            so.option_id,
+            so.saving_id AS option_saving_id,
+            so.intr_rate_type,
+            so.intr_rate_type_nm,
+            so.rsrv_type,
+            so.rsrv_type_nm,
+            so.save_trm,
+            so.intr_rate,
+            so.intr_rate2
+        FROM SavingProduct sp
+                 LEFT JOIN SavingOption so ON sp.saving_id = so.saving_id
+        WHERE sp.saving_id = #{savingId}
     </select>
 
+    <!-- 결과 매핑 -->
+    <resultMap id="SavingWithOptionsMap" type="org.iebbuda.mozi.domain.product.domain.SavingProduct">
+        <id property="savingId" column="saving_id"/>
+        <result property="finPrdtCd" column="fin_prdt_cd"/>
+        <result property="finCoNo" column="fin_co_no"/>
+        <result property="korCoNm" column="kor_co_nm"/>
+        <result property="finPrdtNm" column="fin_prdt_nm"/>
+        <result property="joinWay" column="join_way"/>
+        <result property="joinDeny" column="join_deny"/>
+        <result property="joinMember" column="join_member"/>
+        <result property="spclCnd" column="spcl_cnd"/>
+        <result property="etcNote" column="etc_note"/>
+        <result property="maxLimit" column="max_limit"/>
+        <result property="dclsMonth" column="dcls_month"/>
+        <result property="dclsStrtDay" column="dcls_strt_day"/>
+        <result property="dclsEndDay" column="dcls_end_day"/>
+        <result property="finCoSubmDay" column="fin_co_subm_day"/>
 
+        <collection property="options" ofType="org.iebbuda.mozi.domain.product.domain.SavingOption">
+            <result property="optionId" column="option_id"/>
+            <result property="savingId" column="saving_id"/>
+            <result property="rsrvType" column="rsrv_type"/>
+            <result property="rsrvTypeNm" column="rsrv_type_nm"/>
+            <result property="intrRateType" column="intr_rate_type"/>
+            <result property="intrRateTypeNm" column="intr_rate_type_nm"/>
+            <result property="saveTrm" column="save_trm"/>
+            <result property="intrRate" column="intr_rate"/>
+            <result property="intrRate2" column="intr_rate2"/>
+        </collection>
+    </resultMap>
 
 </mapper>

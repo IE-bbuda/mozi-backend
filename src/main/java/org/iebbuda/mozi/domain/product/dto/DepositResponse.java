@@ -21,18 +21,10 @@ public class DepositResponse {
     private String etcNote;
     private BigDecimal maxLimit;
     private String disclosureMonth;
-    private String disclosureStartDate;
-    private String disclosureEndDate;
+    private LocalDate disclosureStartDate;
+    private LocalDate disclosureEndDate;
 
-    private List<OptionResponse> options;
+    private List<DepositOptionResponse> options;
 
-    @Data
-    @Builder
-    public static class OptionResponse {
-        private String intrRateType;
-        private String intrRateTypeNm;
-        private int saveTrm;
-        private BigDecimal intrRate;
-        private BigDecimal intrRate2;
-    }
+
 }

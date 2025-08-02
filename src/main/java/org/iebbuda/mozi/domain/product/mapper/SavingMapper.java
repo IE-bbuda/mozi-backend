@@ -9,8 +9,7 @@ import java.util.List;
 public interface SavingMapper {
 
     //전체 적금 조회
-    List<SavingProduct>findAll();
-
+    List<SavingProduct>findAllWithOptions();
     //단건 적금 조회
-    SavingProduct findById(Long savingId);
+    SavingProduct findByIdWithOptions(Long savingId);
 }

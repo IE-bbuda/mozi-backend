@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.iebbuda.mozi.domain.scrap.mapper.SavingScrapMapper">
+    <resultMap id="savingScrapMap" type="org.iebbuda.mozi.domain.scrap.domain.SavingScrap">
+        <id property="scrapId" column="scrap_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="savingId" column="deposit_id"/>
+        <result property="createdAt" column="created_at"/>
+        <association property="savingProduct" javaType="org.iebbuda.mozi.domain.product.domain.SavingProduct">
+            <id property="savingId" column="saving_id"/>
+            <result property="finCoNo" column="fin_co_no"/>
+            <result property="korCoNm" column="kor_co_nm"/>
+            <result property="finPrdtNm" column="fin_prdt_nm"/>
+            <result property="joinWay" column="join_way"/>
+            <result property="joinDeny" column="join_deny"/>
+            <result property="joinMember" column="join_member"/>
+            <result property="spclCnd" column="spcl_cnd"/>
+            <result property="etcNote" column="etc_note"/>
+            <result property="maxLimit" column="max_limit"/>
+            <result property="dclsMonth" column="dcls_month"/>
+            <result property="dclsStrtDay" column="dcls_strt_day"/>
+            <result property="dclsEndDay" column="dcls_end_day"/>
+            <collection property="options" ofType="org.iebbuda.mozi.domain.product.domain.SavingOption">
+                <result property="optionId" column="option_id"/>
+                <result property="intrRateType" column="intr_rate_type"/>
+                <result property="intrRateTypeNm" column="intr_rate_type_nm"/>
+                <result property="rsrvType" column="rsrv_type"/>
+                <result property="rsrvTypeNm" column="rsrv_type_nm"/>
+                <result property="saveTrm" column="save_trm"/>
+                <result property="intrRate" column="intr_rate"/>
+                <result property="intrRate2" column="intr_rate2"/>
+            </collection>
+        </association>
+    </resultMap>
+
+    <select id="getUserScraps" resultMap="savingScrapMap">
+        SELECT ss.*, sp.*, so.*
+        FROM SavingScrap ss
+                 JOIN SavingProduct sp ON ss.saving_id = sp.saving_id
+                 LEFT JOIN SavingOption so ON sp.saving_id = so.saving_id
+        WHERE ss.user_id = #{userId}
+    </select>
+
+    <insert id="addScrap">
+        INSERT INTO SavingScrap (user_id, saving_id)
+        VALUES (#{userId}, #{savingId})
+    </insert>
+
+    <delete id="removeScrap">
+        DELETE FROM SavingScrap
+        WHERE user_id = #{userId} AND saving_id = #{savingId}
+    </delete>
+</mapper>

@@ -1,6 +1,7 @@
 package org.iebbuda.mozi.domain.product.scheduler;
 
 import lombok.extern.log4j.Log4j2;
+import org.iebbuda.mozi.domain.product.service.DepositQueryService;
 import org.iebbuda.mozi.domain.product.service.DepositSyncService;
 import org.iebbuda.mozi.domain.product.service.SavingSyncService;
 import org.springframework.stereotype.Component;
@@ -13,10 +14,12 @@ public class FinancialScheduler {
 
     private final DepositSyncService depositSyncService;
     private final SavingSyncService savingSyncService;
+    private final DepositQueryService depositQueryService;
 
-    public FinancialScheduler(DepositSyncService depositSyncService, SavingSyncService savingSyncService) {
+    public FinancialScheduler(DepositSyncService depositSyncService, SavingSyncService savingSyncService, DepositQueryService depositQueryService) {
         this.depositSyncService = depositSyncService;
         this.savingSyncService = savingSyncService;
+        this.depositQueryService=depositQueryService;
     }
 
 //    // 매일 새벽 2시 정기예금/적금 동기화 ->실제 사용시 코드
@@ -36,10 +39,14 @@ public class FinancialScheduler {
 
         // 정기예금 데이터 동기화
         depositSyncService.fetchAndSaveDeposits();
+        depositQueryService.getAllDeposits();
+
         log.info("✅ 정기예금 데이터 동기화 완료");
 
         // 적금 데이터 동기화
         savingSyncService.fetchAndSaveSavings();
         log.info("✅ 적금 데이터 동기화 완료");
     }
+
+
 }
