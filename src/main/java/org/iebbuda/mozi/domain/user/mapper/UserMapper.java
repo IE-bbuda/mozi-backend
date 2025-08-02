@@ -54,4 +54,9 @@ public interface UserMapper {
 
 
     UserVO findByEmail(String email);  // 이메일 중복 확인용
+
+
+    // OAuth 관련 메서드들
+    public UserVO findByProviderAndProviderId(@Param("provider") String provider, @Param("providerId") String providerId);
+    public void updateUserToOAuth(@Param("userId") int userId, @Param("provider") String provider, @Param("providerId") String providerId);
 }
