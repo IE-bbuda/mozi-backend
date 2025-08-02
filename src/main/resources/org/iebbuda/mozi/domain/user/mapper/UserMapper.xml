@@ -19,12 +19,14 @@
         <result property="updatedAt" column="updated_at" />
         <result property="mainBank" column="main_bank"/>
         <result property="birthDate" column="birth_date"/>
+        <result property="provider" column="provider"/>
+        <result property="providerId" column="provider_id"/>
         <collection property="authList" resultMap="authMap" />
     </resultMap>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="userId">
-        INSERT INTO User(username, login_id, password, phone_number, email,birth_date)
-        VALUES (#{username},#{loginId},#{password},#{phoneNumber},#{email},#{birthDate})
+        INSERT INTO User(username, login_id, password, phone_number, email, birth_date, provider, provider_id)
+        VALUES (#{username}, #{loginId}, #{password}, #{phoneNumber}, #{email}, #{birthDate}, #{provider}, #{providerId})
     </insert>
 
     <insert id="insertAuth">
@@ -32,18 +34,23 @@
         values (#{userId},#{auth})
     </insert>
 
-    <select id="findByUserId"  resultMap="userMap">
+    <!-- 기존 쿼리들 유지 -->
+    <select id="findByUserId" resultMap="userMap">
         SELECT u.user_id, u.username, u.login_id, u.password, u.phone_number, u.email,
-               u.created_at, u.updated_at, u.birth_date, a.auth
+               u.created_at, u.updated_at, u.birth_date, u.provider, u.provider_id, a.auth
         FROM User u
-        LEFT OUTER JOIN Auth a
-        ON u.user_id = a.user_id
-        where u.user_id = #{userId}
+                 LEFT OUTER JOIN Auth a ON u.user_id = a.user_id
+        WHERE u.user_id = #{userId}
     </select>
 
     <select id="findByLoginId" resultMap="userMap">
-        SELECT * FROM User WHERE login_id = #{loginId}
+        SELECT u.user_id, u.username, u.login_id, u.password, u.phone_number, u.email,
+               u.created_at, u.updated_at, u.birth_date, u.provider, u.provider_id, a.auth
+        FROM User u
+                 LEFT OUTER JOIN Auth a ON u.user_id = a.user_id
+        WHERE u.login_id = #{loginId}
     </select>
+
     <select id="findLoginIdByEmail" resultType="String">
         SELECT login_id
         FROM User
@@ -64,17 +71,13 @@
     </update>
 
     <!-- 이메일로 사용자 조회 (중복 확인용) -->
-    <select id="findByEmail" resultType="UserVO">
-        SELECT user_id AS userId,
-               login_id AS loginId,
-               username,
-               email,
-               phone_number AS phoneNumber,
-               created_at AS createdAt,
-               updated_at AS updatedAt,
-               birth_date AS birthDate
-        FROM User
-        WHERE email = #{email}
+    <!-- 이메일로 사용자 조회 (중복 확인용) - OAuth 필드 추가 -->
+    <select id="findByEmail" resultMap="userMap">
+        SELECT u.user_id, u.username, u.login_id, u.password, u.phone_number, u.email,
+               u.created_at, u.updated_at, u.birth_date, u.provider, u.provider_id, a.auth
+        FROM User u
+                 LEFT OUTER JOIN Auth a ON u.user_id = a.user_id
+        WHERE u.email = #{email}
     </select>
 
     <!-- 로그인ID와 이메일로 사용자 찾기 -->
@@ -86,7 +89,9 @@
             username,
             password,
             created_at AS createdAt,
-            updated_at AS updatedAt
+            updated_at AS updatedAt,
+            provider,
+            provider_id AS providerId
         FROM User
         WHERE login_id = #{loginId}
           AND email = #{email}
@@ -109,6 +114,28 @@
             password = #{newPassword},
             updated_at = NOW()
         WHERE login_id = #{loginId}
+    </update>
+
+    <!-- OAuth 관련 쿼리들 -->
+
+    <!-- Provider와 ProviderId로 사용자 조회 -->
+    <select id="findByProviderAndProviderId" resultMap="userMap">
+        SELECT u.user_id, u.username, u.login_id, u.password, u.phone_number, u.email,
+               u.created_at, u.updated_at, u.birth_date, u.provider, u.provider_id, a.auth
+        FROM User u
+                 LEFT OUTER JOIN Auth a ON u.user_id = a.user_id
+        WHERE u.provider = #{provider}
+          AND u.provider_id = #{providerId}
+    </select>
+
+    <!-- 기존 사용자를 OAuth 연동으로 업데이트 (확장 가능) -->
+    <update id="updateUserToOAuth">
+        UPDATE User
+        SET
+            provider = #{provider},
+            provider_id = #{providerId},
+            updated_at = NOW()
+        WHERE user_id = #{userId}
     </update>
 </mapper>
 

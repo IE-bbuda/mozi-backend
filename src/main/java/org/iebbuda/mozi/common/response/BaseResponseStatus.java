@@ -46,6 +46,28 @@ public enum BaseResponseStatus {
     INVALID_VERIFICATION_CODE(false, HttpStatus.BAD_REQUEST.value(), "인증번호가 올바르지 않습니다."),
     VERIFICATION_CODE_EXPIRED(false, HttpStatus.BAD_REQUEST.value(), "인증번호가 만료되었습니다."),
     EMAIL_NOT_VERIFIED(false, HttpStatus.BAD_REQUEST.value(), "이메일 인증이 완료되지 않았습니다."),
+
+    // BaseResponseStatus.java에 추가할 OAuth 관련 상태 코드들
+
+
+
+    // OAuth 공통 에러
+    OAUTH_PROVIDER_NOT_SUPPORTED(false, HttpStatus.BAD_REQUEST.value(), "지원하지 않는 OAuth 제공자입니다."),
+    OAUTH_EMAIL_ALREADY_EXISTS(false, HttpStatus.CONFLICT.value(), "해당 이메일은 이미 다른 계정에서 사용 중입니다."),
+
+    // 카카오 OAuth 관련
+    KAKAO_TOKEN_REQUEST_FAILED(false, HttpStatus.BAD_GATEWAY.value(), "카카오 액세스 토큰 요청에 실패했습니다."),
+    KAKAO_USER_INFO_REQUEST_FAILED(false, HttpStatus.BAD_GATEWAY.value(), "카카오 사용자 정보 요청에 실패했습니다."),
+    KAKAO_TOKEN_EXTRACT_FAILED(false, HttpStatus.INTERNAL_SERVER_ERROR.value(), "카카오 토큰 추출에 실패했습니다."),
+
+    // 구글 OAuth 관련 (나중에 추가할 때)
+    GOOGLE_TOKEN_REQUEST_FAILED(false, HttpStatus.BAD_GATEWAY.value(), "구글 액세스 토큰 요청에 실패했습니다."),
+    GOOGLE_USER_INFO_REQUEST_FAILED(false, HttpStatus.BAD_GATEWAY.value(), "구글 사용자 정보 요청에 실패했습니다."),
+
+    // 네이버 OAuth 관련 (나중에 추가할 때)
+    NAVER_TOKEN_REQUEST_FAILED(false, HttpStatus.BAD_GATEWAY.value(), "네이버 액세스 토큰 요청에 실패했습니다."),
+    NAVER_USER_INFO_REQUEST_FAILED(false, HttpStatus.BAD_GATEWAY.value(), "네이버 사용자 정보 요청에 실패했습니다."),
+
     // 공통 에러
     DATABASE_CONSTRAINT_ERROR(false, HttpStatus.BAD_REQUEST.value(), "데이터 제약조건 위반입니다."),
     DATABASE_ERROR(false, HttpStatus.INTERNAL_SERVER_ERROR.value(), "데이터베이스 오류가 발생했습니다."),

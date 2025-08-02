@@ -2,125 +2,116 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
 <mapper namespace="org.iebbuda.mozi.domain.policy.mapper.PolicyMapper">
 
-    <select id="findAll" resultType="org.iebbuda.mozi.domain.policy.domain.PolicyVO">
+    <!-- snake_case ↔ camelCase 매핑 -->
+    <resultMap id="PolicyMap" type="org.iebbuda.mozi.domain.policy.domain.PolicyVO">
+        <id column="policy_id" property="policyId"/>
+        <result column="plcy_nm" property="plcyNm"/>
+        <result column="plcy_no" property="plcyNo"/>
+        <result column="plcy_expln_cn" property="plcyExplnCn"/>
+        <result column="plcy_sprt_cn" property="plcySprtCn"/>
+        <result column="zip_cd" property="zipCd"/>
+        <result column="mrg_stts_cd" property="mrgSttsCd"/>
+        <result column="school_cd" property="schoolCd"/>
+        <result column="job_cd" property="jobCd"/>
+        <result column="plcy_major_cd" property="plcyMajorCd"/>
+        <result column="s_biz_cd" property="sBizCd"/>
+        <result column="aply_url_addr" property="aplyUrlAddr"/>
+        <result column="biz_prd_bgng_ymd" property="bizPrdBgngYmd"/>
+        <result column="biz_prd_end_ymd" property="bizPrdEndYmd"/>
+        <result column="lclsf_nm" property="lclsfNm"/>
+        <result column="mclsf_nm" property="mclsfNm"/>
+        <result column="plcy_kywd_nm" property="plcyKywdNm"/>
+        <result column="sprt_trgt_min_age" property="sprtTrgtMinAge"/>
+        <result column="sprt_trgt_max_age" property="sprtTrgtMaxAge"/>
+        <result column="earn_cnd_se_cd" property="earnCndSeCd"/>
+        <result column="earn_min_amt" property="earnMinAmt"/>
+        <result column="earn_max_amt" property="earnMaxAmt"/>
+        <result column="earn_etc_cn" property="earnEtcCn"/>
+    </resultMap>
+
+    <!-- 전체 조회 -->
+    <select id="findAll" resultMap="PolicyMap">
         SELECT * FROM YouthPolicy
     </select>
 
-    <!-- plcyNo 중복 확인용 -->
+    <!-- 정책 ID로 조회 -->
+    <select id="selectPolicyById" parameterType="int" resultMap="PolicyMap">
+        SELECT * FROM YouthPolicy WHERE policy_id = #{id}
+    </select>
+
+    <!-- plcy_no 중복 여부 -->
     <select id="existsByPlcyNo" resultType="int">
-        SELECT COUNT(*) FROM YouthPolicy WHERE plcyNo = #{plcyNo}
+        SELECT COUNT(*) FROM YouthPolicy WHERE plcy_no = #{plcyNo}
     </select>
 
     <select id="count" resultType="int">
         SELECT COUNT(*) FROM YouthPolicy
     </select>
 
+    <!-- 정책 INSERT -->
     <insert id="insertPolicy" parameterType="org.iebbuda.mozi.domain.policy.domain.PolicyVO">
         INSERT INTO YouthPolicy (
-            plcyNm,
-            plcyNo,
-            plcyExplnCn,
-            plcySprtCn,
-            zipCd,
-            mrgSttsCd,
-            schoolCd,
-            jobCd,
-            plcyMajorCd,
-            sBizCd,
-            aplyUrlAddr,
-            bizPrdBgngYmd,
-            bizPrdEndYmd,
-            lclsfNm,
-            mclsfNm,
-            plcyKywdNm,
-            sprtTrgtMinAge,
-            sprtTrgtMaxAge,
-            earnCndSeCd,
-            earnMinAmt,
-            earnMaxAmt,
-            earnEtcCn
-        )
-        VALUES (
-                   #{plcyNm},
-                   #{plcyNo},
-                   #{plcyExplnCn},
-                   #{plcySprtCn},
-                   #{zipCd},
-                   #{mrgSttsCd},
-                   #{schoolCd},
-                   #{jobCd},
-                   #{plcyMajorCd},
-                   #{sBizCd},
-                   #{aplyUrlAddr},
-                   #{bizPrdBgngYmd},
-                   #{bizPrdEndYmd},
-                   #{lclsfNm},
-                   #{mclsfNm},
-                   #{plcyKywdNm},
-                   #{sprtTrgtMinAge},
-                   #{sprtTrgtMaxAge},
-                   #{earnCndSeCd},
-                   #{earnMinAmt},
-                   #{earnMaxAmt},
-                   #{earnEtcCn}
-               )
+            plcy_nm, plcy_no, plcy_expln_cn, plcy_sprt_cn,
+            zip_cd, mrg_stts_cd, school_cd, job_cd,
+            plcy_major_cd, s_biz_cd, aply_url_addr,
+            biz_prd_bgng_ymd, biz_prd_end_ymd,
+            lclsf_nm, mclsf_nm, plcy_kywd_nm,
+            sprt_trgt_min_age, sprt_trgt_max_age,
+            earn_cnd_se_cd, earn_min_amt, earn_max_amt, earn_etc_cn
+        ) VALUES (
+                     #{plcyNm}, #{plcyNo}, #{plcyExplnCn}, #{plcySprtCn},
+                     #{zipCd}, #{mrgSttsCd}, #{schoolCd}, #{jobCd},
+                     #{plcyMajorCd}, #{sBizCd}, #{aplyUrlAddr},
+                     #{bizPrdBgngYmd}, #{bizPrdEndYmd},
+                     #{lclsfNm}, #{mclsfNm}, #{plcyKywdNm},
+                     #{sprtTrgtMinAge}, #{sprtTrgtMaxAge},
+                     #{earnCndSeCd}, #{earnMinAmt}, #{earnMaxAmt}, #{earnEtcCn}
+                 )
     </insert>
 
-
-    <select id="selectPolicyById" parameterType="int" resultType="org.iebbuda.mozi.domain.policy.domain.PolicyVO">
-        SELECT *
-        FROM YouthPolicy
-        WHERE policy_id = #{id}
-    </select>
-
-
+    <!-- 필터 조회 -->
     <select id="findByFilters" resultType="org.iebbuda.mozi.domain.policy.dto.PolicyDTO">
         SELECT * FROM YouthPolicy
         WHERE 1=1
 
-        <!-- 혼인 여부 -->
         <if test="marital_status != null and marital_status != '0055003'">
-            AND mrgSttsCd = #{marital_status}
+            AND mrg_stts_cd = #{marital_status}
         </if>
 
-        <!-- 지역 필터 -->
         <if test="region != null and region.size > 0">
             AND (
             <foreach collection="region" item="zip" separator=" OR ">
-                zipCd LIKE CONCAT('%', #{zip}, '%')
+                zip_cd LIKE CONCAT('%', #{zip}, '%')
             </foreach>
             )
         </if>
 
-        <!-- 취업 상태 -->
         <if test="job != null and job.size > 0">
-            AND jobCd IN
+            AND job_cd IN
             <foreach collection="job" item="item" open="(" separator="," close=")">
                 #{item}
             </foreach>
         </if>
 
-        <!-- 학력 -->
         <if test="education != null and education.size > 0">
-            AND schoolCd IN
+            AND school_cd IN
             <foreach collection="education" item="item" open="(" separator="," close=")">
                 #{item}
             </foreach>
         </if>
 
-        <!-- 전공 -->
         <if test="major != null and major.size > 0">
-            AND plcyMajorCd IN
+            AND plcy_major_cd IN
             <foreach collection="major" item="item" open="(" separator="," close=")">
                 #{item}
             </foreach>
         </if>
 
-        <!-- 특화 분야 -->
         <if test="specialty != null and specialty.size > 0">
-            AND sBizCd IN
+            AND s_biz_cd IN
             <foreach collection="specialty" item="item" open="(" separator="," close=")">
                 #{item}
             </foreach>
@@ -128,15 +119,10 @@
 
         <if test="age != null">
             AND (
-            (sprtTrgtMinAge = 0 OR sprtTrgtMinAge &lt;= #{age})
+            (sprt_trgt_min_age = 0 OR sprt_trgt_min_age &lt;= #{age})
             AND
-            (sprtTrgtMaxAge = 0 OR sprtTrgtMaxAge &gt;= #{age})
+            (sprt_trgt_max_age = 0 OR sprt_trgt_max_age &gt;= #{age})
             )
         </if>
-
-
     </select>
-
-
-
 </mapper>

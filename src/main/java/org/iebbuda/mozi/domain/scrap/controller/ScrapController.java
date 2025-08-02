@@ -15,35 +15,36 @@ public class ScrapController {
 
     private final ScrapService scrabService;
 
-    // 사용자의 스크랩된 정책 ID 목록 조회
+    // 스크랩된 정책 plcyNo 목록 조회
     @GetMapping
-    public ResponseEntity<List<Integer>> getScrapedList(@RequestParam int userId) {
-        return ResponseEntity.ok(scrabService.getScrapedPolicyIds(userId));
+    public ResponseEntity<List<String>> getScrapedList(@RequestParam int userId) {
+        return ResponseEntity.ok(scrabService.getScrapedPolicyNos(userId));
     }
 
     // 정책 스크랩 등록
-    @PostMapping("/policy/{policyId}")
-    public ResponseEntity<Void> scrapPolicy(@RequestParam int userId, @PathVariable int policyId) {
-        scrabService.scrapPolicy(userId, policyId);
+    @PostMapping("/policy/{plcyNo}")
+    public ResponseEntity<Void> scrapPolicy(@RequestParam int userId, @PathVariable String plcyNo) {
+        scrabService.scrapPolicy(userId, plcyNo);
         return ResponseEntity.ok().build();
     }
 
     // 정책 스크랩 취소
-    @DeleteMapping("/policy/{policyId}")
-    public ResponseEntity<Void> cancelScrap(@RequestParam int userId, @PathVariable int policyId) {
-        scrabService.cancelScrapPolicy(userId, policyId);
+    @DeleteMapping("/policy/{plcyNo}")
+    public ResponseEntity<Void> cancelScrap(@RequestParam int userId, @PathVariable String plcyNo) {
+        scrabService.cancelScrapPolicy(userId, plcyNo);
         return ResponseEntity.ok().build();
     }
 
     // 정책이 스크랩되어 있는지 확인
-    @GetMapping("/policy/{policyId}/check")
-    public ResponseEntity<Boolean> checkScrap(@RequestParam int userId, @PathVariable int policyId) {
-        return ResponseEntity.ok(scrabService.isScrapedPolicy(userId, policyId));
+    @GetMapping("/policy/{plcyNo}/check")
+    public ResponseEntity<Boolean> checkScrap(@RequestParam int userId, @PathVariable String plcyNo) {
+        return ResponseEntity.ok(scrabService.isScrapedPolicy(userId, plcyNo));
     }
 
+    // 스크랩된 정책 전체 조회
     @GetMapping("/policy/list")
     public ResponseEntity<List<PolicyVO>> getScrapedPolicies(@RequestParam int userId) {
-        System.out.println("🔥 getScrappedPolicies 요청됨 - userId: " + userId); // 로그 추가
+        System.out.println("🔥 getScrappedPolicies 요청됨 - userId: " + userId);
         return ResponseEntity.ok(scrabService.getScrapedPolicies(userId));
     }
 }

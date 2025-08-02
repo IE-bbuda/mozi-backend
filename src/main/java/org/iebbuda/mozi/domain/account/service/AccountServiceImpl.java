@@ -185,8 +185,10 @@ public class AccountServiceImpl implements AccountService {
     //일단 "원"만 고려
     @Override
     public Map<String, Object> getBankSummary(Integer userId) {
+        String mainBankCode = accountMapper.getMainBankCodeByUserId(userId);
+
         List<BankSummaryDTO> list = accountMapper.getBankSummaryByUserId(userId);
-        Double totalBalance=0.0;
+        Double totalBalance = 0.0;
         boolean isConnected = false;
         if (list != null && !list.isEmpty()) {
             isConnected = true;
@@ -198,12 +200,19 @@ public class AccountServiceImpl implements AccountService {
                 );
                 totalBalance += summary.getTotalBalance();
             }
+            list.sort((a, b) -> {
+                if (a.getBankCode().equals(mainBankCode)) return -1;
+                if (b.getBankCode().equals(mainBankCode)) return 1;
+                return 0;
+            });
+
         }
 
         return Map.of(
                 "totalBalance", totalBalance,
                 "BankSummaryList", list,
-                "isConnected", isConnected
+                "isConnected", isConnected,
+                "mainBankCode", mainBankCode
         );
     }
     @Override
@@ -233,6 +242,7 @@ public class AccountServiceImpl implements AccountService {
 
         boolean success = (mainSummary != null);
         return Map.of(
+                "mainBankCode", mainBankCode,
                 "success", success,
                 "mainBankSummary", mainSummary
         );
@@ -267,6 +277,19 @@ public class AccountServiceImpl implements AccountService {
         }
         return Map.of("success", true);
 
+    }
+
+    @Override
+    public Map<String, Object> updateAccountsByGoal(List<String> accountNumberList, Integer goalId, Integer userId) {
+        accountMapper.clearGoalFromAccounts(goalId, userId);
+
+        if (accountNumberList != null && !accountNumberList.isEmpty()) {
+            for (String accountNumber : accountNumberList) {
+                accountMapper.assignGoalToAccount(accountNumber, goalId, userId);
+            }
+        }
+
+        return Map.of("success", true);
     }
 }
 
