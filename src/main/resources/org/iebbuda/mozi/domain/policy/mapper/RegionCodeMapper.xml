@@ -32,6 +32,12 @@
         SELECT * FROM RegionCode
     </select>
 
+    <select id="findZipCodesBySido" resultType="String" parameterType="string">
+        SELECT zip_code
+        FROM RegionCode
+        WHERE sido = #{sido}
+    </select>
+
     <delete id="truncateTable">
         TRUNCATE TABLE RegionCode
     </delete>

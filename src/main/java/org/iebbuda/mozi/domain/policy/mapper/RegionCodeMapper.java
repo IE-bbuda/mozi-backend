@@ -20,4 +20,7 @@ public interface RegionCodeMapper {
     // 전체 지역코드 리스트 조회
     List<RegionCodeVO> findAll();
 
+    // 시,도로 조회
+    List<String> findZipCodesBySido(String sido);
+
 }

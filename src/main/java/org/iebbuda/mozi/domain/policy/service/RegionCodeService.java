@@ -18,6 +18,7 @@ public interface RegionCodeService {
     // zipCd API 호출 후 저장
     void fetchAndSaveFromApi();
 
-
+    // 시, 도로 조회
+    List<String> findZipCodesBySido(String sido);
 
 }
