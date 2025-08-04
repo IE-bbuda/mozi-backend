@@ -2,10 +2,15 @@ package org.iebbuda.mozi.domain.profile.domain.enums;
 
 public enum EducationLevel {
     NO_RESTRICTION("제한없음"),
-    HIGH_SCHOOL("고등학교"),
-    COLLEGE("전문대학"),
-    UNIVERSITY("대학교"),
-    GRADUATE("대학원");
+    LESS_THAN_HIGH("고등학교 미만"),
+    HIGH_SCHOOL_ENROLLED("고등학교 재학"),
+    HIGH_SCHOOL_EXPECTED("고등학교 졸업 예정"),
+    HIGH_SCHOOL("고등학교 졸업"),
+    COLLEGE_ENROLLED("전문대학 재학"),
+    COLLEGE_EXPECTED("전문대학 졸업 예정"),
+    COLLEGE("전문대학 졸업"),
+    GRADUATE("대학원"),
+    OTHER("기타");
 
     private final String label;
 
