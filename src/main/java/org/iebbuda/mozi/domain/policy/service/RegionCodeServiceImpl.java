@@ -34,6 +34,13 @@ public class RegionCodeServiceImpl implements RegionCodeService {
         return regionCodeMapper.findAll();
     }
 
+    // 시, 도로 조회
+    @Override
+    public List<String> findZipCodesBySido(String sido) {
+        return regionCodeMapper.findZipCodesBySido(sido);
+    }
+
+
     // zipCd API 호출 후 저장
     @Override
     public void fetchAndSaveFromApi() {

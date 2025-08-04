@@ -17,7 +17,7 @@ public class PolicyDTO {
     private String schoolCd;           // 학력
     private String jobCd;              // 취업 상태
     private String plcyMajorCd;        // 전공 분야
-    private String sBizCd;             // 특화 분야
+    private String sbizCd;             // 특화 분야
     private String aplyUrlAddr;        // 신청 URL
     private String bizPrdBgngYmd;      // 시작일
     private String bizPrdEndYmd;       // 종료일

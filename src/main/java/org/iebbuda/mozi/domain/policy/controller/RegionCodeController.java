@@ -15,6 +15,14 @@ public class RegionCodeController {
 
     private final RegionCodeService regionCodeService;
 
+
+    // 전체 지역 반환
+    @GetMapping
+    public List<RegionCodeVO> getAllRegionCodes() {
+        return regionCodeService.getAllRegionCodes();
+    }
+
+
     // zip 코드 리스트로 변환
     @PostMapping("/zipcodes")
     public List<String> getZipCodesByRegionNames(@RequestBody List<String> regionNames) {
@@ -27,10 +35,10 @@ public class RegionCodeController {
         return regionCodeService.getRegionNamesByZipCodes(zipCodes);
     }
 
-    // 전체 지역 반환
-    @GetMapping("/all")
-    public List<RegionCodeVO> getAllRegionCodes() {
-         return regionCodeService.getAllRegionCodes();
+    // 시도(sido) 기준 zip_code 전체 반환
+    @GetMapping("/zipcodes/sido")
+    public ResponseEntity<List<String>> getZipCodesBySido(@RequestParam String sido) {
+        return ResponseEntity.ok(regionCodeService.findZipCodesBySido(sido));
     }
 
 

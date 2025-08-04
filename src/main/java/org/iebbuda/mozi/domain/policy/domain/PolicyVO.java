@@ -17,7 +17,7 @@ public class PolicyVO {
     private String schoolCd;           // 학력 (ENUM)
     private String jobCd;              // 취업 상태 (ENUM)
     private String plcyMajorCd;        // 전공 분야
-    private String sBizCd;             // 특화 분야
+    private String sbizCd;             // 특화 분야
     private String aplyUrlAddr;        // 신청 URL
     private String bizPrdBgngYmd;      // 시작일 (String으로 받고 저장 시 DATE로 변환)
     private String bizPrdEndYmd;       // 종료일
