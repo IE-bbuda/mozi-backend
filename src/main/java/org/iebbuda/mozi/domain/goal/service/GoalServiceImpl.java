@@ -50,10 +50,9 @@ public class GoalServiceImpl implements GoalService {
     public GoalDTO createGoal(GoalDTO goalDTO) {
         log.info("목표 생성 - 목표명: {}", goalDTO.getGoalName());
 
-        // 생성 시간은 DB에서 자동 설정 (now() 함수 사용)
-        // 목표 상태 초기화 (미달성) - DB 기본값이 false이므로 설정하지 않아도 됨
-        if (goalDTO.isGoalStatus() == false) {
-            goalDTO.setGoalStatus(false);
+        // goalStatus가 null이면 기본값 true(미달성)로 설정
+        if (goalDTO.getGoalStatus() == null) {
+            goalDTO.setGoalStatus(true);
         }
 
         GoalVO goalVO = goalDTO.toVo();
