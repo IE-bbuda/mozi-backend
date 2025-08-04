@@ -24,7 +24,7 @@ public class GoalDTO {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime goalDate;     // 목표날짜
     private String memo;                // 메모
-    private boolean goalStatus;         // 목표상태
+    private Boolean goalStatus;         // 목표상태 (Boolean 래퍼 타입으로 변경)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;    // 생성날짜
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
@@ -39,6 +39,26 @@ public class GoalDTO {
         HOBBY
     }
 
+    // boolean 타입을 위한 getter (기존 코드 호환성)
+    public boolean isGoalStatus() {
+        return goalStatus != null ? goalStatus : true; // null이면 기본값 true 반환
+    }
+
+    // Boolean 타입을 위한 getter
+    public Boolean getGoalStatus() {
+        return goalStatus;
+    }
+
+    // Boolean 타입을 위한 setter
+    public void setGoalStatus(Boolean goalStatus) {
+        this.goalStatus = goalStatus;
+    }
+
+    // boolean 타입을 위한 setter (기존 코드 호환성)
+    public void setGoalStatus(boolean goalStatus) {
+        this.goalStatus = goalStatus;
+    }
+
     // VO -> DTO
     public static GoalDTO of(GoalVO vo) {
         return vo == null ? null : GoalDTO.builder()
@@ -49,7 +69,7 @@ public class GoalDTO {
                 .targetAmount(vo.getTargetAmount())
                 .goalDate(vo.getGoalDate())
                 .memo(vo.getMemo())
-                .goalStatus(vo.isGoalStatus())
+                .goalStatus(vo.isGoalStatus()) // boolean을 Boolean으로 자동 박싱
                 .createdAt(vo.getCreatedAt())
                 .updatedAt(vo.getUpdatedAt())
                 .build();
@@ -65,10 +85,9 @@ public class GoalDTO {
                 .targetAmount(targetAmount)
                 .goalDate(goalDate)
                 .memo(memo)
-                .goalStatus(goalStatus)
+                .goalStatus(isGoalStatus()) // Boolean을 boolean으로 변환
                 .createdAt(createdAt)
                 .updatedAt(updatedAt)
                 .build();
     }
-
 }
