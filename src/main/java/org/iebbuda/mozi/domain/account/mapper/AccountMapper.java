@@ -22,7 +22,7 @@ public interface AccountMapper {
 
     List<AccountVO> getAccountsByUserIdAndBank(@Param("userId")Integer userId, @Param("bankCode") String bankCode);
 
-    List<AccountResponseDTO> findAccountsByUserAndGoal(Integer userId, Integer goalId);
+    List<AccountResponseDTO> findAccountsByUserAndGoal(@Param("userId") Integer userId, @Param("goalId") Integer goalId);
 
     String getMainBankCodeByUserId(Integer userId);
 
