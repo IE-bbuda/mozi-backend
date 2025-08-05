@@ -19,6 +19,12 @@ public class OAuthLoginService {
     private final OAuthUserService oAuthUserService;
     private final JwtProcessor jwtProcessor;
 
+
+    public String getLoginUrl(String provider) {
+        OAuthService oauthService = oAuthServiceFactory.getOAuthService(provider);
+        return oauthService.getLoginUrl();
+    }
+
    public AuthResultDTO processOAuthLogin(String provider, String code){
        log.info("{} OAuth 로그인 처리 시작 - code: {}", provider, code);
 

@@ -236,7 +236,7 @@ class UserProfileMapperTest {
         profile.setAge(25);
         profile.setMaritalStatus(MaritalStatus.SINGLE);
         profile.setAnnualIncome(new BigDecimal("30000000.00")); // 3천만원
-        profile.setEducationLevel(EducationLevel.UNIVERSITY);
+        profile.setEducationLevel(EducationLevel.GRADUATE);
         profile.setEmploymentStatus(EmploymentStatus.EMPLOYED);
         profile.setMajor(Major.BUSINESS);
         profile.setSpecialty(Specialty.NO_RESTRICTION);
