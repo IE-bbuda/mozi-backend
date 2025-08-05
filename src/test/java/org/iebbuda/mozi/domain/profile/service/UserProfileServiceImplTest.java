@@ -151,7 +151,7 @@ class UserProfileServiceImplTest {
         assertEquals(25, result.getAge());
         assertEquals(MaritalStatus.SINGLE, result.getMaritalStatus());
         assertEquals(0, new BigDecimal("30000000.00").compareTo(result.getAnnualIncome()));
-        assertEquals(EducationLevel.UNIVERSITY, result.getEducationLevel());
+        assertEquals(EducationLevel.GRADUATE, result.getEducationLevel());
         assertEquals(EmploymentStatus.EMPLOYED, result.getEmploymentStatus());
         assertEquals(Major.BUSINESS, result.getMajor());
         assertEquals(Specialty.NO_RESTRICTION, result.getSpecialty());
@@ -242,7 +242,7 @@ class UserProfileServiceImplTest {
                 .age(25)
                 .maritalStatus(MaritalStatus.SINGLE)
                 .annualIncome(new BigDecimal("30000000.00"))
-                .educationLevel(EducationLevel.UNIVERSITY)
+                .educationLevel(EducationLevel.GRADUATE)
                 .employmentStatus(EmploymentStatus.EMPLOYED)
                 .major(Major.BUSINESS)
                 .specialty(Specialty.NO_RESTRICTION)
