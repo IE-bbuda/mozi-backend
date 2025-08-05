@@ -25,24 +25,28 @@ public class OAuthController {
         return new BaseResponse<>(result);
     }
 
-//    @GetMapping("/google/callback")
-//    public BaseResponse<AuthResultDTO> googleCallback(@RequestParam("code") String code) {
-//        AuthResultDTO result = oauthLoginService.processOAuthLogin("GOOGLE", code);
-//        return new BaseResponse<>(result);
-//    }
-//
-//    @GetMapping("/naver/callback")
-//    public BaseResponse<AuthResultDTO> naverCallback(@RequestParam("code") String code) {
-//        AuthResultDTO result = oauthLoginService.processOAuthLogin("NAVER", code);
-//        return new BaseResponse<>(result);
-//    }
+    // ===== 네이버 =====
+    @GetMapping("/naver/login-url")
+    public BaseResponse<String> getNaverLoginUrl() {
+        String loginUrl = oauthLoginService.getLoginUrl("NAVER");
+        return new BaseResponse<>(loginUrl);
+    }
 
-//    // 범용 OAuth 콜백 엔드포인트
-//    @GetMapping("/{provider}/callback")
-//    public BaseResponse<AuthResultDTO> oauthCallback(
-//            @PathVariable("provider") String provider,
-//            @RequestParam("code") String code) {
-//        AuthResultDTO result = oauthLoginService.processOAuthLogin(provider.toUpperCase(), code);
-//        return new BaseResponse<>(result);
-//    }
+    @GetMapping("/naver/callback")
+    public BaseResponse<AuthResultDTO> naverCallback(@RequestParam("code") String code) {
+        AuthResultDTO result = oauthLoginService.processOAuthLogin("NAVER", code);
+        return new BaseResponse<>(result);
+    }
+    // ===== 구글 =====
+    @GetMapping("/google/login-url")
+    public BaseResponse<String> getGoogleLoginUrl() {
+        String loginUrl = oauthLoginService.getLoginUrl("GOOGLE");
+        return new BaseResponse<>(loginUrl);
+    }
+
+    @GetMapping("/google/callback")
+    public BaseResponse<AuthResultDTO> googleCallback(@RequestParam("code") String code) {
+        AuthResultDTO result = oauthLoginService.processOAuthLogin("GOOGLE", code);
+        return new BaseResponse<>(result);
+    }
 }
