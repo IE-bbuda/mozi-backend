@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -290,6 +291,10 @@ public class AccountServiceImpl implements AccountService {
         }
 
         return Map.of("success", true);
+    }
+    public Map<String, Object> getConnectedBanks(Integer userId) {
+        List<String> connectedBankCodes=bankLoginMapper.getBankCodeByUserId(userId);
+        return Map.of("bankCodeList", connectedBankCodes);
     }
 }
 

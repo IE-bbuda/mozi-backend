@@ -14,4 +14,6 @@ public interface BankLoginMapper {
     void deleteById(Integer bankLoginId);
 
     List<String> getBankCodeByUserId(Integer userId);
+
+    List<String> getAllBanks();
 }
