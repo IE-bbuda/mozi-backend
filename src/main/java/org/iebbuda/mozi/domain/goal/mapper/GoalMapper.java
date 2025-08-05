@@ -21,4 +21,7 @@ public interface GoalMapper {
     public int delete(int goalId);
 
     public GoalVO getBillionGoal(@Param("userId") int userId);
+
+    List<GoalVO> findByUserId(int userId);
+
 }

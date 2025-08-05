@@ -61,4 +61,12 @@
             limit 1
     </select>
 
+
+<!--    특정 사용자의 목표만 조회-->
+    <select id="findByUserId" resultType="org.iebbuda.mozi.domain.goal.domain.GoalVO">
+        SELECT *
+        FROM goal
+        WHERE user_id = #{userId}
+    </select>
+
 </mapper>
