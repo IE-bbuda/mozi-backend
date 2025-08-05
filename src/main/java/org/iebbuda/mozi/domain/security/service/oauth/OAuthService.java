@@ -6,4 +6,5 @@ public interface OAuthService {
     String getAccessToken(String code);
     OAuthUserInfo getUserInfo(String accessToken);
     boolean supports(String provider);
+    String getLoginUrl(); // 추가
 }
