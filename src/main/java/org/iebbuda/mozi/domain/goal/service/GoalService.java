@@ -61,4 +61,9 @@ public interface GoalService {
      return 목표 키워드 (목표가 없으면 null)*/
     GoalVO.GoalKeyword getGoalKeyword(int goalId);
 
+
+    GoalVO getGoalById(int goalId); // goalId로 GoalVO 가져오기
+    List<GoalVO> getGoalVOListByUserId(int userId);
+
+
 }

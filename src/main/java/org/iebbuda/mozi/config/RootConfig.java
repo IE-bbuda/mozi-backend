@@ -30,7 +30,7 @@ import java.util.Properties;
 @ComponentScan(basePackages = {
         "org.iebbuda.mozi.domain.user.service",
         "org.iebbuda.mozi.domain.policy.service","org.iebbuda.mozi.domain.policy.util", "org.iebbuda.mozi.domain.product.scheduler",
-        "org.iebbuda.mozi.domain.product.service","org.iebbuda.mozi.domain.profile.service","org.iebbuda.mozi.domain.goal.service", "org.iebbuda.mozi.domain.account.service", "org.iebbuda.mozi.domain.account.encrypt", "org.iebbuda.mozi.domain.scrap","org.iebbuda.mozi.domain.security.service","org.iebbuda.mozi.domain.recommend.service"})
+        "org.iebbuda.mozi.domain.product.service","org.iebbuda.mozi.domain.profile.service","org.iebbuda.mozi.domain.goal.service", "org.iebbuda.mozi.domain.account.service", "org.iebbuda.mozi.domain.account.encrypt", "org.iebbuda.mozi.domain.scrap","org.iebbuda.mozi.domain.security.service", "org.iebbuda.mozi.domain.recommend"})
 
 @Import(ExternalApiClientConfig.class)
 

@@ -24,11 +24,11 @@ public interface AccountMapper {
 
     List<AccountResponseDTO> findAccountsByUserAndGoal(@Param("userId") Integer userId, @Param("goalId") Integer goalId);
 
-    String getMainBankCodeByUserId(Integer userId);
-
-    void clearMainBankByUserId(Integer userId);
-
-    int updateMainBankCodeByUserId(@Param("bankCode") String bankCode, @Param("userId") Integer userId);
+//    String getMainBankCodeByUserId(Integer userId);
+//
+//    void clearMainBankByUserId(Integer userId);
+//
+//    int updateMainBankCodeByUserId(@Param("bankCode") String bankCode, @Param("userId") Integer userId);
 
     int clearGoalFromAccounts(@Param("goalId")Integer goalId, @Param("userId") Integer userId);
 

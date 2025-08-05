@@ -5,11 +5,17 @@ import lombok.RequiredArgsConstructor;
 import org.iebbuda.mozi.domain.account.dto.BankLoginRequestDTO;
 import org.iebbuda.mozi.domain.account.encrypt.RsaEncryptor;
 import org.iebbuda.mozi.domain.account.external.ExternalApiClient;
+import org.iebbuda.mozi.domain.security.account.domain.CustomUser;
+import org.iebbuda.mozi.domain.user.mapper.UserMapper;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -20,7 +26,7 @@ public class ConnectionServiceImpl implements ConnectionService {
     private final RsaEncryptor rsaEncryptor;
     private final AuthService authService;
     private final ExternalApiClient externalApiClient;
-
+    private final UserMapper userMapper;
 
     @Override
     public String connect(BankLoginRequestDTO dto) {
@@ -29,10 +35,14 @@ public class ConnectionServiceImpl implements ConnectionService {
 
         // 2. 비밀번호 암호화
         String encryptedPassword = rsaEncryptor.encrypt(dto.getUserBankPassword());
-
-        // 3. 생년월일 6자리 변환 (예: 19990101 → 990101)
-        // String birthDate6 = dto.getBirthDate().substring(2);
-
+        //3. 생년월일
+        // 로그인 유저 정보 가져오기
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        CustomUser user = (CustomUser) authentication.getPrincipal();
+        Integer userId = user.getUser().getUserId();
+        // userId로 DB에서 생일 조회
+        Date birthDate = userMapper.getbirthDateByUserId(userId);
+        String formattedBirthDate = new SimpleDateFormat("yyMMdd").format(birthDate);
         // 4. 요청 바디 구성
         Map<String, Object> requestBody = Map.of(
                 "accountList", List.of(Map.of(
@@ -42,8 +52,8 @@ public class ConnectionServiceImpl implements ConnectionService {
                         "clientType", "P",
                         "loginType", "1",
                         "id", dto.getUserBankId(),
-                        "password", encryptedPassword
-                        // ,"birthDate", birthDate6 // ← 추후 필요 시 포함
+                        "password", encryptedPassword,
+                        "birthDate", formattedBirthDate // ← 추후 필요 시 포함
                 ))
         );
 

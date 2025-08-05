@@ -24,4 +24,7 @@
         select bank_code from banklogin
         where user_id=#{userId}
     </select>
+    <select id="getAllBanks" resultType="java.lang.String">
+        select bank_code from banklogin
+    </select>
 </mapper>

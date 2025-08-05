@@ -196,4 +196,16 @@ public class GoalServiceImpl implements GoalService {
         }
         return goal.getKeyword();
     }
+
+    @Override
+    public GoalVO getGoalById(int goalId) {
+        return goalMapper.get(goalId); // goalMapper에 get(int id) 있음
+    }
+
+    @Override
+    public List<GoalVO> getGoalVOListByUserId(int userId) {
+        return goalMapper.findByUserId(userId); // mapper에서 GoalVO 리스트 반환해야 함
+    }
+
+
 }

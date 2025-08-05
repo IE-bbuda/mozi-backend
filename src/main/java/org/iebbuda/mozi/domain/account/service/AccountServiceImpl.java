@@ -10,12 +10,14 @@ import org.iebbuda.mozi.domain.account.dto.BankSummaryDTO;
 import org.iebbuda.mozi.domain.account.external.ExternalApiClient;
 import org.iebbuda.mozi.domain.account.mapper.AccountMapper;
 import org.iebbuda.mozi.domain.account.mapper.BankLoginMapper;
+import org.iebbuda.mozi.domain.user.mapper.UserMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -27,6 +29,7 @@ public class AccountServiceImpl implements AccountService {
 
     private final AccountMapper accountMapper;
     private final BankLoginMapper bankLoginMapper;
+    private final UserMapper userMapper;
 
 
     @Override
@@ -160,7 +163,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public List<String> deleteAccounts(List<String> bankCodeList, Integer userId) {
-        String mainBankCode = accountMapper.getMainBankCodeByUserId(userId);
+        String mainBankCode = userMapper.getMainBankCodeByUserId(userId);
         System.out.println(mainBankCode);
 
         List<BankLoginVO> bankLogins = bankLoginMapper.getByUserID(userId);
@@ -173,7 +176,7 @@ public class AccountServiceImpl implements AccountService {
                 bankLoginMapper.deleteById(bankLoginId);
                 deletedBanks.add(login.getBankCode());
                 if (login.getBankCode().equals(mainBankCode)) {
-                    accountMapper.clearMainBankByUserId(userId);
+                    userMapper.clearMainBankByUserId(userId);
                     System.out.println("null설정");// main_bank = NULL로 설정하는 메서드
                 }
             }
@@ -185,7 +188,7 @@ public class AccountServiceImpl implements AccountService {
     //일단 "원"만 고려
     @Override
     public Map<String, Object> getBankSummary(Integer userId) {
-        String mainBankCode = accountMapper.getMainBankCodeByUserId(userId);
+        String mainBankCode = userMapper.getMainBankCodeByUserId(userId);
 
         List<BankSummaryDTO> list = accountMapper.getBankSummaryByUserId(userId);
         Double totalBalance = 0.0;
@@ -220,8 +223,7 @@ public class AccountServiceImpl implements AccountService {
         Map<String, Object> result = getBankSummary(userId);
         List<BankSummaryDTO> summaryList = (List<BankSummaryDTO>) result.get("BankSummaryList");
 
-        String mainBankCode = accountMapper.getMainBankCodeByUserId(userId);
-        //String mainBankCode="0011";
+        String mainBankCode = userMapper.getMainBankCodeByUserId(userId);
 
         BankSummaryDTO mainSummary = null;
 
@@ -257,7 +259,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public Map<String, Object> getBank(Integer userId){
         //수정 userMapper로
-        String mainBankCode = accountMapper.getMainBankCodeByUserId(userId);
+        String mainBankCode = userMapper.getMainBankCodeByUserId(userId);
         //String mainBankCode="";
         List<String> list=bankLoginMapper.getBankCodeByUserId(userId);
         return Map.of("mainBankCode", mainBankCode,"bankList", list);
@@ -271,9 +273,9 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public Map<String, Object> updateMainBankCode(String bankCode, Integer userId) {
         if (bankCode == null || bankCode.isEmpty()) {
-            accountMapper.clearMainBankByUserId(userId); // main_bank = null
+            userMapper.clearMainBankByUserId(userId); // main_bank = null
         } else {
-            accountMapper.updateMainBankCodeByUserId(bankCode, userId);
+            userMapper.updateMainBankCodeByUserId(bankCode, userId);
         }
         return Map.of("success", true);
 
@@ -290,6 +292,10 @@ public class AccountServiceImpl implements AccountService {
         }
 
         return Map.of("success", true);
+    }
+    public Map<String, Object> getConnectedBanks(Integer userId) {
+        List<String> connectedBankCodes=bankLoginMapper.getBankCodeByUserId(userId);
+        return Map.of("bankCodeList", connectedBankCodes);
     }
 }
 
