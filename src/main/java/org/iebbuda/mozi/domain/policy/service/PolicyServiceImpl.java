@@ -114,7 +114,11 @@ public class PolicyServiceImpl implements PolicyService {
         vo.setJobCd(dto.getJobCd());
         vo.setPlcyMajorCd(dto.getPlcyMajorCd());
         vo.setSbizCd(dto.getSbizCd());
-        vo.setAplyUrlAddr(dto.getAplyUrlAddr());
+        vo.setAplyUrlAddr(
+                dto.getAplyUrlAddr() != null && dto.getAplyUrlAddr().length() > 200
+                        ? dto.getAplyUrlAddr().substring(0, 200)
+                        : dto.getAplyUrlAddr()
+        );
 
         // 날짜 공백 처리 추가
         vo.setBizPrdBgngYmd(
