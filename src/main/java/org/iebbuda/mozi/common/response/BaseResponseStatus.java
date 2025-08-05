@@ -60,13 +60,15 @@ public enum BaseResponseStatus {
     KAKAO_USER_INFO_REQUEST_FAILED(false, HttpStatus.BAD_GATEWAY.value(), "카카오 사용자 정보 요청에 실패했습니다."),
     KAKAO_TOKEN_EXTRACT_FAILED(false, HttpStatus.INTERNAL_SERVER_ERROR.value(), "카카오 토큰 추출에 실패했습니다."),
 
-    // 구글 OAuth 관련 (나중에 추가할 때)
-    GOOGLE_TOKEN_REQUEST_FAILED(false, HttpStatus.BAD_GATEWAY.value(), "구글 액세스 토큰 요청에 실패했습니다."),
-    GOOGLE_USER_INFO_REQUEST_FAILED(false, HttpStatus.BAD_GATEWAY.value(), "구글 사용자 정보 요청에 실패했습니다."),
-
-    // 네이버 OAuth 관련 (나중에 추가할 때)
-    NAVER_TOKEN_REQUEST_FAILED(false, HttpStatus.BAD_GATEWAY.value(), "네이버 액세스 토큰 요청에 실패했습니다."),
+    // 네이버 OAuth 에러
+    NAVER_TOKEN_REQUEST_FAILED(false, HttpStatus.BAD_GATEWAY.value(), "네이버 토큰 요청에 실패했습니다."),
     NAVER_USER_INFO_REQUEST_FAILED(false, HttpStatus.BAD_GATEWAY.value(), "네이버 사용자 정보 요청에 실패했습니다."),
+    NAVER_TOKEN_EXTRACT_FAILED(false, HttpStatus.INTERNAL_SERVER_ERROR.value(), "네이버 토큰 추출에 실패했습니다."),
+
+    // 구글 OAuth 에러
+    GOOGLE_TOKEN_REQUEST_FAILED(false, HttpStatus.BAD_GATEWAY.value(), "구글 토큰 요청에 실패했습니다."),
+    GOOGLE_USER_INFO_REQUEST_FAILED(false, HttpStatus.BAD_GATEWAY.value(), "구글 사용자 정보 요청에 실패했습니다."),
+    GOOGLE_TOKEN_EXTRACT_FAILED(false, HttpStatus.INTERNAL_SERVER_ERROR.value(), "구글 토큰 추출에 실패했습니다."),
 
     // 공통 에러
     DATABASE_CONSTRAINT_ERROR(false, HttpStatus.BAD_REQUEST.value(), "데이터 제약조건 위반입니다."),
