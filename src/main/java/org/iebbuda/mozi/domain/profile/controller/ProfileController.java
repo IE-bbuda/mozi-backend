@@ -45,6 +45,7 @@ public class ProfileController {
     @GetMapping("/test/{userId}")
     public BaseResponse<UserProfileInfoDTO> getUserProfileByUserId(@PathVariable int userId) {
         UserProfileVO vo = userProfileMapper.findByUserId(userId);
+        System.out.println(vo);
         return new BaseResponse<>(UserProfileInfoDTO.of(vo));
     }
 

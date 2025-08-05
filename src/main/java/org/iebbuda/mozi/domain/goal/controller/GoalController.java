@@ -2,6 +2,8 @@ package org.iebbuda.mozi.domain.goal.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.iebbuda.mozi.domain.account.dto.AccountResponseDTO;
+import org.iebbuda.mozi.domain.account.service.AccountServiceImpl;
 import org.iebbuda.mozi.domain.goal.dto.GoalDTO;
 import org.iebbuda.mozi.domain.goal.service.GoalService;
 import org.iebbuda.mozi.domain.security.account.domain.CustomUser;
@@ -18,6 +20,7 @@ import java.util.List;
 public class GoalController {
 
     final private GoalService service;
+    final private AccountServiceImpl accountService;
 
     /* 현재 사용자의 모든 목표 조회 */
     @GetMapping
@@ -101,8 +104,20 @@ public class GoalController {
         int userId = user.getUser().getUserId();
         log.info("목표 달성률 조회 - userId: {}, goalId : {}", userId, goalId);
         // 현재 금액은 0으로 가정 (실제 계좌 연동 api 필요)
+
+
+        //실제 계좌의 잔액
+        log.info("실제 계좌 잔액:"+accountService.getAccountsByGoal(goalId,userId));
+        List<AccountResponseDTO> accounts = (List<AccountResponseDTO>) accountService
+                .getAccountsByGoal(goalId, userId)
+                .get("accountList");
+
+        BigDecimal totalBalance = accounts.stream()
+                .map(a -> BigDecimal.valueOf(a.getBalance())) // Double → BigDecimal 변환
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
         return service.calculateAchievementRate(
-                BigDecimal.ZERO,
+                totalBalance,
                 service.getGoal(goalId).getTargetAmount()
         );
     }
