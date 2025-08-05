@@ -12,6 +12,13 @@ import org.springframework.web.bind.annotation.*;
 public class OAuthController {
     private final OAuthLoginService oauthLoginService;
 
+
+    @GetMapping("/kakao/login-url")
+    public BaseResponse<String> getKakaoLoginUrl() {
+        String loginUrl = oauthLoginService.getLoginUrl("KAKAO");
+        return new BaseResponse<>(loginUrl);
+    }
+
     @GetMapping("/kakao/callback")
     public BaseResponse<AuthResultDTO> kakaoCallback(@RequestParam("code") String code) {
         AuthResultDTO result = oauthLoginService.processOAuthLogin("KAKAO", code);
