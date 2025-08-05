@@ -2,6 +2,7 @@ package org.iebbuda.mozi.domain.recommend.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.iebbuda.mozi.common.response.BaseResponse;
+import org.iebbuda.mozi.domain.recommend.dto.GoalPolicyRecommendDTO;
 import org.iebbuda.mozi.domain.recommend.dto.PolicyRecommendDTO;
 import org.iebbuda.mozi.domain.recommend.service.PolicyRecommendService;
 import org.iebbuda.mozi.domain.security.account.domain.CustomUser;
@@ -19,6 +20,16 @@ import java.util.List;
 public class PolicyRecommendController {
 
     private final PolicyRecommendService policyRecommendService;
+
+    // 전체 목표 추천 (goalId 여러 개일 경우)
+    @GetMapping("/all")
+    public BaseResponse<List<GoalPolicyRecommendDTO>> recommendAll(
+            @AuthenticationPrincipal CustomUser user) {
+
+        int userId = user.getUser().getUserId();
+        List<GoalPolicyRecommendDTO> result = policyRecommendService.recommendAll(userId);
+        return new BaseResponse<>(result);
+    }
 
     // 목표 별 상세 추천
     @GetMapping("/{goalId}")

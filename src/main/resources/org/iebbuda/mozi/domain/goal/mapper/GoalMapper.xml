@@ -65,7 +65,7 @@
 <!--    특정 사용자의 목표만 조회-->
     <select id="findByUserId" resultType="org.iebbuda.mozi.domain.goal.domain.GoalVO">
         SELECT *
-        FROM goal
+        FROM usergoal
         WHERE user_id = #{userId}
     </select>
 
