@@ -137,4 +137,11 @@ public ResponseEntity<Map<String, Object>> addAccounts(
         Map<String, Object> result=accountService.updateAccountsByGoal(accountNumberList, goalId, userId);
         return ResponseEntity.ok(result);
     }
+
+    @GetMapping("/connected-banks")
+    public ResponseEntity<Map<String, Object>> getUnconnectedBanks(@AuthenticationPrincipal CustomUser user){
+        Integer userId=user.getUser().getUserId();
+        Map<String,Object> result=accountService.getConnectedBanks(userId);
+        return ResponseEntity.ok(result);
+    }
 }
