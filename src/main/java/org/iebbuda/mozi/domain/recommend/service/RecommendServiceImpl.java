@@ -6,8 +6,8 @@ import org.iebbuda.mozi.domain.account.dto.AccountResponseDTO;
 import org.iebbuda.mozi.domain.account.service.AccountServiceImpl;
 import org.iebbuda.mozi.domain.goal.service.GoalServiceImpl;
 import org.iebbuda.mozi.domain.recommend.dto.GoalRecommendationDTO;
-import org.iebbuda.mozi.domain.recommend.dto.RecommendProductDTO;
-import org.iebbuda.mozi.domain.recommend.mapper.RecommendMapper;
+import org.iebbuda.mozi.domain.recommend.dto.FinancialRecommendProductDTO;
+import org.iebbuda.mozi.domain.recommend.mapper.FinancialRecommendMapper;
 import org.iebbuda.mozi.domain.goal.mapper.GoalMapper; // 목표 정보 가져오는 Mapper
 import org.iebbuda.mozi.domain.goal.dto.GoalDTO;
 import org.springframework.stereotype.Service;
@@ -23,7 +23,7 @@ import java.util.List;
 @Log4j2
 public class RecommendServiceImpl implements RecommendService {
 
-    private final RecommendMapper recommendMapper;
+    private final FinancialRecommendMapper financialrecommendMapper;
     private final GoalServiceImpl goalService;
     private final AccountServiceImpl accountService;
 
@@ -38,15 +38,15 @@ public class RecommendServiceImpl implements RecommendService {
             long monthsLeft = ChronoUnit.MONTHS.between(LocalDate.now(), goal.getGoalDate().toLocalDate());//목표일-현재일 계산
 
             log.info("계산된 달 차이: "+monthsLeft);
-            List<RecommendProductDTO> recommendedProducts = new ArrayList<>();
+            List<FinancialRecommendProductDTO> recommendedProducts = new ArrayList<>();
             goal.getKeyword();
             if (achievementRate < 30) {
-                recommendedProducts.addAll(recommendMapper.findTopSavingsProducts(monthsLeft, 4));
+                recommendedProducts.addAll(financialrecommendMapper.findTopSavingsProducts(monthsLeft, 4));
             } else if (achievementRate < 70) {
-                recommendedProducts.addAll(recommendMapper.findTopSavingsProducts(monthsLeft, 2));
-                recommendedProducts.addAll(recommendMapper.findTopDepositProducts(monthsLeft, 2));
+                recommendedProducts.addAll(financialrecommendMapper.findTopSavingsProducts(monthsLeft, 2));
+                recommendedProducts.addAll(financialrecommendMapper.findTopDepositProducts(monthsLeft, 2));
             } else {
-                recommendedProducts.addAll(recommendMapper.findTopDepositProducts(monthsLeft, 4));
+                recommendedProducts.addAll(financialrecommendMapper.findTopDepositProducts(monthsLeft, 4));
             }
 
             goalRecommendations.add(new GoalRecommendationDTO(goal.getGoalId(), goal.getGoalName(), recommendedProducts));
