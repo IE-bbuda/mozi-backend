@@ -3,8 +3,10 @@ package org.iebbuda.mozi.domain.product.service;
 import lombok.RequiredArgsConstructor;
 
 import org.iebbuda.mozi.domain.product.domain.DepositProduct;
+import org.iebbuda.mozi.domain.product.domain.SavingProduct;
 import org.iebbuda.mozi.domain.product.dto.DepositOptionResponse;
 import org.iebbuda.mozi.domain.product.dto.DepositResponse;
+import org.iebbuda.mozi.domain.product.dto.SavingResponse;
 import org.iebbuda.mozi.domain.product.mapper.DepositMapper;
 
 import org.springframework.cache.annotation.Cacheable;
@@ -51,6 +53,11 @@ public class DepositQueryService {
             throw new RuntimeException("예금 상품을 찾을 수 없습니다. (id=" + id + ")");
         }
         return toResponse(product);
+    }
+
+    public List<DepositResponse> getTopDepositProduct(int limit) {
+        List<DepositProduct> products = depositMapper.findTopDepositProduct(limit);
+        return products.stream().map(this::toResponse).toList();
     }
 
     private DepositResponse toResponse(DepositProduct product) {

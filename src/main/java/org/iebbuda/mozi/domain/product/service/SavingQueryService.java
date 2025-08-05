@@ -49,6 +49,13 @@ public class SavingQueryService {
         }
         return toResponse(product);
     }
+
+    public List<SavingResponse> getTopSavingProduct(int limit) {
+        List<SavingProduct> products = savingMapper.findTopSavingProduct(limit);
+        return products.stream().map(this::toResponse).toList();
+    }
+
+
     private SavingResponse toResponse(SavingProduct product){
         return SavingResponse.builder()
                 .savingId(product.getSavingId())
