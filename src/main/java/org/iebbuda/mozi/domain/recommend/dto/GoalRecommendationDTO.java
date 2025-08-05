@@ -12,5 +12,5 @@ import java.util.List;
 public class GoalRecommendationDTO {
     private int goalId;
     private String goalName;
-    private List<RecommendProductDTO> recommendedProducts;
+    private List<FinancialRecommendProductDTO> recommendedProducts;
 }

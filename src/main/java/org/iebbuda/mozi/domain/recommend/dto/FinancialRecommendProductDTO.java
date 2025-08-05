@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class RecommendProductDTO {
+public class FinancialRecommendProductDTO {
     private int productId;
     private String productName;     // 상품명
     private String bankCode;

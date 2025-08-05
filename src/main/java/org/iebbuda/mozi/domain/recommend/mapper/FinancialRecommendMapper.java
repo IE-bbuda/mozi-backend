@@ -2,20 +2,21 @@ package org.iebbuda.mozi.domain.recommend.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-import org.iebbuda.mozi.domain.recommend.dto.RecommendProductDTO;
+import org.iebbuda.mozi.domain.recommend.dto.FinancialRecommendProductDTO;
+
 
 import java.util.List;
 
 @Mapper
-public interface RecommendMapper {
+public interface FinancialRecommendMapper {
 
-    List<RecommendProductDTO> findTopSavingsProducts(
+    List<FinancialRecommendProductDTO> findTopSavingsProducts(
             @Param("monthsLeft") long monthsLeft,
             @Param("limit") int limit
 
     );
 
-    List<RecommendProductDTO> findTopDepositProducts(
+    List<FinancialRecommendProductDTO> findTopDepositProducts(
             @Param("monthsLeft") long monthsLeft,
             @Param("limit") int limit
     );

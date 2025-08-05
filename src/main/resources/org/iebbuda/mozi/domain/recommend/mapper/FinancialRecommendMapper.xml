@@ -2,10 +2,10 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="org.iebbuda.mozi.domain.recommend.mapper.RecommendMapper">
+<mapper namespace="org.iebbuda.mozi.domain.recommend.mapper.FinancialRecommendMapper">
 
     <!-- 적금 금리 높은 상품 -->
-    <select id="findTopSavingsProducts" resultType="org.iebbuda.mozi.domain.recommend.dto.RecommendProductDTO">
+    <select id="findTopSavingsProducts" resultType="org.iebbuda.mozi.domain.recommend.dto.FinancialRecommendProductDTO">
         SELECT
         sp.saving_id AS productId,
         sp.fin_prdt_nm AS productName,
@@ -29,7 +29,7 @@
     </select>
 
     <!-- 예금 금리 높은 상품 -->
-    <select id="findTopDepositProducts" resultType="org.iebbuda.mozi.domain.recommend.dto.RecommendProductDTO">
+    <select id="findTopDepositProducts" resultType="org.iebbuda.mozi.domain.recommend.dto.FinancialRecommendProductDTO">
         SELECT
         dp.deposit_id AS productId,
         dp.fin_prdt_nm AS productName,
