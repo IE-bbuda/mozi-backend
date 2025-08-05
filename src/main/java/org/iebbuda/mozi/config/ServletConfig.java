@@ -19,7 +19,8 @@ import org.springframework.web.servlet.view.JstlView;
         "org.iebbuda.mozi.domain.goal.controller",
         "org.iebbuda.mozi.domain.account.controller",
         "org.iebbuda.mozi.domain.scrap",
-        "org.iebbuda.mozi.domain.security.controller"
+        "org.iebbuda.mozi.domain.security.controller",
+        "org.iebbuda.mozi.domain.recommend"
 
 })    // Spring MVC용 컴포넌트 등록을 위한 스캔 패키지
 public class ServletConfig implements WebMvcConfigurer {

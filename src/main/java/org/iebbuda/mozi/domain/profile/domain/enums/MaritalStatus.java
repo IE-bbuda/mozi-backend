@@ -1,14 +1,16 @@
 package org.iebbuda.mozi.domain.profile.domain.enums;
 
 public enum MaritalStatus {
-    NO_RESTRICTION("제한없음"),
-    SINGLE("미혼"),
-    MARRIED("기혼");
+    NO_RESTRICTION("제한없음", "0055003"),
+    SINGLE("미혼", "0055002"),
+    MARRIED("기혼", "0055001");
 
     private final String label;
+    private final String code;
 
-    MaritalStatus(String label) {
+    MaritalStatus(String label, String code) {
         this.label = label;
+        this.code = code;
     }
 
     public String getLabel() {
@@ -16,12 +18,12 @@ public enum MaritalStatus {
     }
 
     public String getCode() {
-        return this.name();
+        return code;
     }
 
     public static MaritalStatus fromCode(String code) {
-        for (MaritalStatus status : MaritalStatus.values()) {
-            if (status.name().equals(code)) {
+        for (MaritalStatus status : values()) {
+            if (status.code.equals(code)) {
                 return status;
             }
         }
