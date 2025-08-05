@@ -24,16 +24,16 @@
         set balance=#{balance}
         where account_number=#{accountNumber}
     </update>
-    <update id="clearMainBankByUserId">
-        UPDATE user
-        SET main_bank = NULL  -- 국민은행 코드 예시
-        WHERE user_id = #{userId};
-    </update>
-    <update id="updateMainBankCodeByUserId">
-        update user
-        set main_bank=#{bankCode}
-        where user_id=#{userId}
-    </update>
+<!--    <update id="clearMainBankByUserId">-->
+<!--        UPDATE user-->
+<!--        SET main_bank = NULL-->
+<!--        WHERE user_id = #{userId};-->
+<!--    </update>-->
+<!--    <update id="updateMainBankCodeByUserId">-->
+<!--        update user-->
+<!--        set main_bank=#{bankCode}-->
+<!--        where user_id=#{userId}-->
+<!--    </update>-->
     <update id="clearGoalFromAccounts">
         UPDATE account
         SET goal_id = NULL
@@ -123,9 +123,9 @@
         WHERE u.user_id = #{userId}
           AND u.goal_id = #{goalId}
     </select>
-    <select id="getMainBankCodeByUserId" resultType="java.lang.String">
-        SELECT IFNULL(main_bank, '') FROM user
-        where user_id=#{userId}
-    </select>
+<!--    <select id="getMainBankCodeByUserId" resultType="java.lang.String">-->
+<!--        SELECT IFNULL(main_bank, '') FROM user-->
+<!--        where user_id=#{userId}-->
+<!--    </select>-->
 
 </mapper>
