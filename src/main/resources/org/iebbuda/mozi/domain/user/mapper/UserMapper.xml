@@ -127,6 +127,14 @@
         WHERE u.provider = #{provider}
           AND u.provider_id = #{providerId}
     </select>
+    <select id="getMainBankCodeByUserId" resultType="java.lang.String">
+        SELECT IFNULL(main_bank, '') FROM user
+        where user_id=#{userId}
+    </select>
+    <select id="getbirthDateByUserId" resultType="java.util.Date">
+        select birth_date from user
+        where user_id=#{userId}
+    </select>
 
     <!-- 기존 사용자를 OAuth 연동으로 업데이트 (확장 가능) -->
     <update id="updateUserToOAuth">
@@ -136,6 +144,16 @@
             provider_id = #{providerId},
             updated_at = NOW()
         WHERE user_id = #{userId}
+    </update>
+    <update id="clearMainBankByUserId">
+        UPDATE user
+        SET main_bank = NULL
+        WHERE user_id = #{userId};
+    </update>
+    <update id="updateMainBankCodeByUserId">
+        update user
+        set main_bank=#{bankCode}
+        where user_id=#{userId}
     </update>
 </mapper>
 

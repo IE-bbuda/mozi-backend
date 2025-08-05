@@ -7,6 +7,7 @@ import org.iebbuda.mozi.domain.security.account.domain.AuthVO;
 import org.iebbuda.mozi.domain.user.domain.UserVO;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 public interface UserMapper {
     UserVO findByUserId(int userId);
@@ -59,4 +60,11 @@ public interface UserMapper {
     // OAuth 관련 메서드들
     public UserVO findByProviderAndProviderId(@Param("provider") String provider, @Param("providerId") String providerId);
     public void updateUserToOAuth(@Param("userId") int userId, @Param("provider") String provider, @Param("providerId") String providerId);
+
+    //주거래은행 관련 메서드들
+    String getMainBankCodeByUserId(Integer userId);
+    void clearMainBankByUserId(Integer userId);
+    int updateMainBankCodeByUserId(@Param("bankCode") String bankCode, @Param("userId") Integer userId);
+
+    Date getbirthDateByUserId(Integer UserId);
 }
