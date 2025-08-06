@@ -48,6 +48,14 @@ public class EmailVerificationService {
     }
 
     /**
+     * 마이페이지 이메일 변경용 인증번호 발송
+     * @param email 인증번호를 받을 이메일
+     */
+    public void sendMyPageVerificationCode(String email) {
+        sendVerificationCode(email, "mypage");
+    }
+
+    /**
      * 인증번호 발송 (내부 메서드)
      * @param email 인증번호를 받을 이메일
      * @param purpose 용도 ("signup" 또는 "password")
@@ -67,16 +75,24 @@ public class EmailVerificationService {
             helper.setTo(email);
 
             // 용도에 따라 제목과 내용 변경
-            if ("signup".equals(purpose)) {
-                helper.setSubject("[MoZi] 회원가입 이메일 인증번호");
-                helper.setText(createSignupEmailContent(code), true);
-            } else {
-                helper.setSubject("[MoZi] 비밀번호 재설정 인증번호");
-                helper.setText(createPasswordResetEmailContent(code), true);
+            switch (purpose) {
+                case "signup":
+                    helper.setSubject("[MoZi] 회원가입 이메일 인증번호");
+                    helper.setText(createSignupEmailContent(code), true);
+                    break;
+                case "password":
+                    helper.setSubject("[MoZi] 비밀번호 재설정 인증번호");
+                    helper.setText(createPasswordResetEmailContent(code), true);
+                    break;
+                case "mypage":
+                    helper.setSubject("[MoZi] 이메일 변경 인증번호");
+                    helper.setText(createMyPageEmailContent(code), true);
+                    break;
+                default:
+                    throw new IllegalArgumentException("지원하지 않는 인증 용도입니다: " + purpose);
             }
 
             mailSender.send(message);
-
             log.info("인증번호 발송 완료 - 이메일: {}, 용도: {}", email, purpose);
 
         } catch (Exception e) {
@@ -150,53 +166,48 @@ public class EmailVerificationService {
      * 회원가입용 이메일 내용 생성
      */
     private String createSignupEmailContent(String code) {
-        return "<div style='padding: 20px; font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;'>" +
-                "<div style='text-align: center; margin-bottom: 30px;'>" +
-                "<h1 style='color: #6fb3a0; margin: 0;'>MoZi</h1>" +
-                "<h2 style='color: #333; margin: 10px 0;'>회원가입 이메일 인증</h2>" +
-                "</div>" +
-
-                "<div style='background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;'>" +
-                "<p style='margin: 0 0 15px 0; color: #333;'>안녕하세요!</p>" +
-                "<p style='margin: 0 0 15px 0; color: #333;'>MoZi 회원가입을 위한 이메일 인증번호를 보내드립니다.</p>" +
-                "</div>" +
-
-                "<div style='background: #e3f2fd; padding: 20px; margin: 20px 0; text-align: center; border-radius: 8px; border-left: 4px solid #2196f3;'>" +
-                "<h3 style='margin: 0 0 10px 0; color: #1976d2;'>인증번호</h3>" +
-                "<div style='font-size: 36px; font-weight: bold; color: #1976d2; letter-spacing: 4px;'>" +
-                code +
-                "</div>" +
-                "</div>" +
-
-                "<div style='background: #fff3e0; padding: 15px; border-radius: 8px; margin: 20px 0;'>" +
-                "<p style='margin: 0; color: #e65100; font-size: 14px;'>" +
-                "⚠️ <strong>주의사항</strong></p>" +
-                "<ul style='margin: 10px 0 0 0; color: #bf360c; font-size: 14px;'>" +
-                "<li>인증번호는 <strong>5분 내에</strong> 입력해주세요.</li>" +
-                "<li>본인이 요청하지 않았다면 이 메일을 무시해주세요.</li>" +
-                "<li>인증번호를 타인에게 알려주지 마세요.</li>" +
-                "</ul>" +
-                "</div>" +
-
-                "<div style='text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;'>" +
-                "<p style='margin: 0; color: #666; font-size: 12px;'>© 2025 MoZi. All rights reserved.</p>" +
-                "</div>" +
-                "</div>";
+        return createEmailTemplate(
+                "회원가입 이메일 인증",
+                "MoZi 회원가입을 위한 이메일 인증번호를 보내드립니다.",
+                code
+        );
     }
 
     /**
      * 비밀번호 재설정용 이메일 내용 생성
      */
     private String createPasswordResetEmailContent(String code) {
+        return createEmailTemplate(
+                "비밀번호 재설정",
+                "비밀번호 재설정을 위한 인증번호를 보내드립니다.",
+                code
+        );
+    }
+
+    /**
+     * 마이페이지 이메일 변경용 이메일 내용 생성
+     */
+    private String createMyPageEmailContent(String code) {
+        return createEmailTemplate(
+                "이메일 변경 인증",
+                "이메일 주소 변경을 위한 인증번호를 보내드립니다.",
+                code
+        );
+    }
+
+    /**
+     * 공통 이메일 템플릿 생성
+     */
+    private String createEmailTemplate(String title, String description, String code) {
         return "<div style='padding: 20px; font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;'>" +
                 "<div style='text-align: center; margin-bottom: 30px;'>" +
-                "<h1 style='color: #6fb3a0; margin: 0;'>MoZi</h1>" +
-                "<h2 style='color: #333; margin: 10px 0;'>비밀번호 재설정</h2>" +
+                "<h1 style='color: #36c18c; margin: 0;'>MoZi</h1>" +
+                "<h2 style='color: #333; margin: 10px 0;'>" + title + "</h2>" +
                 "</div>" +
 
                 "<div style='background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;'>" +
                 "<p style='margin: 0 0 15px 0; color: #333;'>안녕하세요!</p>" +
-                "<p style='margin: 0 0 15px 0; color: #333;'>비밀번호 재설정을 위한 인증번호를 보내드립니다.</p>" +
+                "<p style='margin: 0 0 15px 0; color: #333;'>" + description + "</p>" +
                 "</div>" +
 
                 "<div style='background: #e3f2fd; padding: 20px; margin: 20px 0; text-align: center; border-radius: 8px; border-left: 4px solid #2196f3;'>" +

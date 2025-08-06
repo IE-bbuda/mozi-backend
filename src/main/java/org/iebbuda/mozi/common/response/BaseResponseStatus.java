@@ -54,6 +54,10 @@ public enum BaseResponseStatus {
     // OAuth 공통 에러
     OAUTH_PROVIDER_NOT_SUPPORTED(false, HttpStatus.BAD_REQUEST.value(), "지원하지 않는 OAuth 제공자입니다."),
     OAUTH_EMAIL_ALREADY_EXISTS(false, HttpStatus.CONFLICT.value(), "해당 이메일은 이미 다른 계정에서 사용 중입니다."),
+    OAUTH_USER_ACCESS_DENIED(false, HttpStatus.FORBIDDEN.value(), "소셜 로그인 사용자는 해당 기능을 이용할 수 없습니다."),
+    OAUTH_USER_PASSWORD_RESET_DENIED(false, HttpStatus.FORBIDDEN.value(), "소셜 로그인 사용자는 비밀번호 재설정을 할 수 없습니다. 해당 소셜 서비스에서 비밀번호를 변경해주세요."),
+    OAUTH_USER_PASSWORD_CHANGE_DENIED(false, HttpStatus.FORBIDDEN.value(), "소셜 로그인 사용자는 비밀번호를 변경할 수 없습니다."),
+    OAUTH_USER_EMAIL_CHANGE_DENIED(false, HttpStatus.FORBIDDEN.value(), "소셜 로그인 사용자는 이메일을 변경할 수 없습니다."),
 
     // 카카오 OAuth 관련
     KAKAO_TOKEN_REQUEST_FAILED(false, HttpStatus.BAD_GATEWAY.value(), "카카오 액세스 토큰 요청에 실패했습니다."),

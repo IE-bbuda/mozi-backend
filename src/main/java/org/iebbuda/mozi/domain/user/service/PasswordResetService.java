@@ -77,6 +77,8 @@ public class PasswordResetService {
         // 1. 사용자 조회 및 검증
         UserVO user = findAndValidateUser(request.getLoginId(), request.getEmail());
 
+        validateNotOAuthUser(user, "비밀번호 리셋");
+
         // 2. 이메일 인증 여부 확인 (이 부분이 빠져있음!)
         if (!emailVerificationService.isEmailVerified(request.getEmail())) {
             log.warn("이메일 인증 미완료로 계정 확인 시도: {}", request.getEmail());
@@ -111,7 +113,8 @@ public class PasswordResetService {
 
         // 3. 세션 완료 처리
         completeResetSession(request.getToken());
-
+        // 3. 기존 세션 정리
+        cleanupExistingSessions(session.getUserId());
         log.info("비밀번호 재설정 완료 - 사용자ID: {}, 세션ID: {}", session.getUserId(), session.getId());
     }
 
@@ -214,5 +217,15 @@ public class PasswordResetService {
             return "***";
         }
         return token.substring(0, 4) + "***" + token.substring(token.length() - 4);
+    }
+
+    /**
+     * OAuth 로그인은 차단
+     */
+    private void validateNotOAuthUser(UserVO user, String action) {
+        if (user.getProvider() != null) {
+            log.warn("OAuth 사용자의 {} 시도 차단 - provider: {}", action, user.getProvider());
+            throw new BaseException(BaseResponseStatus.OAUTH_USER_ACCESS_DENIED);
+        }
     }
 }
