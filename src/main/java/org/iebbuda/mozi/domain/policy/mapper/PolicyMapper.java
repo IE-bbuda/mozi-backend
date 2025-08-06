@@ -1,5 +1,6 @@
 package org.iebbuda.mozi.domain.policy.mapper;
 
+import org.apache.ibatis.annotations.Param;
 import org.iebbuda.mozi.domain.policy.domain.PolicyVO;
 import org.iebbuda.mozi.domain.policy.dto.PolicyDTO;
 import org.iebbuda.mozi.domain.policy.dto.PolicyFilterDTO;
@@ -27,4 +28,7 @@ public interface PolicyMapper {
 
     // 현재 DB에 저장된 정책 개수 반환
     int count();
+
+    // 마감 임박 정책 조히
+    List<PolicyVO> selectDeadlineSoonPolicies(@Param("days") int days);
 }

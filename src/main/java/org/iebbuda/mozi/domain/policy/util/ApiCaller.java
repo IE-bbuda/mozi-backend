@@ -23,7 +23,7 @@ public class ApiCaller {
 
     // 실제 요청 최종 URL
     public String getRequestUrl() {
-        return apiUrl + "?apiKeyNm=" + apiKey + "&rtnType=json&pageNum=1&pageSize=300";
+        return apiUrl + "?apiKeyNm=" + apiKey + "&rtnType=json&pageNum=1&pageSize=1000";
     }
 
     public String getJsonResponse() {

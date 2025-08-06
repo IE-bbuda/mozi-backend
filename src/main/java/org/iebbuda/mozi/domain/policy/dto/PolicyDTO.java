@@ -30,4 +30,13 @@ public class PolicyDTO {
     private Integer earnMinAmt;        // 최소 소득
     private Integer earnMaxAmt;        // 최대 소득
     private String earnEtcCn;          // 소득 기타 내용
+
+    private String refUrlAddr1;  // 참고 URL
+    private String sprvsnInstCdNm; // 주관기관 코드명
+    private String plcyAplyMthdCn; // 정책 신청방법 내용
+    private String aplyYmd; //신청기간
+    private String srngMthdCn; // 심사방법 내용
+    private String ptcpPrpTrgtCn; // 참여제안 대상 내용
+    private Integer sprtSclCnt; // 지원 규모 수
+
 }
