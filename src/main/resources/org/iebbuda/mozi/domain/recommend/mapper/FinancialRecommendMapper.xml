@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.iebbuda.mozi.domain.recommend.mapper.FinancialRecommendMapper">
+
+    <!-- 적금 금리 높은 상품 -->
+    <select id="findTopSavingsProducts" resultType="org.iebbuda.mozi.domain.recommend.dto.FinancialRecommendProductDTO">
+        SELECT
+        sp.saving_id AS productId,
+        sp.fin_prdt_nm AS productName,
+        sp.fin_co_no AS bankCode,
+        sp.kor_co_nm AS bankName,
+        so.intr_rate AS intRate,
+        so.intr_rate2 AS intRate2,
+        so.save_trm AS saveTrm,
+        'SAVINGS' AS productType
+        FROM savingproduct sp
+        JOIN savingoption so
+        ON sp.saving_id = so.saving_id
+        WHERE so.save_trm = (
+        SELECT MAX(so2.save_trm)
+        FROM savingoption so2
+        WHERE so2.saving_id = sp.saving_id
+        AND <![CDATA[so2.save_trm <= #{monthsLeft}]]>
+        )
+        ORDER BY COALESCE(so.intr_rate2, so.intr_rate) DESC
+        LIMIT #{limit}
+    </select>
+
+    <!-- 예금 금리 높은 상품 -->
+    <select id="findTopDepositProducts" resultType="org.iebbuda.mozi.domain.recommend.dto.FinancialRecommendProductDTO">
+        SELECT
+        dp.deposit_id AS productId,
+        dp.fin_prdt_nm AS productName,
+        dp.fin_co_no AS bankCode,
+        dp.kor_co_nm AS bankName,
+        do.intr_rate AS intRate,
+        do.intr_rate2 AS intRate2,
+        do.save_trm AS saveTrm,
+        'DEPOSIT' AS productType
+        FROM depositproduct dp
+        JOIN depositoption do
+        ON dp.deposit_id = do.deposit_id
+        WHERE do.save_trm = (
+        SELECT MAX(do2.save_trm)
+        FROM depositoption do2
+        WHERE do2.deposit_id = dp.deposit_id
+        AND <![CDATA[do2.save_trm <= #{monthsLeft}]]>
+        )
+        ORDER BY COALESCE(do.intr_rate2, do.intr_rate) DESC
+        LIMIT #{limit}
+    </select>
+
+</mapper>

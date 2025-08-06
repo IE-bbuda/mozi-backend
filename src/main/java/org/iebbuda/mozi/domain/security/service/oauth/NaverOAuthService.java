@@ -6,10 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.log4j.Log4j2;
 import org.iebbuda.mozi.common.response.BaseException;
 import org.iebbuda.mozi.common.response.BaseResponseStatus;
-import org.iebbuda.mozi.domain.security.dto.oauth.KakaoUserInfoDTO;
-import org.iebbuda.mozi.domain.security.dto.oauth.OAuthProvider;
+import org.iebbuda.mozi.domain.security.dto.oauth.NaverUserInfoDTO;
 import org.iebbuda.mozi.domain.security.dto.oauth.OAuthUserInfo;
-import org.iebbuda.mozi.domain.user.domain.UserVO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.*;
@@ -22,34 +20,33 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Service
 @Log4j2
 @PropertySource("classpath:application.properties")
-public class KakaoOAuthService implements OAuthService{
+public class NaverOAuthService implements OAuthService{
 
-    @Value("${kakao.client.id}")
+    @Value("${naver.client.id}")
     private String clientId;
 
-    @Value("${kakao.client.secret}")
+    @Value("${naver.client.secret}")
     private String clientSecret;
 
-    @Value("${kakao.redirect.uri}")
+    @Value("${naver.redirect.uri}")
     private String redirectUri;
 
-    private static final String KAKAO_TOKEN_URL = "https://kauth.kakao.com/oauth/token";
-    private static final String KAKAO_USER_INFO_URL = "https://kapi.kakao.com/v2/user/me";
+    private static final String NAVER_TOKEN_URL = "https://nid.naver.com/oauth2.0/token";
+    private static final String NAVER_USER_INFO_URL = "https://openapi.naver.com/v1/nid/me";
+
 
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    // 카카오 로그인 URL 생성 메서드 추가
     @Override
     public String getLoginUrl() {
         return UriComponentsBuilder
-                .fromUriString("https://kauth.kakao.com/oauth/authorize")
+                .fromUriString("https://nid.naver.com/oauth2.0/authorize")
+                .queryParam("response_type", "code")
                 .queryParam("client_id", clientId)
                 .queryParam("redirect_uri", redirectUri)
-                .queryParam("response_type", "code")
                 .toUriString();
     }
-
     @Override
     public String getAccessToken(String code) {
         HttpHeaders headers = new HttpHeaders();
@@ -64,44 +61,41 @@ public class KakaoOAuthService implements OAuthService{
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
         try {
-            ResponseEntity<String> response = restTemplate.postForEntity(KAKAO_TOKEN_URL, request, String.class);
-            String responseBody = response.getBody();
-            String accessToken = extractAccessToken(responseBody);
-            return accessToken;
+            ResponseEntity<String> response = restTemplate.postForEntity(NAVER_TOKEN_URL, request, String.class);
+            return extractAccessToken(response.getBody());
         } catch (Exception e) {
-            log.error("카카오 액세스 토큰 요청 실패", e);
-            throw new BaseException(BaseResponseStatus.KAKAO_TOKEN_REQUEST_FAILED);
+            log.error("네이버 액세스 토큰 요청 실패", e);
+            throw new BaseException(BaseResponseStatus.NAVER_TOKEN_REQUEST_FAILED);
         }
     }
-
 
     @Override
     public OAuthUserInfo getUserInfo(String accessToken) {
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(accessToken);
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
         HttpEntity<String> request = new HttpEntity<>(headers);
 
         try {
-            ResponseEntity<KakaoUserInfoDTO> response = restTemplate.exchange(
-                    KAKAO_USER_INFO_URL,
+            ResponseEntity<NaverUserInfoDTO> response = restTemplate.exchange(
+                    NAVER_USER_INFO_URL,
                     HttpMethod.GET,
                     request,
-                    KakaoUserInfoDTO.class
+                    NaverUserInfoDTO.class
             );
 
             return response.getBody();
         } catch (Exception e) {
-            log.error("카카오 사용자 정보 요청 실패", e);
-            throw new BaseException(BaseResponseStatus.KAKAO_USER_INFO_REQUEST_FAILED);
+            log.error("네이버 사용자 정보 요청 실패", e);
+            throw new BaseException(BaseResponseStatus.NAVER_USER_INFO_REQUEST_FAILED);
         }
     }
 
     @Override
     public boolean supports(String provider) {
-        return "KAKAO".equalsIgnoreCase(provider);
+        return "NAVER".equalsIgnoreCase(provider);
     }
+
 
     private String extractAccessToken(String responseBody) {
         try {
@@ -109,15 +103,13 @@ public class KakaoOAuthService implements OAuthService{
             String accessToken = rootNode.path("access_token").asText();
 
             if (accessToken.isEmpty()) {
-                throw new BaseException(BaseResponseStatus.KAKAO_TOKEN_EXTRACT_FAILED);
+                throw new BaseException(BaseResponseStatus.NAVER_TOKEN_EXTRACT_FAILED);
             }
 
             return accessToken;
         } catch (Exception e) {
-            log.error("access_token 파싱 실패", e);
-            throw new BaseException(BaseResponseStatus.KAKAO_TOKEN_EXTRACT_FAILED);
+            log.error("네이버 access_token 파싱 실패", e);
+            throw new BaseException(BaseResponseStatus.NAVER_TOKEN_EXTRACT_FAILED);
         }
     }
-
-
 }

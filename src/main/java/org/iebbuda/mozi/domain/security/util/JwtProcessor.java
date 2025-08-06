@@ -17,7 +17,7 @@ import java.util.Date;
 @Component
 @PropertySource({"classpath:/application.properties"})
 public class JwtProcessor {
-    static private final long TOKEN_VALID_MILISECOND = 1000L * 60 * 5; //5분
+    static private final long TOKEN_VALID_MILISECOND = 1000L * 60 * 30; //5분
 
 
     //개발시 사용

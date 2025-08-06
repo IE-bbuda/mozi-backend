@@ -28,4 +28,9 @@ public class SavingController {
     public SavingResponse getSavingProductById(@PathVariable Long id){
         return savingQueryService.getSavingById(id);
     }
+
+    @GetMapping("/top")
+    public List<SavingResponse>getTopSavingProduct(){
+        return savingQueryService.getTopSavingProduct(2);
+    }
 }

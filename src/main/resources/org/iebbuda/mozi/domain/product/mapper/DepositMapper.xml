@@ -63,6 +63,38 @@
         WHERE dp.deposit_id = #{depositId}
     </select>
 
+    <!-- 금리 높은 순 TOP N -->
+    <select id="findTopDepositProduct" parameterType="int" resultMap="DepositWithOptionsMap">
+        SELECT
+            dp.deposit_id,
+            dp.fin_prdt_cd,
+            dp.fin_co_no,
+            dp.kor_co_nm,
+            dp.fin_prdt_nm,
+            dp.join_way,
+            dp.join_deny,
+            dp.join_member,
+            dp.spcl_cnd,
+            dp.etc_note,
+            dp.max_limit,
+            dp.dcls_month,
+            dp.dcls_strt_day,
+            dp.dcls_end_day,
+            dp.fin_co_subm_day,
+            do.option_id,
+            do.deposit_id AS option_deposit_id,
+            do.intr_rate_type,
+            do.intr_rate_type_nm,
+            do.save_trm,
+            do.intr_rate,
+            do.intr_rate2
+        FROM DepositProduct dp
+                 JOIN DepositOption do ON dp.deposit_id = do.deposit_id
+        ORDER BY do.intr_rate2 DESC
+        LIMIT #{limit}
+    </select>
+
+
     <!-- 결과 매핑 -->
     <resultMap id="DepositWithOptionsMap" type="org.iebbuda.mozi.domain.product.domain.DepositProduct">
         <id property="depositId" column="deposit_id"/>
