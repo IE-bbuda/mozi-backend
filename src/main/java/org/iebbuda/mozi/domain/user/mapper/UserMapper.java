@@ -47,11 +47,10 @@ public interface UserMapper {
                                 @Param("newPassword") String newPassword);
 
     /**
-     * 사용자 기본 정보 수정 (이메일, 전화번호)
+     * 사용자 기본 정보 수정 (이메일)
      */
     int updateUserInfo(@Param("loginId") String loginId,
-                       @Param("email") String email,
-                       @Param("phoneNumber") String phoneNumber);
+                       @Param("email") String email);
 
 
     UserVO findByEmail(String email);  // 이메일 중복 확인용
