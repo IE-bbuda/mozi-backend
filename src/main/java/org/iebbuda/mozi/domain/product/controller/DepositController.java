@@ -2,6 +2,7 @@ package org.iebbuda.mozi.domain.product.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.iebbuda.mozi.domain.product.dto.DepositResponse;
+import org.iebbuda.mozi.domain.product.dto.SavingResponse;
 import org.iebbuda.mozi.domain.product.service.DepositQueryService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,5 +27,9 @@ public class DepositController {
     @GetMapping("/{id}")
     public DepositResponse getDepositProductById(@PathVariable Long id){
         return depositQueryService.getDepositById(id);
+    }
+    @GetMapping("/top")
+    public List<DepositResponse>getTopDepositProduct(){
+        return depositQueryService.getTopDepositProduct(2);
     }
 }

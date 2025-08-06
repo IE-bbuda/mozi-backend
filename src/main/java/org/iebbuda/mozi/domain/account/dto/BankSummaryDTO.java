@@ -12,6 +12,9 @@ import lombok.NoArgsConstructor;
 public class BankSummaryDTO {
     private String bankCode;
     private Integer accountCount;
-    private Double totalBalance;
-    private String representativeAccountName;
+    @Builder.Default
+    private Double totalBalance = 0.0;
+
+    @Builder.Default
+    private String representativeAccountName = "";
 }

@@ -30,6 +30,14 @@
         <result column="earn_min_amt" property="earnMinAmt"/>
         <result column="earn_max_amt" property="earnMaxAmt"/>
         <result column="earn_etc_cn" property="earnEtcCn"/>
+        <result column="ref_url_addr1" property="refUrlAddr1"/>
+        <result column="sprvsn_inst_cd_nm" property="sprvsnInstCdNm"/>
+        <result column="plcy_aply_mthd_cn" property="plcyAplyMthdCn"/>
+        <result column="aply_ymd" property="aplyYmd"/>
+        <result column="srng_mthd_cn" property="srngMthdCn"/>
+        <result column="ptcp_prp_trgt_cn" property="ptcpPrpTrgtCn"/>
+        <result column="sprt_scl_cnt" property="sprtSclCnt"/>
+
     </resultMap>
 
     <!-- 전체 조회 -->
@@ -60,7 +68,10 @@
             biz_prd_bgng_ymd, biz_prd_end_ymd,
             lclsf_nm, mclsf_nm, plcy_kywd_nm,
             sprt_trgt_min_age, sprt_trgt_max_age,
-            earn_cnd_se_cd, earn_min_amt, earn_max_amt, earn_etc_cn
+            earn_cnd_se_cd, earn_min_amt, earn_max_amt, earn_etc_cn,
+            ref_url_addr1, sprvsn_inst_cd_nm, plcy_aply_mthd_cn,
+            aply_ymd, srng_mthd_cn, ptcp_prp_trgt_cn, sprt_scl_cnt
+
         ) VALUES (
                      #{plcyNm}, #{plcyNo}, #{plcyExplnCn}, #{plcySprtCn},
                      #{zipCd}, #{mrgSttsCd}, #{schoolCd}, #{jobCd},
@@ -68,8 +79,10 @@
                      #{bizPrdBgngYmd}, #{bizPrdEndYmd},
                      #{lclsfNm}, #{mclsfNm}, #{plcyKywdNm},
                      #{sprtTrgtMinAge}, #{sprtTrgtMaxAge},
-                     #{earnCndSeCd}, #{earnMinAmt}, #{earnMaxAmt}, #{earnEtcCn}
-                 )
+                     #{earnCndSeCd}, #{earnMinAmt}, #{earnMaxAmt}, #{earnEtcCn},
+                     #{refUrlAddr1}, #{sprvsnInstCdNm}, #{plcyAplyMthdCn},
+                     #{aplyYmd}, #{srngMthdCn}, #{ptcpPrpTrgtCn}, #{sprtSclCnt}
+                         )
     </insert>
 
     <!-- 필터 조회 -->
@@ -125,4 +138,20 @@
             )
         </if>
     </select>
+
+
+    <select id="selectDeadlineSoonPolicies" resultType="org.iebbuda.mozi.domain.policy.domain.PolicyVO">
+  <![CDATA[
+        SELECT *
+        FROM YouthPolicy
+        WHERE aply_ymd IS NOT NULL
+          AND STR_TO_DATE(SUBSTRING_INDEX(aply_ymd, ' ~ ', -1), '%Y%m%d') >= CURDATE()
+          AND STR_TO_DATE(SUBSTRING_INDEX(aply_ymd, ' ~ ', -1), '%Y%m%d') <= DATE_ADD(CURDATE(), INTERVAL ${days} DAY)
+        ORDER BY STR_TO_DATE(SUBSTRING_INDEX(aply_ymd, ' ~ ', -1), '%Y%m%d') ASC
+            LIMIT 5
+        ]]>
+</select>
+
+
+
 </mapper>
