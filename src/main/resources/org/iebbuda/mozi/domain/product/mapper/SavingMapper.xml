@@ -67,6 +67,39 @@
         WHERE sp.saving_id = #{savingId}
     </select>
 
+    <!-- 금리 높은 순 TOP N -->
+    <select id="findTopSavingProduct" parameterType="int" resultMap="SavingWithOptionsMap">
+        SELECT
+            sp.saving_id,
+            sp.fin_prdt_cd,
+            sp.fin_co_no,
+            sp.kor_co_nm,
+            sp.fin_prdt_nm,
+            sp.join_way,
+            sp.join_deny,
+            sp.join_member,
+            sp.spcl_cnd,
+            sp.etc_note,
+            sp.max_limit,
+            sp.dcls_month,
+            sp.dcls_strt_day,
+            sp.dcls_end_day,
+            sp.fin_co_subm_day,
+            so.option_id,
+            so.saving_id AS option_saving_id,
+            so.intr_rate_type,
+            so.intr_rate_type_nm,
+            so.rsrv_type,
+            so.rsrv_type_nm,
+            so.save_trm,
+            so.intr_rate,
+            so.intr_rate2
+        FROM SavingProduct sp
+                 JOIN SavingOption so ON sp.saving_id = so.saving_id
+        ORDER BY so.intr_rate2 DESC
+        LIMIT #{limit}
+    </select>
+
     <!-- 결과 매핑 -->
     <resultMap id="SavingWithOptionsMap" type="org.iebbuda.mozi.domain.product.domain.SavingProduct">
         <id property="savingId" column="saving_id"/>
@@ -97,5 +130,6 @@
             <result property="intrRate2" column="intr_rate2"/>
         </collection>
     </resultMap>
+
 
 </mapper>
