@@ -86,7 +86,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     // 접근 제한 무시 경로 설정 – resource
     @Override
     public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers("/assets/**", "/*");
+        web.ignoring().requestMatchers(request ->
+                !request.getRequestURI().startsWith("/api/")  // API가 아닌 모든 요청 허용
+        );
     }
 
 
@@ -104,9 +106,26 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         http
                 .authorizeRequests()
+                // CORS preflight 요청 허용
                 .antMatchers(HttpMethod.OPTIONS).permitAll()
-                //일단 모든 접근 허용
-                .anyRequest().permitAll();
+
+                // 인증 없이 접근 가능한 API들
+                .antMatchers("/api/auth/login").permitAll()                    // 로그인
+                .antMatchers("/api/users/signup").permitAll()                  // 회원가입
+                .antMatchers("/api/users/check-username/**").permitAll()       // 아이디 중복 확인
+                .antMatchers("/api/users/find-id").permitAll()                 // 아이디 찾기
+                .antMatchers("/api/users/signup/send-email-code").permitAll()  // 회원가입 이메일 인증
+                .antMatchers("/api/users/signup/verify-email-code").permitAll() // 회원가입 이메일 인증 확인
+                .antMatchers("/api/users/password/send-email-code").permitAll() // 비밀번호 재설정 이메일 인증
+                .antMatchers("/api/users/password/verify-email-code").permitAll() // 비밀번호 재설정 이메일 인증 확인
+                .antMatchers("/api/users/password/verify-account").permitAll()  // 계정 확인
+                .antMatchers("/api/users/password/reset").permitAll()          // 비밀번호 재설정
+
+                // OAuth 관련 API들
+                .antMatchers("/api/oauth/**").permitAll()                      // OAuth 로그인 (카카오, 구글, 네이버 등)
+
+                // 나머지 모든 요청은 인증 필요
+                .anyRequest().authenticated();
         http.httpBasic().disable() // 기본 HTTP 인증 비활성화
                 .csrf().disable() // CSRF 비활성화
                 .formLogin().disable() // formLogin 비활성화  관련 필터 해제
