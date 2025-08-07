@@ -70,6 +70,11 @@ public class PolicyServiceImpl implements PolicyService {
         System.out.printf("정책 자동 저장 완료: %d건 추가됨 (총 %d건)\n", added, after);
     }
 
+    // 마감 임박 정책 조회
+    @Override
+    public List<PolicyVO> getDeadlineSoonPolicies(int days) {
+        return policyMapper.selectDeadlineSoonPolicies(days);
+    }
 
     // 내부 변환 메서드
     private PolicyDTO toDTO(PolicyVO vo) {
@@ -97,6 +102,14 @@ public class PolicyServiceImpl implements PolicyService {
         dto.setEarnMinAmt(vo.getEarnMinAmt());
         dto.setEarnMaxAmt(vo.getEarnMaxAmt());
         dto.setEarnEtcCn(vo.getEarnEtcCn());
+        dto.setRefUrlAddr1(vo.getRefUrlAddr1());
+        dto.setSprvsnInstCdNm(vo.getSprvsnInstCdNm());
+        dto.setPlcyAplyMthdCn(vo.getPlcyAplyMthdCn());
+        dto.setAplyYmd(vo.getAplyYmd());
+        dto.setSrngMthdCn(vo.getSrngMthdCn());
+        dto.setPtcpPrpTrgtCn(vo.getPtcpPrpTrgtCn());
+        dto.setSprtSclCnt(vo.getSprtSclCnt());
+
         return dto;
 
     }
@@ -114,7 +127,11 @@ public class PolicyServiceImpl implements PolicyService {
         vo.setJobCd(dto.getJobCd());
         vo.setPlcyMajorCd(dto.getPlcyMajorCd());
         vo.setSbizCd(dto.getSbizCd());
-        vo.setAplyUrlAddr(dto.getAplyUrlAddr());
+        vo.setAplyUrlAddr(
+                dto.getAplyUrlAddr() != null && dto.getAplyUrlAddr().length() > 200
+                        ? dto.getAplyUrlAddr().substring(0, 200)
+                        : dto.getAplyUrlAddr()
+        );
 
         // 날짜 공백 처리 추가
         vo.setBizPrdBgngYmd(
@@ -137,6 +154,14 @@ public class PolicyServiceImpl implements PolicyService {
         vo.setEarnMinAmt(dto.getEarnMinAmt());
         vo.setEarnMaxAmt(dto.getEarnMaxAmt());
         vo.setEarnEtcCn(dto.getEarnEtcCn());
+        vo.setRefUrlAddr1(dto.getRefUrlAddr1());
+        vo.setSprvsnInstCdNm(dto.getSprvsnInstCdNm());
+        vo.setPlcyAplyMthdCn(dto.getPlcyAplyMthdCn());
+        vo.setAplyYmd(dto.getAplyYmd());
+        vo.setSrngMthdCn(dto.getSrngMthdCn());
+        vo.setPtcpPrpTrgtCn(dto.getPtcpPrpTrgtCn());
+        vo.setSprtSclCnt(dto.getSprtSclCnt());
+
         return vo;
     }
 

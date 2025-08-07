@@ -243,6 +243,9 @@ public class AccountServiceImpl implements AccountService {
         }
 
         boolean success = (mainSummary != null);
+        if(mainSummary == null) {
+            mainSummary=new BankSummaryDTO();
+        }
         return Map.of(
                 "mainBankCode", mainBankCode,
                 "success", success,

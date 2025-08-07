@@ -102,7 +102,6 @@
         UPDATE User
         SET
             email = #{email},
-            phone_number = #{phoneNumber},
             updated_at = NOW()
         WHERE login_id = #{loginId}
     </update>

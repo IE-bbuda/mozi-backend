@@ -1,6 +1,8 @@
 package org.iebbuda.mozi.domain.policy.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.iebbuda.mozi.common.response.BaseResponse;
+import org.iebbuda.mozi.domain.policy.domain.PolicyVO;
 import org.iebbuda.mozi.domain.policy.dto.PolicyDTO;
 import org.iebbuda.mozi.domain.policy.dto.PolicyFilterDTO;
 import org.iebbuda.mozi.domain.policy.service.PolicyService;
@@ -40,14 +42,10 @@ public class PolicyController {
         return policyService.getPoliciesByFilters(filters);
     }
 
-
-//    // 정책 API에서 받아와 DB에 저장(수동 버전.)
-//    @PostMapping(value = "/fetch-and-save", produces = "text/plain; charset=UTF-8")
-//    public ResponseEntity<String> fetchAndSave() {
-//        String json = apiCaller.getJsonResponse();
-//        List<PolicyDTO> dtoList = apiCaller.parseJsonToPolicies(json);
-//        policyService.saveAll(dtoList);
-//
-//        return ResponseEntity.ok("정책 정보 DB 저장 완료됨!!");
-//    }
+    // 마감 임박 정책 조회
+    @GetMapping("/deadline")
+    public BaseResponse<List<PolicyVO>> getDeadlineSoonPolicies(@RequestParam(defaultValue = "31") int days) {
+        List<PolicyVO> result = policyService.getDeadlineSoonPolicies(days);
+        return new BaseResponse<>(result);
+    }
 }

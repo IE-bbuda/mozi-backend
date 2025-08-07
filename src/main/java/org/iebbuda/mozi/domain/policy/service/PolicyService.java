@@ -1,5 +1,6 @@
 package org.iebbuda.mozi.domain.policy.service;
 
+import org.iebbuda.mozi.domain.policy.domain.PolicyVO;
 import org.iebbuda.mozi.domain.policy.dto.PolicyDTO;
 import org.iebbuda.mozi.domain.policy.dto.PolicyFilterDTO;
 
@@ -19,5 +20,6 @@ public interface PolicyService {
     // 필터 조건으로 정책 리스트 조회
     List<PolicyDTO> getPoliciesByFilters(PolicyFilterDTO filters);
 
-
+    // 마감 임박 정책 조회
+    List<PolicyVO> getDeadlineSoonPolicies(int days);
 }
