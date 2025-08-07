@@ -64,7 +64,7 @@ public class AccountServiceImpl implements AccountService {
             Map<String, Object> resultMap = objectMapper.readValue(decoded, Map.class);
             Map<String, Object> data = (Map<String, Object>) resultMap.get("data");
 
-            String[] keys = {"resDepositTrust", "resForeignCurrency", "resFund", "resLoan"};
+            String[] keys = {"resDepositTrust", "resFund", "resLoan"};
 
             for (String key : keys) {
                 List<Map<String, Object>> items = (List<Map<String, Object>>) data.get(key);
