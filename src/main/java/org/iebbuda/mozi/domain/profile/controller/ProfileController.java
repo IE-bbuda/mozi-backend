@@ -40,14 +40,6 @@ public class ProfileController {
         return new BaseResponse<>(BaseResponseStatus.SUCCESS);
     }
 
-    // 정책 페이지에서 테스트용: userId로 직접 퍼스널 정보 조회 (인증 없음)
-    private final UserProfileMapper userProfileMapper;
-    @GetMapping("/test/{userId}")
-    public BaseResponse<UserProfileInfoDTO> getUserProfileByUserId(@PathVariable int userId) {
-        UserProfileVO vo = userProfileMapper.findByUserId(userId);
-        System.out.println(vo);
-        return new BaseResponse<>(UserProfileInfoDTO.of(vo));
-    }
 
 
 }
