@@ -122,19 +122,39 @@ public class MyPageService {
         // 1. 사용자 존재 여부 확인
         UserVO user = findUserByLoginId(loginId);
         validateNotOAuthUser(user, "내 정보 수정 실행");
-
-        // 이메일 변경 시 인증 확인
+// 2. 변경 사항 확인
         boolean isEmailChanged = isEmailChanged(request, user);
+        boolean isPasswordChanged = request.getPassword() != null && !request.getPassword().trim().isEmpty();
+
+        log.info("변경 사항 - 이메일: {}, 비밀번호: {}", isEmailChanged, isPasswordChanged);
+
+        // 3. 이메일 변경 시 인증 확인
         verifyEmailIfChanged(request, isEmailChanged);
 
-        // 사용자 정보 업데이트
-        updateUserInfo(user, request);
+        // 4. 실제 변경이 있는 경우에만 업데이트 수행
+        if (isPasswordChanged || isEmailChanged) {
 
-        userMapper.updatePasswordByLoginId(user.getLoginId(),user.getPassword());
-        // 이메일 변경된 경우 인증 상태 제거
-        handleEmailVerificationReset(request, isEmailChanged, user);
-        userMapper.updateUserInfo(user.getLoginId(),user.getEmail());
-        // 4. 수정 후 최신 정보 반환
+            // 비밀번호 변경
+            if (isPasswordChanged) {
+                String encodedPassword = passwordEncoder.encode(request.getPassword());
+                userMapper.updatePasswordByLoginId(user.getLoginId(), encodedPassword);
+                log.info("비밀번호 업데이트 완료 - loginId: {}", loginId);
+            }
+
+            // 이메일 변경
+            if (isEmailChanged) {
+                userMapper.updateUserInfo(user.getLoginId(), request.getEmail());
+                log.info("이메일 업데이트 완료 - loginId: {}, 새 이메일: {}", loginId, request.getEmail());
+
+                // 이메일 변경된 경우 인증 상태 제거
+                emailVerificationService.clearVerifiedStatus(request.getEmail());
+                log.info("이메일 인증 상태 제거 완료");
+            }
+
+        } else {
+            log.warn("실제 변경 사항이 없음 - loginId: {}", loginId);
+        }
+
         log.info("마이페이지 정보 수정 완료: loginId={}", loginId);
     }
 
@@ -204,21 +224,6 @@ public class MyPageService {
                 log.warn("이메일 인증 미완료로 수정 시도 - email: {}", request.getEmail());
                 throw new BaseException(BaseResponseStatus.EMAIL_NOT_VERIFIED);
             }
-        }
-    }
-    /**
-     * 사용자 정보 업데이트 (내부 메서드)
-     */
-    private void updateUserInfo(UserVO user, MyPageUpdateRequestDTO request) {
-        // 이메일 업데이트 (인증 완료된 경우에만)
-        if (request.getEmail() != null && !request.getEmail().equals(user.getEmail())) {
-            user.setEmail(request.getEmail());
-        }
-
-        // 비밀번호 변경 (입력된 경우에만)
-        if (request.getPassword() != null && !request.getPassword().trim().isEmpty()) {
-            user.setPassword(passwordEncoder.encode(request.getPassword()));
-            log.info("비밀번호 변경 완료 - loginId: {}", user.getLoginId());
         }
     }
 
