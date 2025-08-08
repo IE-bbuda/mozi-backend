@@ -5,6 +5,7 @@ import lombok.extern.log4j.Log4j2;
 import org.iebbuda.mozi.common.response.BaseException;
 import org.iebbuda.mozi.common.response.BaseResponseStatus;
 import org.iebbuda.mozi.domain.profile.domain.UserProfileVO;
+import org.iebbuda.mozi.domain.profile.dto.PersonalInfoStatusDTO;
 import org.iebbuda.mozi.domain.profile.dto.UserProfileInfoDTO;
 import org.iebbuda.mozi.domain.profile.mapper.UserProfileMapper;
 import org.iebbuda.mozi.domain.user.domain.UserVO;
@@ -12,6 +13,8 @@ import org.iebbuda.mozi.domain.user.mapper.UserMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Map;
 
 @Service
@@ -80,6 +83,29 @@ public class UserProfileServiceImpl implements UserProfileService {
 
         log.info("프로필 조회 완료: loginId={}, hasData=true", loginId);
         return userProfileInfoDTO;
+    }
+
+    @Override
+    public PersonalInfoStatusDTO getPersonalInfoStatus(String loginId) {
+        UserVO user = findUserByLoginId(loginId);
+
+        UserProfileVO profile = userProfileMapper.findByUserId(user.getUserId());
+        boolean hasPersonalInfo = (profile != null);
+
+        LocalDateTime createdAt = user.getCreatedAt();
+        LocalDateTime now = LocalDateTime.now();
+        long daysPassed = ChronoUnit.DAYS.between(createdAt, now);
+        int daysRemaining = Math.max(0, 14 - (int)daysPassed);
+
+        // 4. 프롬프트 표시 필요 여부 판단
+        boolean needsPrompt = !hasPersonalInfo && (daysPassed <= 14);
+
+        return PersonalInfoStatusDTO.builder()
+                .hasPersonalInfo(hasPersonalInfo)
+                .createdAt(createdAt)
+                .daysRemaining(daysRemaining)
+                .needsPrompt(needsPrompt)
+                .build();
     }
 
     // ========== Private Methods ==========
