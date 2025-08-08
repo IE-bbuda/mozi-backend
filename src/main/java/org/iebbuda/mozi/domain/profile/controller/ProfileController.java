@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.iebbuda.mozi.common.response.BaseResponse;
 import org.iebbuda.mozi.common.response.BaseResponseStatus;
 import org.iebbuda.mozi.domain.profile.domain.UserProfileVO;
+import org.iebbuda.mozi.domain.profile.dto.PersonalInfoStatusDTO;
 import org.iebbuda.mozi.domain.profile.dto.UserProfileInfoDTO;
 import org.iebbuda.mozi.domain.profile.mapper.UserProfileMapper;
 import org.iebbuda.mozi.domain.profile.service.UserProfileService;
@@ -41,5 +42,14 @@ public class ProfileController {
     }
 
 
+
+    @GetMapping("/status")
+    public BaseResponse<PersonalInfoStatusDTO> getPersonalInfoStatus(
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        String loginId = userDetails.getUsername();
+        PersonalInfoStatusDTO status = userProfileService.getPersonalInfoStatus(loginId);
+        return new BaseResponse<>(status);
+    }
 
 }
