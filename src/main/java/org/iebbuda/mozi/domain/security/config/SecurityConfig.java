@@ -120,6 +120,21 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/users/password/verify-email-code").permitAll() // 비밀번호 재설정 이메일 인증 확인
                 .antMatchers("/api/users/password/verify-account").permitAll()  // 계정 확인
                 .antMatchers("/api/users/password/reset").permitAll()          // 비밀번호 재설정
+                .antMatchers("/api/deposits").permitAll()
+                .antMatchers("/api/deposits/{id}").permitAll()
+                .antMatchers("/api/deposits/top").permitAll()
+                .antMatchers("/api/savings").permitAll()
+                .antMatchers("/api/savings/{id}").permitAll()
+                .antMatchers("/api/savings/top").permitAll()
+                .antMatchers("/api/policy").permitAll()
+                .antMatchers("/api/policy/{id}").permitAll()
+                .antMatchers("/api/policy/filter").permitAll()
+                .antMatchers("/api/policy/deadline").permitAll()
+                .antMatchers("/api/region").permitAll()
+                .antMatchers("/api/region/zipcodes").permitAll()
+                .antMatchers("/api/region/names").permitAll()
+                .antMatchers("/api/region/zipcodes/sido").permitAll()
+
 
                 // OAuth 관련 API들
                 .antMatchers("/api/oauth/**").permitAll()                      // OAuth 로그인 (카카오, 구글, 네이버 등)
@@ -132,14 +147,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS); // 세션 생성 모드 설정
     }
 
-
     // Authentication Manger 구성
     // 사용자 정보를 어디서 얻을지 설정
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-                 auth
+        auth
                 .userDetailsService(userDetailsService)
                 .passwordEncoder(passwordEncoder());
     }
+
 }
 
