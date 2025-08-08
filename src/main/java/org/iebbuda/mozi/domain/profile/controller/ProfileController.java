@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.iebbuda.mozi.common.response.BaseResponse;
 import org.iebbuda.mozi.common.response.BaseResponseStatus;
 import org.iebbuda.mozi.domain.profile.domain.UserProfileVO;
+import org.iebbuda.mozi.domain.profile.dto.PersonalInfoStatusDTO;
 import org.iebbuda.mozi.domain.profile.dto.UserProfileInfoDTO;
 import org.iebbuda.mozi.domain.profile.mapper.UserProfileMapper;
 import org.iebbuda.mozi.domain.profile.service.UserProfileService;
@@ -38,6 +39,16 @@ public class ProfileController {
         String userId = userDetails.getUsername();
         userProfileService.saveProfile(userId, data);
         return new BaseResponse<>(BaseResponseStatus.SUCCESS);
+    }
+
+
+    @GetMapping("/status")
+    public BaseResponse<PersonalInfoStatusDTO> getPersonalInfoStatus(
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        String loginId = userDetails.getUsername();
+        PersonalInfoStatusDTO status = userProfileService.getPersonalInfoStatus(loginId);
+        return new BaseResponse<>(status);
     }
 
     // 정책 페이지에서 테스트용: userId로 직접 퍼스널 정보 조회 (인증 없음)
