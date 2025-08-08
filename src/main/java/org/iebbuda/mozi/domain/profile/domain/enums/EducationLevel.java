@@ -6,9 +6,9 @@ public enum EducationLevel {
     HIGH_SCHOOL_ENROLLED("고등학교 재학", "0049002"),
     HIGH_SCHOOL_EXPECTED("고등학교 졸업 예정", "0049003"),
     HIGH_SCHOOL("고등학교 졸업", "0049004"),
-    COLLEGE_ENROLLED("전문대학 재학", "0049005"),
-    COLLEGE_EXPECTED("전문대학 졸업 예정", "0049006"),
-    COLLEGE("전문대학 졸업", "0049007"),
+    COLLEGE_ENROLLED("대학 재학", "0049005"),
+    COLLEGE_EXPECTED("대학 졸업 예정", "0049006"),
+    COLLEGE("대학 졸업", "0049007"),
     GRADUATE("대학원", "0049008"),
     OTHER("기타", "0049009");
 
