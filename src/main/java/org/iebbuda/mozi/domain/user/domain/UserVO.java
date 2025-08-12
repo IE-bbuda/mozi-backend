@@ -25,4 +25,8 @@ public class UserVO {
     private String providerId;    // OAuth 제공자의 사용자 ID
 
     private List<AuthVO> authList;
+
+
+    private Boolean isDeleted;      // is_deleted 컬럼
+    private LocalDateTime deletedAt; // deleted_at 컬럼
 }
