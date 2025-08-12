@@ -74,6 +74,15 @@ public enum BaseResponseStatus {
     GOOGLE_USER_INFO_REQUEST_FAILED(false, HttpStatus.BAD_GATEWAY.value(), "구글 사용자 정보 요청에 실패했습니다."),
     GOOGLE_TOKEN_EXTRACT_FAILED(false, HttpStatus.INTERNAL_SERVER_ERROR.value(), "구글 토큰 추출에 실패했습니다."),
 
+
+    // 회원탈퇴 관련
+    DATA_DELETION_NOT_AGREED(false, HttpStatus.BAD_REQUEST.value(), "데이터 삭제에 동의하지 않았습니다."),
+    PASSWORD_REQUIRED(false, HttpStatus.BAD_REQUEST.value(), "비밀번호가 필요합니다."),
+    USER_NOT_FOUND(false, HttpStatus.NOT_FOUND.value(), "사용자를 찾을 수 없습니다."),
+    ACCOUNT_NOT_RECOVERABLE(false, HttpStatus.BAD_REQUEST.value(), "복구할 수 없는 계정입니다."),
+    RECOVERY_DEADLINE_EXPIRED(false, HttpStatus.BAD_REQUEST.value(), "복구 가능 기간이 지났습니다."),
+    
+
     // 공통 에러
     DATABASE_CONSTRAINT_ERROR(false, HttpStatus.BAD_REQUEST.value(), "데이터 제약조건 위반입니다."),
     DATABASE_ERROR(false, HttpStatus.INTERNAL_SERVER_ERROR.value(), "데이터베이스 오류가 발생했습니다."),
