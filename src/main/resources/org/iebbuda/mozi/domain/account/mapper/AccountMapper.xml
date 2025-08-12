@@ -123,7 +123,14 @@
         WHERE u.user_id = #{userId}
           AND u.goal_id = #{goalId}
     </select>
-<!--    <select id="getMainBankCodeByUserId" resultType="java.lang.String">-->
+    <!-- 사용자의 모든 계좌 정보 삭제 -->
+    <delete id="deleteAllAccountsByUserId" parameterType="int">
+        DELETE a FROM Account a
+        INNER JOIN BankLogin bl ON a.bank_login_id = bl.bank_login_id
+        WHERE bl.user_id = #{userId};
+    </delete>
+
+    <!--    <select id="getMainBankCodeByUserId" resultType="java.lang.String">-->
 <!--        SELECT IFNULL(main_bank, '') FROM user-->
 <!--        where user_id=#{userId}-->
 <!--    </select>-->

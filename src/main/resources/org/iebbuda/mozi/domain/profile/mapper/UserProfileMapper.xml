@@ -38,5 +38,10 @@
         WHERE user_id = #{userId}
     </update>
 
+    <!-- 사용자 프로필 삭제 -->
+    <delete id="deleteProfileByUserId" parameterType="int">
+        DELETE FROM userprofile
+        WHERE user_id = #{userId}
+    </delete>
 
 </mapper>

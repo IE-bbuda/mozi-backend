@@ -24,4 +24,13 @@ public interface PolicyScrapMapper {
 
     List<PolicyVO> getScrapedPolicies(int userId);
 
+    /**
+     * 사용자별 정책 스크랩 개수 조회
+     */
+    int countByUserId(@Param("userId") int userId);
+
+    /**
+     * 사용자의 모든 정책 스크랩 삭제 (회원탈퇴용)
+     */
+    int deleteByUserId(@Param("userId") int userId);
 }

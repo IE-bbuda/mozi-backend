@@ -1,5 +1,6 @@
 package org.iebbuda.mozi.domain.account.mapper;
 
+import org.apache.ibatis.annotations.Param;
 import org.iebbuda.mozi.domain.account.domain.BankLoginVO;
 
 import java.util.List;
@@ -16,4 +17,6 @@ public interface BankLoginMapper {
     List<String> getBankCodeByUserId(Integer userId);
 
     List<String> getAllBanks();
+
+    void deleteAllBankLoginsByUserId(@Param("userId") int userId);
 }

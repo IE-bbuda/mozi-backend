@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.iebbuda.mozi.domain.user.mapper.WithdrawalMapper">
+    <!-- 탈퇴 전 백업 저장 -->
+    <insert id="backupUserBeforeDelete">
+        INSERT INTO deleted_users_backup (
+            original_user_id, original_login_id, original_username, original_email,
+            original_password, original_phone_number, original_birth_date,
+            original_provider, original_provider_id, user_type, withdrawal_type,
+            withdrawal_reason, recovery_deadline, original_created_at
+        )
+        SELECT
+            user_id, login_id, username, email, password, phone_number, birth_date,
+            provider, provider_id, #{userType}, #{withdrawalType}, #{reason},
+            DATE_ADD(NOW(), INTERVAL 7 DAY), created_at
+        FROM user
+        WHERE user_id = #{userId}
+    </insert>
+
+
+
+    <!-- 복구 가능한 사용자 조회 -->
+    <select id="findRecoverableUser" resultType="org.iebbuda.mozi.domain.user.domain.DeletedUserBackupVO">
+        <![CDATA[SELECT dub.*, u.user_id as original_user_id
+        FROM deleted_users_backup dub
+                 JOIN user u ON dub.original_user_id = u.user_id
+        WHERE dub.original_login_id = #{loginId}
+          AND dub.recovery_deadline > NOW()
+          AND dub.is_recoverable = TRUE
+          AND u.is_deleted = TRUE
+        ]]>
+    </select>
+
+    <!-- OAuth 사용자 복구 조회 -->
+    <select id="findRecoverableOAuthUser" resultType="org.iebbuda.mozi.domain.user.domain.DeletedUserBackupVO">
+        <![CDATA[  SELECT dub.*, u.user_id as original_user_id
+        FROM deleted_users_backup dub
+                 JOIN user u ON dub.original_user_id = u.user_id
+        WHERE dub.original_provider = #{provider}
+          AND dub.original_provider_id = #{providerId}
+          AND dub.recovery_deadline > NOW()
+          AND dub.is_recoverable = TRUE
+          AND withdrawal_type IN ('OAUTH_SERVICE_ONLY') -- 복구 가능한 탈퇴 타입만
+          AND u.is_deleted = TRUE ]]>
+    </select>
+
+
+
+    <!-- 백업 데이터 삭제 -->
+    <delete id="deleteBackupData" parameterType="int">
+        DELETE FROM deleted_users_backup WHERE original_user_id = #{userId}
+    </delete>
+
+    <!-- 복구 기간 만료된 사용자들 조회 -->
+    <select id="findExpiredUsers" resultType="int">
+        <![CDATA[ SELECT dub.original_user_id
+        FROM deleted_users_backup dub
+        JOIN user u ON dub.original_user_id = u.user_id
+        WHERE dub.recovery_deadline < NOW()
+        AND u.is_deleted = TRUE]]>
+    </select>
+
+
+    <!-- 만료된 백업 데이터 삭제 -->
+    <delete id="deleteExpiredBackups">
+        <![CDATA[ DELETE FROM deleted_users_backup WHERE recovery_deadline < NOW()]]>
+    </delete>
+
+</mapper>

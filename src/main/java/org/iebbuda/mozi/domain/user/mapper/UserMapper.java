@@ -4,6 +4,7 @@ package org.iebbuda.mozi.domain.user.mapper;
 import org.apache.ibatis.annotations.Param;
 
 import org.iebbuda.mozi.domain.security.account.domain.AuthVO;
+import org.iebbuda.mozi.domain.user.domain.DeletedUserBackupVO;
 import org.iebbuda.mozi.domain.user.domain.UserVO;
 
 import java.time.LocalDateTime;
@@ -66,4 +67,8 @@ public interface UserMapper {
     int updateMainBankCodeByUserId(@Param("bankCode") String bankCode, @Param("userId") Integer userId);
 
     Date getbirthDateByUserId(Integer UserId);
+
+    void restoreUser(DeletedUserBackupVO backup);
+    void hardDeleteUser(@Param("userId") int userId);
+    void maskDeletedUser(@Param("userId") int userId);
 }
