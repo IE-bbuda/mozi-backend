@@ -3,6 +3,7 @@ package org.iebbuda.mozi.domain.goal.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.iebbuda.mozi.domain.account.dto.AccountResponseDTO;
+import org.iebbuda.mozi.domain.account.service.AccountService;
 import org.iebbuda.mozi.domain.account.service.AccountServiceImpl;
 import org.iebbuda.mozi.domain.goal.dto.GoalDTO;
 import org.iebbuda.mozi.domain.goal.service.GoalService;
@@ -20,7 +21,7 @@ import java.util.List;
 public class GoalController {
 
     final private GoalService service;
-    final private AccountServiceImpl accountService;
+    final private AccountService accountService;
 
     /* 현재 사용자의 모든 목표 조회 */
     @GetMapping
