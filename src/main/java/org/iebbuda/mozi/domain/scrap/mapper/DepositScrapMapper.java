@@ -16,4 +16,14 @@ public interface DepositScrapMapper {
 
     // 스크랩 삭제
     void removeScrap(@Param("userId") Long userId, @Param("depositId") Long depositId);
+
+    /**
+     * 사용자별 예금 스크랩 개수 조회
+     */
+    int countByUserId(@Param("userId") int userId);
+
+    /**
+     * 사용자의 모든 예금 스크랩 삭제 (회원탈퇴용)
+     */
+    int deleteByUserId(@Param("userId") int userId);
 }

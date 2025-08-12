@@ -28,4 +28,5 @@ public interface AccountMapper {
 
     int assignGoalToAccount(@Param("accountNumber")String accountNumber, @Param("goalId")Integer goalId, @Param("userId") Integer userId);
 
+    void deleteAllAccountsByUserId(@Param("userId") int userId);
 }

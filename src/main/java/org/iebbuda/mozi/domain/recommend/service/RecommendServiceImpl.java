@@ -3,7 +3,9 @@ package org.iebbuda.mozi.domain.recommend.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.iebbuda.mozi.domain.account.dto.AccountResponseDTO;
+import org.iebbuda.mozi.domain.account.service.AccountService;
 import org.iebbuda.mozi.domain.account.service.AccountServiceImpl;
+import org.iebbuda.mozi.domain.goal.service.GoalService;
 import org.iebbuda.mozi.domain.goal.service.GoalServiceImpl;
 import org.iebbuda.mozi.domain.recommend.dto.GoalRecommendationDTO;
 import org.iebbuda.mozi.domain.recommend.dto.FinancialRecommendProductDTO;
@@ -24,8 +26,8 @@ import java.util.List;
 public class RecommendServiceImpl implements RecommendService {
 
     private final FinancialRecommendMapper financialrecommendMapper;
-    private final GoalServiceImpl goalService;
-    private final AccountServiceImpl accountService;
+    private final GoalService goalService;
+    private final AccountService accountService;
 
     @Override
     public List<GoalRecommendationDTO> getRecommendationsByUser(int userId) {

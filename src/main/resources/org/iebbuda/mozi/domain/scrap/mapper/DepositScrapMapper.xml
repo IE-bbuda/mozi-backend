@@ -63,4 +63,19 @@
         WHERE user_id = #{userId} AND deposit_id = #{depositId}
     </delete>
 
+
+    <!-- ========== 회원탈퇴용 메서드들 ========== -->
+
+    <!-- 사용자별 예금 스크랩 개수 조회 -->
+    <select id="countByUserId" parameterType="int" resultType="int">
+        SELECT COUNT(*)
+        FROM DepositScrap
+        WHERE user_id = #{userId}
+    </select>
+
+    <!-- 사용자의 모든 예금 스크랩 삭제 (회원탈퇴용) -->
+    <delete id="deleteByUserId" parameterType="int">
+        DELETE FROM DepositScrap
+        WHERE user_id = #{userId}
+    </delete>
 </mapper>

@@ -52,4 +52,19 @@
         DELETE FROM SavingScrap
         WHERE user_id = #{userId} AND saving_id = #{savingId}
     </delete>
+
+    <!-- ========== 회원탈퇴용 메서드들 ========== -->
+
+    <!-- 사용자별 적금 스크랩 개수 조회 -->
+    <select id="countByUserId" parameterType="int" resultType="int">
+        SELECT COUNT(*)
+        FROM SavingScrap
+        WHERE user_id = #{userId}
+    </select>
+
+    <!-- 사용자의 모든 적금 스크랩 삭제 (회원탈퇴용) -->
+    <delete id="deleteByUserId" parameterType="int">
+        DELETE FROM SavingScrap
+        WHERE user_id = #{userId}
+    </delete>
 </mapper>

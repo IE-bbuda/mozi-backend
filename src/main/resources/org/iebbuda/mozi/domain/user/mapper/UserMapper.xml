@@ -21,6 +21,8 @@
         <result property="birthDate" column="birth_date"/>
         <result property="provider" column="provider"/>
         <result property="providerId" column="provider_id"/>
+        <result property="isDeleted" column="is_deleted"/>
+        <result property="deletedAt" column="deleted_at"/>
         <collection property="authList" resultMap="authMap" />
     </resultMap>
 
@@ -34,32 +36,39 @@
         values (#{userId},#{auth})
     </insert>
 
-    <!-- 기존 쿼리들 유지 -->
+    <!--  3. findByUserId - is_deleted, deleted_at 컬럼 추가 -->
     <select id="findByUserId" resultMap="userMap">
         SELECT u.user_id, u.username, u.login_id, u.password, u.phone_number, u.email,
-               u.created_at, u.updated_at, u.birth_date, u.provider, u.provider_id, a.auth
+               u.created_at, u.updated_at, u.birth_date, u.provider, u.provider_id,
+               u.is_deleted, u.deleted_at, a.auth
         FROM User u
                  LEFT OUTER JOIN Auth a ON u.user_id = a.user_id
         WHERE u.user_id = #{userId}
+          AND (u.is_deleted = FALSE OR u.is_deleted IS NULL)
     </select>
 
+    <!--  4. findByLoginId - is_deleted, deleted_at 컬럼 추가 -->
     <select id="findByLoginId" resultMap="userMap">
         SELECT u.user_id, u.username, u.login_id, u.password, u.phone_number, u.email,
-               u.created_at, u.updated_at, u.birth_date, u.provider, u.provider_id, a.auth
+               u.created_at, u.updated_at, u.birth_date, u.provider, u.provider_id,
+               u.is_deleted, u.deleted_at, a.auth
         FROM User u
                  LEFT OUTER JOIN Auth a ON u.user_id = a.user_id
         WHERE u.login_id = #{loginId}
+          AND (u.is_deleted = FALSE OR u.is_deleted IS NULL)
     </select>
 
     <select id="findLoginIdByEmail" resultType="String">
         SELECT login_id
         FROM User
         WHERE username = #{username} AND email=#{email}
+          AND (u.is_deleted = FALSE OR u.is_deleted IS NULL)
     </select>
     <select id="findLoginIdByPhoneNumber" resultType="String">
         SELECT login_id
         FROM User
         WHERE username = #{username} AND phone_number = #{phoneNumber}
+          AND (u.is_deleted = FALSE OR u.is_deleted IS NULL)
     </select>
 
     <!-- 사용자 비밀번호 업데이트 -->
@@ -68,15 +77,16 @@
         SET password = #{password},
             updated_at = #{updatedAt}
         WHERE user_id = #{userId}
+          AND (u.is_deleted = FALSE OR u.is_deleted IS NULL)
     </update>
 
-    <!-- 이메일로 사용자 조회 (중복 확인용) -->
-    <!-- 이메일로 사용자 조회 (중복 확인용) - OAuth 필드 추가 -->
+    <!-- findByEmail에서 is_deleted 조건이 없음 -->
     <select id="findByEmail" resultMap="userMap">
         SELECT u.user_id, u.username, u.login_id, u.password, u.phone_number, u.email,
-               u.created_at, u.updated_at, u.birth_date, u.provider, u.provider_id, a.auth
+        u.created_at, u.updated_at, u.birth_date, u.provider, u.provider_id,
+        u.is_deleted, u.deleted_at, a.auth
         FROM User u
-                 LEFT OUTER JOIN Auth a ON u.user_id = a.user_id
+        LEFT OUTER JOIN Auth a ON u.user_id = a.user_id
         WHERE u.email = #{email}
     </select>
 
@@ -95,6 +105,7 @@
         FROM User
         WHERE login_id = #{loginId}
           AND email = #{email}
+          AND (u.is_deleted = FALSE OR u.is_deleted IS NULL)
     </select>
 
     <!-- 사용자 기본 정보 수정 (이메일, 전화번호) -->
@@ -104,6 +115,7 @@
             email = #{email},
             updated_at = NOW()
         WHERE login_id = #{loginId}
+          AND (u.is_deleted = FALSE OR u.is_deleted IS NULL)
     </update>
 
     <!-- 마이페이지 비밀번호 변경 (로그인된 상태) -->
@@ -113,26 +125,31 @@
             password = #{newPassword},
             updated_at = NOW()
         WHERE login_id = #{loginId}
+          AND (u.is_deleted = FALSE OR u.is_deleted IS NULL)
     </update>
 
     <!-- OAuth 관련 쿼리들 -->
 
-    <!-- Provider와 ProviderId로 사용자 조회 -->
+    <!-- 2. findByProviderAndProviderId - 활성 사용자만 조회 -->
     <select id="findByProviderAndProviderId" resultMap="userMap">
         SELECT u.user_id, u.username, u.login_id, u.password, u.phone_number, u.email,
-               u.created_at, u.updated_at, u.birth_date, u.provider, u.provider_id, a.auth
+        u.created_at, u.updated_at, u.birth_date, u.provider, u.provider_id,
+        u.is_deleted, u.deleted_at, a.auth
         FROM User u
-                 LEFT OUTER JOIN Auth a ON u.user_id = a.user_id
+        LEFT OUTER JOIN Auth a ON u.user_id = a.user_id
         WHERE u.provider = #{provider}
-          AND u.provider_id = #{providerId}
+        AND u.provider_id = #{providerId}
+        AND (u.is_deleted = FALSE OR u.is_deleted IS NULL)  <!--  활성 사용자만 -->
     </select>
     <select id="getMainBankCodeByUserId" resultType="java.lang.String">
         SELECT IFNULL(main_bank, '') FROM user
         where user_id=#{userId}
+          AND (u.is_deleted = FALSE OR u.is_deleted IS NULL)
     </select>
     <select id="getbirthDateByUserId" resultType="java.util.Date">
         select birth_date from user
         where user_id=#{userId}
+          AND (u.is_deleted = FALSE OR u.is_deleted IS NULL)
     </select>
 
     <!-- 기존 사용자를 OAuth 연동으로 업데이트 (확장 가능) -->
@@ -143,15 +160,56 @@
             provider_id = #{providerId},
             updated_at = NOW()
         WHERE user_id = #{userId}
+          AND (u.is_deleted = FALSE OR u.is_deleted IS NULL)
     </update>
     <update id="clearMainBankByUserId">
         UPDATE user
         SET main_bank = NULL
         WHERE user_id = #{userId};
+        AND (u.is_deleted = FALSE OR u.is_deleted IS NULL)
     </update>
     <update id="updateMainBankCodeByUserId">
         update user
         set main_bank=#{bankCode}
         where user_id=#{userId}
+          AND (u.is_deleted = FALSE OR u.is_deleted IS NULL)
+    </update>
+
+    <!-- 사용자 복구 -->
+    <update id="restoreUser" parameterType="org.iebbuda.mozi.domain.user.domain.DeletedUserBackupVO">
+        UPDATE user u
+        SET
+            u.is_deleted = FALSE,
+            u.deleted_at = NULL,
+            u.login_id = #{originalLoginId},
+            u.username = #{originalUsername},
+            u.email = #{originalEmail},
+            u.password = #{originalPassword},
+            u.phone_number = #{originalPhoneNumber},
+            u.birth_date = #{originalBirthDate},
+            u.provider = #{originalProvider},
+            u.provider_id = #{originalProviderId}
+        WHERE u.user_id = #{originalUserId}
+    </update>
+
+    <!-- 완전 삭제 -->
+    <delete id="hardDeleteUser" parameterType="int">
+        DELETE FROM user WHERE user_id = #{userId}
+    </delete>
+
+
+    <update id="maskDeletedUser" parameterType="int">
+        UPDATE user
+        SET
+            is_deleted = TRUE,
+            deleted_at = NOW(),
+            login_id = CONCAT('DEL_', user_id, '_', UNIX_TIMESTAMP()),
+            username = '탈퇴한사용자',
+            email = CONCAT('deleted_', user_id, '_', UNIX_TIMESTAMP(), '@deleted.local'),
+            password = 'DELETED',
+            phone_number = '000-0000-0000',
+            provider = NULL,
+            provider_id = NULL
+        WHERE user_id = #{userId}
     </update>
 </mapper>

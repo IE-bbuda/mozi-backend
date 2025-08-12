@@ -9,4 +9,5 @@ public interface UserProfileService {
     void saveProfile(String loginId, UserProfileInfoDTO dto);
     UserProfileInfoDTO getUserProfile(String userId);
     PersonalInfoStatusDTO getPersonalInfoStatus(String loginId);
+    void deleteProfileByUserId(int userId);
 }

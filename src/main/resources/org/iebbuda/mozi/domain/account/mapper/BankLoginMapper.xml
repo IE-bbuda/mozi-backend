@@ -27,4 +27,9 @@
     <select id="getAllBanks" resultType="java.lang.String">
         select bank_code from banklogin
     </select>
+    <!-- 사용자의 모든 은행 로그인 정보 삭제 -->
+    <delete id="deleteAllBankLoginsByUserId" parameterType="int">
+        DELETE FROM banklogin
+        WHERE user_id = #{userId}
+    </delete>
 </mapper>

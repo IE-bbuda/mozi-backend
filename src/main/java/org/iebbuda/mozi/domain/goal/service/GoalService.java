@@ -65,5 +65,7 @@ public interface GoalService {
     GoalVO getGoalById(int goalId); // goalId로 GoalVO 가져오기
     List<GoalVO> getGoalVOListByUserId(int userId);
 
-
+    //유저 제거
+    int getGoalCountByUserId(int userId);
+    void deleteAllGoalsByUserId(int userId);
 }
