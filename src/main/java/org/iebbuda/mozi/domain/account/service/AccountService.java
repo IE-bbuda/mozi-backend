@@ -20,4 +20,6 @@ public interface AccountService {
     Map<String, Object> updateMainBankCode(String bankCode, Integer userId);
     Map<String, Object> updateAccountsByGoal(List<String> accountNumberList, Integer goalId, Integer userId);
     Map<String, Object> getConnectedBanks(Integer userId);
+    void deleteAllAccountsByUserId(int userId);
+    void deleteAllBankLoginsByUserId(int userId);
 }
