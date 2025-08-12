@@ -1,7 +1,9 @@
 package org.iebbuda.mozi.domain.security.dto.oauth;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
 
+@Data
 public class GoogleUserInfoDTO implements OAuthUserInfo{
     private String id;
     private String email;
