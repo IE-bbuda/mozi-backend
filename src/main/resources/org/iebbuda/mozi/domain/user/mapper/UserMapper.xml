@@ -60,20 +60,20 @@
 
     <select id="findLoginIdByEmail" resultType="String">
         SELECT login_id
-        FROM User
+        FROM User u
         WHERE username = #{username} AND email=#{email}
           AND (u.is_deleted = FALSE OR u.is_deleted IS NULL)
     </select>
     <select id="findLoginIdByPhoneNumber" resultType="String">
         SELECT login_id
-        FROM User
+        FROM User u
         WHERE username = #{username} AND phone_number = #{phoneNumber}
           AND (u.is_deleted = FALSE OR u.is_deleted IS NULL)
     </select>
 
     <!-- 사용자 비밀번호 업데이트 -->
     <update id="updateUserPassword">
-        UPDATE User
+        UPDATE User u
         SET password = #{password},
             updated_at = #{updatedAt}
         WHERE user_id = #{userId}
@@ -83,10 +83,10 @@
     <!-- findByEmail에서 is_deleted 조건이 없음 -->
     <select id="findByEmail" resultMap="userMap">
         SELECT u.user_id, u.username, u.login_id, u.password, u.phone_number, u.email,
-        u.created_at, u.updated_at, u.birth_date, u.provider, u.provider_id,
-        u.is_deleted, u.deleted_at, a.auth
+               u.created_at, u.updated_at, u.birth_date, u.provider, u.provider_id,
+               u.is_deleted, u.deleted_at, a.auth
         FROM User u
-        LEFT OUTER JOIN Auth a ON u.user_id = a.user_id
+                 LEFT OUTER JOIN Auth a ON u.user_id = a.user_id
         WHERE u.email = #{email}
     </select>
 
@@ -102,7 +102,7 @@
             updated_at AS updatedAt,
             provider,
             provider_id AS providerId
-        FROM User
+        FROM User u
         WHERE login_id = #{loginId}
           AND email = #{email}
           AND (u.is_deleted = FALSE OR u.is_deleted IS NULL)
@@ -110,7 +110,7 @@
 
     <!-- 사용자 기본 정보 수정 (이메일, 전화번호) -->
     <update id="updateUserInfo">
-        UPDATE User
+        UPDATE User u
         SET
             email = #{email},
             updated_at = NOW()
@@ -120,7 +120,7 @@
 
     <!-- 마이페이지 비밀번호 변경 (로그인된 상태) -->
     <update id="updatePasswordByLoginId">
-        UPDATE User
+        UPDATE User u
         SET
             password = #{newPassword},
             updated_at = NOW()
@@ -142,19 +142,19 @@
         AND (u.is_deleted = FALSE OR u.is_deleted IS NULL)  <!--  활성 사용자만 -->
     </select>
     <select id="getMainBankCodeByUserId" resultType="java.lang.String">
-        SELECT IFNULL(main_bank, '') FROM user
+        SELECT IFNULL(main_bank, '') FROM user u
         where user_id=#{userId}
           AND (u.is_deleted = FALSE OR u.is_deleted IS NULL)
     </select>
     <select id="getbirthDateByUserId" resultType="java.util.Date">
-        select birth_date from user
+        select birth_date from user u
         where user_id=#{userId}
           AND (u.is_deleted = FALSE OR u.is_deleted IS NULL)
     </select>
 
     <!-- 기존 사용자를 OAuth 연동으로 업데이트 (확장 가능) -->
     <update id="updateUserToOAuth">
-        UPDATE User
+        UPDATE User u
         SET
             provider = #{provider},
             provider_id = #{providerId},
@@ -163,13 +163,13 @@
           AND (u.is_deleted = FALSE OR u.is_deleted IS NULL)
     </update>
     <update id="clearMainBankByUserId">
-        UPDATE user
+        UPDATE user u
         SET main_bank = NULL
-        WHERE user_id = #{userId};
-        AND (u.is_deleted = FALSE OR u.is_deleted IS NULL)
+        WHERE user_id = #{userId}
+          AND (u.is_deleted = FALSE OR u.is_deleted IS NULL)
     </update>
     <update id="updateMainBankCodeByUserId">
-        update user
+        update user u
         set main_bank=#{bankCode}
         where user_id=#{userId}
           AND (u.is_deleted = FALSE OR u.is_deleted IS NULL)
