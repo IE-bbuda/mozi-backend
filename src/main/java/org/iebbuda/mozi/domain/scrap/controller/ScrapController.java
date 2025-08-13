@@ -13,7 +13,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/scrap")
 @RequiredArgsConstructor
-public class ScrapController {
+public class
+ScrapController {
 
     private final ScrapService scrabService;
     // 스크랩된 정책 plcyNo 목록 조회
