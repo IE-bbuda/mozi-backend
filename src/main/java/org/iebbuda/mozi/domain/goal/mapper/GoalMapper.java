@@ -24,4 +24,14 @@ public interface GoalMapper {
 
     List<GoalVO> findByUserId(int userId);
 
+
+    /**
+     * 사용자별 목표 개수 조회
+     */
+    int countByUserId(@Param("userId") int userId);
+
+    /**
+     * 사용자의 모든 목표 삭제 (회원탈퇴용)
+     */
+    int deleteByUserId(@Param("userId") int userId);
 }

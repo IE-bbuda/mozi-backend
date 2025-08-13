@@ -6,6 +6,7 @@ import org.iebbuda.mozi.domain.goal.dto.GoalDTO;
 import org.iebbuda.mozi.domain.goal.domain.GoalVO;
 import org.iebbuda.mozi.domain.goal.mapper.GoalMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -205,6 +206,26 @@ public class GoalServiceImpl implements GoalService {
     @Override
     public List<GoalVO> getGoalVOListByUserId(int userId) {
         return goalMapper.findByUserId(userId); // mapper에서 GoalVO 리스트 반환해야 함
+    }
+
+    @Override
+    public int getGoalCountByUserId(int userId) {
+        log.info("목표 개수 조회 - userId: {}", userId);
+
+        int count = goalMapper.countByUserId(userId);
+        log.info("목표 개수 조회 완료 - userId: {}, {}개", userId, count);
+
+        return count;
+    }
+
+
+    @Override
+    @Transactional
+    public void deleteAllGoalsByUserId(int userId) {
+        log.info("모든 목표 삭제 시작 - userId: {}", userId);
+
+        int deletedCount = goalMapper.deleteByUserId(userId);
+        log.info("목표 삭제 완료 - userId: {}, {}개", userId, deletedCount);
     }
 
 

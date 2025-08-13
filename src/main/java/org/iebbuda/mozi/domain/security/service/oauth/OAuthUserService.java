@@ -9,13 +9,16 @@ import org.iebbuda.mozi.domain.security.account.domain.AuthVO;
 import org.iebbuda.mozi.domain.security.account.domain.UserRole;
 import org.iebbuda.mozi.domain.security.dto.oauth.OAuthProvider;
 import org.iebbuda.mozi.domain.security.dto.oauth.OAuthUserInfo;
+import org.iebbuda.mozi.domain.user.domain.DeletedUserBackupVO;
 import org.iebbuda.mozi.domain.user.domain.UserVO;
 import org.iebbuda.mozi.domain.user.mapper.UserMapper;
+import org.iebbuda.mozi.domain.user.mapper.WithdrawalMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
@@ -25,6 +28,8 @@ public class OAuthUserService {
 
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
+    private final WithdrawalMapper withdrawalMapper;
+
     private final SecureRandom random = new SecureRandom();
 
     @Transactional
@@ -32,6 +37,7 @@ public class OAuthUserService {
         String provider = oAuthUserInfo.getProvider().getCode();
         String providerId = oAuthUserInfo.getProviderId();
 
+        log.info("OAuth 사용자 처리 시작 - provider: {}, providerId: {}", provider, providerId);
         // 1. 기존 OAuth 사용자 조회
         UserVO existingUser = userMapper.findByProviderAndProviderId(provider, providerId);
         if (existingUser != null) {
@@ -39,8 +45,121 @@ public class OAuthUserService {
             return existingUser;
         }
 
-        // 2. 새로운 OAuth 사용자 생성
+        // 2. 탈퇴한 사용자 중 복구 가능한 사용자 조회
+        DeletedUserBackupVO backupUser = withdrawalMapper.findRecoverableOAuthUser(provider, providerId);
+        if (backupUser != null && canRecover(backupUser)) {
+            log.info("탈퇴한 {} 사용자 자동 복구 시작 - providerId: {}", provider, providerId);
+            return recoverOAuthUser(backupUser, oAuthUserInfo);
+        }
+
+        // 3. 새로운 OAuth 사용자 생성
         return createOAuthUser(oAuthUserInfo);
+    }
+
+    /**
+     * OAuth 사용자 자동 복구 - 깔끔한 버전
+     */
+    private UserVO recoverOAuthUser(DeletedUserBackupVO backup, OAuthUserInfo oAuthUserInfo) {
+        log.info("OAuth 사용자 복구 진행 - userId: {}, provider: {}",
+                backup.getOriginalUserId(), backup.getOriginalProvider());
+
+        // 🔥 핵심 로직 - 실패 시 예외 던지기 (GlobalExceptionHandler가 처리)
+        userMapper.restoreUser(backup);
+
+        UserVO recoveredUser = userMapper.findByUserId(backup.getOriginalUserId());
+        if (recoveredUser == null) {
+            throw new BaseException(BaseResponseStatus.USER_NOT_FOUND);
+        }
+
+        // 🔥 부가 기능 - 실패해도 복구는 계속 진행
+        updateEmailIfChangedSafely(backup, oAuthUserInfo, recoveredUser);
+        deleteBackupDataSafely(backup.getOriginalUserId());
+
+        log.info("OAuth 사용자 복구 완료 - userId: {}, email: {}",
+                backup.getOriginalUserId(), recoveredUser.getEmail());
+        return recoveredUser;
+    }
+
+    /**
+     * 안전한 이메일 업데이트 (실패해도 복구는 계속)
+     */
+    private void updateEmailIfChangedSafely(DeletedUserBackupVO backup, OAuthUserInfo oAuthUserInfo, UserVO recoveredUser) {
+        try {
+            String currentOAuthEmail = oAuthUserInfo.getEmail();
+            String originalEmail = backup.getOriginalEmail();
+
+            if (currentOAuthEmail == null || currentOAuthEmail.trim().isEmpty()) {
+                log.info("OAuth에서 이메일 정보 없음 - 기존 이메일 유지: {}", originalEmail);
+                return;
+            }
+
+            if (currentOAuthEmail.equals(originalEmail)) {
+                log.info("OAuth 이메일 변경 없음 - 기존 이메일 유지: {}", originalEmail);
+                return;
+            }
+
+            log.info("OAuth 이메일 변경 감지: {} -> {}", originalEmail, currentOAuthEmail);
+
+            // 다른 활성 사용자가 새 이메일을 사용 중인지 확인
+            if (isEmailUsedByOtherActiveUser(currentOAuthEmail, backup.getOriginalUserId())) {
+                log.warn("새 이메일이 다른 사용자에 의해 사용 중 - 기존 이메일 유지: {}", originalEmail);
+                return;
+            }
+
+            // 이메일 업데이트
+            userMapper.updateUserInfo(recoveredUser.getLoginId(), currentOAuthEmail);
+            recoveredUser.setEmail(currentOAuthEmail);
+            log.info("OAuth 복구 시 이메일 업데이트 완료: {}", currentOAuthEmail);
+
+        } catch (Exception e) {
+            log.warn("이메일 업데이트 실패하지만 복구는 계속 진행: {}", e.getMessage());
+        }
+    }
+
+    /**
+     * 안전한 백업 데이터 삭제 (실패해도 복구는 성공)
+     */
+    private void deleteBackupDataSafely(int userId) {
+        try {
+            withdrawalMapper.deleteBackupData(userId);
+            log.info("백업 데이터 삭제 완료 - userId: {}", userId);
+        } catch (Exception e) {
+            log.warn("백업 데이터 삭제 실패하지만 복구는 성공 - userId: {}, 수동 정리 필요", userId, e);
+        }
+    }
+
+    /**
+     * 다른 활성 사용자가 이메일을 사용 중인지 확인
+     */
+    private boolean isEmailUsedByOtherActiveUser(String email, int excludeUserId) {
+        UserVO existingUser = userMapper.findByEmail(email);
+
+        if (existingUser == null) {
+            return false;
+        }
+
+        // 복구 대상 자신은 제외
+        if (existingUser.getUserId() == excludeUserId) {
+            return false;
+        }
+
+        // 탈퇴한 사용자는 중복으로 간주하지 않음
+        if (existingUser.getIsDeleted() != null && existingUser.getIsDeleted()) {
+            return false;
+        }
+
+        // 다른 활성 사용자가 사용 중
+        return true;
+    }
+
+    /**
+     * 복구 가능한지 확인
+     */
+    private boolean canRecover(DeletedUserBackupVO backup) {
+        return backup.getIsRecoverable() != null &&
+                backup.getIsRecoverable() &&
+                backup.getRecoveryDeadline() != null &&
+                backup.getRecoveryDeadline().isAfter(LocalDateTime.now());
     }
     private UserVO createOAuthUser(OAuthUserInfo oAuthUserInfo) {
         UserVO newUser = new UserVO();
@@ -112,7 +231,21 @@ public class OAuthUserService {
 
     // 이메일 중복 체크
     private boolean isEmailAlreadyUsed(String email) {
-        return userMapper.findByEmail(email) != null;
+        UserVO existingUser = userMapper.findByEmail(email);
+
+        // 사용자가 없으면 사용 가능
+        if (existingUser == null) {
+            return false;
+        }
+
+        // 탈퇴한 사용자는 중복으로 간주하지 않음
+        if (existingUser.getIsDeleted() != null && existingUser.getIsDeleted()) {
+            log.info("탈퇴한 사용자의 이메일이므로 중복으로 간주하지 않음: {}", email);
+            return false;
+        }
+
+        // 활성 사용자가 이미 사용 중
+        return true;
     }
 
     // OAuth 전용 더미 이메일 생성

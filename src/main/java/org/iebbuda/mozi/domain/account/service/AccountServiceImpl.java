@@ -2,6 +2,7 @@ package org.iebbuda.mozi.domain.account.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.iebbuda.mozi.domain.account.domain.AccountVO;
 import org.iebbuda.mozi.domain.account.domain.BankLoginVO;
 import org.iebbuda.mozi.domain.account.dto.AccountResponseDTO;
@@ -13,6 +14,7 @@ import org.iebbuda.mozi.domain.account.mapper.BankLoginMapper;
 import org.iebbuda.mozi.domain.user.mapper.UserMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -21,6 +23,7 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
+@Log4j2
 public class AccountServiceImpl implements AccountService {
     private final AuthService authService;
     private final ConnectionService connectionService;
@@ -299,6 +302,22 @@ public class AccountServiceImpl implements AccountService {
     public Map<String, Object> getConnectedBanks(Integer userId) {
         List<String> connectedBankCodes=bankLoginMapper.getBankCodeByUserId(userId);
         return Map.of("bankCodeList", connectedBankCodes);
+    }
+
+    @Override
+    @Transactional
+    public void deleteAllAccountsByUserId(int userId) {
+        log.info("사용자 계좌 데이터 삭제 시작 - userId: {}", userId);
+        accountMapper.deleteAllAccountsByUserId(userId);
+        log.info("사용자 계좌 데이터 삭제 완료 - userId: {}", userId);
+    }
+
+    @Override
+    @Transactional
+    public void deleteAllBankLoginsByUserId(int userId) {
+        log.info("사용자 은행 연동 데이터 삭제 시작 - userId: {}", userId);
+        bankLoginMapper.deleteAllBankLoginsByUserId(userId);
+        log.info("사용자 은행 연동 데이터 삭제 완료 - userId: {}", userId);
     }
 }
 

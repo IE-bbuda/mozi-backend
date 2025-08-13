@@ -108,6 +108,14 @@ public class UserProfileServiceImpl implements UserProfileService {
                 .build();
     }
 
+    @Override
+    @Transactional
+    public void deleteProfileByUserId(int userId) {
+        log.info("사용자 프로필 데이터 삭제 시작 - userId: {}", userId);
+        userProfileMapper.deleteProfileByUserId(userId);
+        log.info("사용자 프로필 데이터 삭제 완료 - userId: {}", userId);
+    }
+
     // ========== Private Methods ==========
 
     /**

@@ -14,4 +14,6 @@ public interface UserProfileMapper {
 
     int updateUserProfile(UserProfileVO userProfile);
     int insertUserProfile(UserProfileVO userProfile);
+
+    void deleteProfileByUserId(@Param("userId") int userId);
 }

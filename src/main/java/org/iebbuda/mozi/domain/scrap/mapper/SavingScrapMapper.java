@@ -18,4 +18,14 @@ public interface SavingScrapMapper {
 
     // 스크랩 삭제
     void removeScrap(@Param("userId") Long userId, @Param("savingId") Long savingId);
+
+    /**
+     * 사용자별 적금 스크랩 개수 조회
+     */
+    int countByUserId(@Param("userId") int userId);
+
+    /**
+     * 사용자의 모든 적금 스크랩 삭제 (회원탈퇴용)
+     */
+    int deleteByUserId(@Param("userId") int userId);
 }

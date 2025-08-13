@@ -134,7 +134,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/region/zipcodes").permitAll()
                 .antMatchers("/api/region/names").permitAll()
                 .antMatchers("/api/region/zipcodes/sido").permitAll()
-
+                .antMatchers("/api/withdrawal/recovery").permitAll()
 
                 // OAuth 관련 API들
                 .antMatchers("/api/oauth/**").permitAll()                      // OAuth 로그인 (카카오, 구글, 네이버 등)

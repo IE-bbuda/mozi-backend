@@ -118,6 +118,12 @@ public class PasswordResetService {
         log.info("비밀번호 재설정 완료 - 사용자ID: {}, 세션ID: {}", session.getUserId(), session.getId());
     }
 
+    public void deleteSessionsByUserId(int userId) {
+            log.info("사용자 세션 데이터 삭제 시작 - userId: {}", userId);
+            sessionMapper.deleteSessionsByUserId(userId);
+            log.info("사용자 세션 데이터 삭제 완료 - userId: {}", userId);
+    }
+
 
     /**
      * 사용자 조회 및 검증

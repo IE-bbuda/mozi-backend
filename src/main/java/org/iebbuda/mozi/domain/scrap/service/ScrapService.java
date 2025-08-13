@@ -16,4 +16,12 @@ public interface ScrapService {
 
     List<PolicyVO> getScrapedPolicies(int userId);
 
+    int getTotalScrapCountByUserId(int userId);
+
+    /**
+     * 탈퇴 시 모든 스크랩 삭제
+     * @param userId 사용자 ID
+     */
+    void deleteAllScrapsByUserId(int userId);
+
 }
