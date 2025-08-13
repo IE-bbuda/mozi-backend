@@ -52,4 +52,46 @@
         LIMIT #{limit}
     </select>
 
+    <select id="findTopDepositByOption" resultType="org.iebbuda.mozi.domain.recommend.dto.FinancialRecommendProductDTO">
+        SELECT
+        dp.deposit_id AS productId,
+        dp.fin_prdt_nm AS productName,
+        dp.fin_co_no AS bankCode,
+        dp.kor_co_nm AS bankName,
+        do.intr_rate AS intRate,
+        do.intr_rate2 AS intRate2,
+        do.save_trm AS saveTrm,
+        'DEPOSIT' AS productType
+        FROM DepositProduct dp
+        JOIN DepositOption do ON dp.deposit_id = do.deposit_id
+        WHERE <![CDATA[do.save_trm <= #{monthsLeft}]]>
+        <if test="intrRateType != null">
+            AND do.intr_rate_type = #{intrRateType}
+        </if>
+        ORDER BY do.intr_rate DESC
+        LIMIT #{limit}
+    </select>
+    <!-- 정액/자유 적립 방식, 단리/복리 필터 포함한 적금 상품 추천 -->
+    <select id="findTopSavingsByOption" resultType="org.iebbuda.mozi.domain.recommend.dto.FinancialRecommendProductDTO">
+        SELECT
+        sp.saving_id AS productId,
+        sp.fin_prdt_nm AS productName,
+        sp.fin_co_no AS bankCode,
+        sp.kor_co_nm AS bankName,
+        so.intr_rate AS intRate,
+        so.intr_rate2 AS intRate2,
+        so.save_trm AS saveTrm,
+        'SAVINGS' AS productType
+        FROM SavingProduct sp
+        JOIN SavingOption so ON sp.saving_id = so.saving_id
+        WHERE <![CDATA[so.save_trm <= #{monthsLeft}]]>
+        <if test="rsrvType != null">
+            AND so.rsrv_type = #{rsrvType}
+        </if>
+        <if test="intrRateType != null">
+            AND so.intr_rate_type = #{intrRateType}
+        </if>
+        ORDER BY so.intr_rate DESC
+        LIMIT #{limit}
+    </select>
 </mapper>

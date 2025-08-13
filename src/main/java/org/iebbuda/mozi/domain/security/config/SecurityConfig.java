@@ -147,14 +147,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS); // 세션 생성 모드 설정
     }
 
-
     // Authentication Manger 구성
     // 사용자 정보를 어디서 얻을지 설정
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-                 auth
+        auth
                 .userDetailsService(userDetailsService)
                 .passwordEncoder(passwordEncoder());
     }
+
 }
 

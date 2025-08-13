@@ -35,7 +35,6 @@ public class PolicyController {
         return ResponseEntity.ok(dto);
     }
 
-
     // 필터 조건에 따른 정책 조회
     @PostMapping("/filter")
     public List<PolicyDTO> getFilteredPolicies(@RequestBody PolicyFilterDTO filters) {
