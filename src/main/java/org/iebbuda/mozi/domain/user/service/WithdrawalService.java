@@ -135,9 +135,11 @@ public class WithdrawalService {
 
 
         if (isUnlink) {
-            // OAuth 연동 해제는 비동기로 처리
-            userMapper.maskDeletedUser(user.getUserId()); // is_deleted = TRUE로 설정
-            unlinkOAuthSync(user.getProvider(), user.getProviderId());
+
+            // 완전 탈퇴 - 백업 없이 바로 삭제
+            cleanupUserDataAsync(user.getUserId());  // 관련 데이터 정리
+            unlinkOAuthSync(user.getProvider(), user.getProviderId());  // OAuth 연동 해제
+            userMapper.hardDeleteUser(user.getUserId());  // 완전 삭제 (복구 불가)
 
             return WithdrawalResultDTO.builder()
                     .success(true)
