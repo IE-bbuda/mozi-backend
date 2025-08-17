@@ -51,7 +51,6 @@ public class PolicyRecommendServiceImpl implements PolicyRecommendService {
                     );
                 })
                 .collect(Collectors.toList());
-
     }
 
     @Override
@@ -61,8 +60,6 @@ public class PolicyRecommendServiceImpl implements PolicyRecommendService {
         if (profile == null || goal == null) return Collections.emptyList();
 
         List<PolicyVO> validPolicies = filterValidPolicies(profile, policyMapper.findAll(), userId, goal.getKeyword());
-
-
         return scorePolicies(profile, goal, validPolicies);
     }
 
@@ -80,7 +77,11 @@ public class PolicyRecommendServiceImpl implements PolicyRecommendService {
         }
 
         List<PolicyVO> validPolicies = policyMapper.findAll().stream()
-                .filter(p -> PolicyScoreCalculator.isAvailablePolicy(p.getBizPrdEndYmd(), p.getAplyUrlAddr()))
+                .filter(p -> PolicyScoreCalculator.isAvailablePolicy(
+                        p.getAplyYmd(),
+                        p.getBizPrdBgngYmd(),
+                        p.getBizPrdEndYmd()
+                ))
                 .collect(Collectors.toList());
 
         GoalVO goal = new GoalVO();
@@ -90,59 +91,98 @@ public class PolicyRecommendServiceImpl implements PolicyRecommendService {
         return scorePolicies(profile, goal, validPolicies);
     }
 
-    // ===== 내부 공통 =====
+    // ==================== 내부 공통 ====================
 
     private List<PolicyRecommendDTO> scorePolicies(UserProfileVO profile, GoalVO goal, List<PolicyVO> policies) {
+        Comparator<Map.Entry<PolicyVO, Integer>> cmp = Comparator
+                // 1) 점수 높은 순
+                .comparingInt((Map.Entry<PolicyVO, Integer> e) -> e.getValue()).reversed()
+                // 2) 마감 임박 우선 (상시는 LocalDate.MAX라 자동으로 뒤로 감)
+                .thenComparing(e -> PolicyScoreCalculator.getApplyEndForSort(e.getKey().getAplyYmd()))
+                // 3) 지역 특화 우선(동점 타이브레이커)
+                .thenComparing( (a, b) -> {
+                    int la = localityTieBreaker(profile, a.getKey());
+                    int lb = localityTieBreaker(profile, b.getKey());
+                    // 높은 점수(특화)가 먼저 오도록 내림차순
+                    return Integer.compare(lb, la);
+                });
+
         return policies.stream()
                 .map(policy -> {
                     int score = PolicyScoreCalculator.calculateTotalScore(profile, goal.getKeyword(), policy, regionCodeMapper);
                     return new AbstractMap.SimpleEntry<>(policy, score);
                 })
-                .sorted((a, b) -> b.getValue() - a.getValue())
+                .sorted(cmp)
                 .limit(5)
                 .map(entry -> PolicyRecommendDTO.from(entry.getKey(), entry.getValue()))
                 .collect(Collectors.toList());
     }
 
-    // 로그용
+    // 지역 특화 타이브레이커 (정책 ZIP이 많지 않고 사용자 시/도와 교집합이 있으면 2, 전국/정보없음 1, 불일치 0)
+    private int localityTieBreaker(UserProfileVO profile, PolicyVO p) {
+        if (profile == null || profile.getRegion() == null) return 1;
+        String zip = p.getZipCd();
+        if (zip == null || zip.isBlank()) return 1;
+
+        List<String> policyZip = Arrays.asList(zip.split(","));
+        if (policyZip.size() >= 200) return 1; // 전국 추정
+
+        List<String> userZip = regionCodeMapper.findZipCodesBySido(profile.getRegion().getLabel());
+        if (userZip == null || userZip.isEmpty()) return 0;
+
+        boolean match = userZip.stream().anyMatch(policyZip::contains);
+        return match ? 2 : 0;
+    }
+
     private List<PolicyVO> filterValidPolicies(UserProfileVO profile, List<PolicyVO> allPolicies, int userId, GoalVO.GoalKeyword keyword) {
         log.info("🟦 [추천 시작] 사용자 ID: {}, 목표 키워드: {}", userId, keyword);
         log.info("📊 전체 정책 수: {}", allPolicies.size());
 
-        // 1. 신청 기한 유효
+        // 1) 운영기간 + 신청기간 유효
         List<PolicyVO> step1 = allPolicies.stream()
-                .filter(p -> PolicyScoreCalculator.isAvailablePolicy(p.getAplyYmd(), p.getBizPrdEndYmd()
-                        ))
+                .filter(p -> PolicyScoreCalculator.isAvailablePolicy(
+                        p.getAplyYmd(),
+                        p.getBizPrdBgngYmd(),
+                        p.getBizPrdEndYmd()
+                ))
                 .collect(Collectors.toList());
-        log.info("🔎 [1차 필터링] 신청 기한 유효 → {}건", step1.size());
+        log.info("🔎 [1차 필터링] 운영기간 포함 + 신청기간 유효 → {}건", step1.size());
 
-        // 2. 연령 조건
+        // 2) 연령 조건 통과 (20점 스킴이므로 >0이면 통과)
         List<PolicyVO> step2 = step1.stream()
-                .filter(p -> PolicyScoreCalculator.calculateAgeScore(
-                        profile.getAge(), p.getSprtTrgtMinAge(), p.getSprtTrgtMaxAge()
+                .filter(p -> PolicyScoreCalculator.calculateAgeScoreStrict(
+                        profile.getAge(),
+                        p.getSprtTrgtMinAge(),
+                        p.getSprtTrgtMaxAge()
                 ) > 0)
                 .collect(Collectors.toList());
         log.info("🔎 [2차 필터링] 연령 조건 통과 → {}건", step2.size());
 
-        // 3. 연소득 조건
+        // 3) 연소득 조건 통과 (5점 스킴이므로 >0 통과, 또는 소득조건이 아예 없으면 통과)
         List<PolicyVO> step3 = step2.stream()
-                .filter(p -> PolicyScoreCalculator.calculateIncomeScore(
-                        profile.getAnnualIncome(), p.getEarnCndSeCd(), p.getEarnMinAmt(), p.getEarnMaxAmt()
-                ) >= 0)
+                .filter(p -> {
+                    int s = PolicyScoreCalculator.calculateIncomeScore(
+                            profile.getAnnualIncome(),
+                            p.getEarnCndSeCd(),
+                            p.getEarnMinAmt(),
+                            p.getEarnMaxAmt()
+                    );
+                    return s > 0 || p.getEarnCndSeCd() == null || p.getEarnCndSeCd().isBlank();
+                })
                 .collect(Collectors.toList());
         log.info("🔎 [3차 필터링] 연소득 조건 통과 → {}건", step3.size());
 
-        // 4. 지역 조건
+        // 4) 지역 조건 통과 (9/3/0 스킴에서 >0이면 통과)
         List<PolicyVO> step4 = step3.stream()
-                .filter(p -> PolicyScoreCalculator.calculateRegionScore(
-                        profile.getRegion(), p.getZipCd(), regionCodeMapper
+                .filter(p -> PolicyScoreCalculator.calculateRegionScore99(
+                        profile.getRegion(),
+                        p.getZipCd(),
+                        regionCodeMapper
                 ) > 0)
                 .collect(Collectors.toList());
         log.info("🔎 [4차 필터링] 지역 조건 통과 → {}건", step4.size());
 
         log.info("✅ [최종 추천 후보] {} / {}건", step4.size(), allPolicies.size());
-
         return step4;
     }
-
 }

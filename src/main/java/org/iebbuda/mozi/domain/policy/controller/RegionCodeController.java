@@ -15,13 +15,11 @@ public class RegionCodeController {
 
     private final RegionCodeService regionCodeService;
 
-
     // 전체 지역 반환
     @GetMapping
     public List<RegionCodeVO> getAllRegionCodes() {
         return regionCodeService.getAllRegionCodes();
     }
-
 
     // zip 코드 리스트로 변환
     @PostMapping("/zipcodes")
@@ -41,11 +39,4 @@ public class RegionCodeController {
         return ResponseEntity.ok(regionCodeService.findZipCodesBySido(sido));
     }
 
-
-//    // zipCd DB에 저장
-//    @PostMapping("/fetch")
-//    public ResponseEntity<String> fetchAndSave() {
-//        regionCodeService.fetchAndSaveFromApi();
-//        return ResponseEntity.ok(" RegionCode DB 저장 완료");
-//    }
 }
