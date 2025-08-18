@@ -20,17 +20,17 @@ import java.util.Map;
 public class AccountController {
     private final AccountService accountService;
 
-@GetMapping("/get")
-public ResponseEntity<?> getAccounts(@AuthenticationPrincipal CustomUser user) {
-    try {
-        Integer userId = user.getUser().getUserId();
-        Map<String, Object> result = accountService.getAccounts(userId);
-        return ResponseEntity.ok(result);
-    } catch (Exception e) {
-        log.error("계좌 조회 중 오류 발생", e);  // 예외와 함께 로그 남기기
-        return ResponseEntity.status(500).body(Map.of("error", "서버 오류가 발생했습니다."));
+    @GetMapping("/get")
+    public ResponseEntity<Map<String, Object>> getAccounts(@AuthenticationPrincipal CustomUser user) {
+        try {
+            Integer userId = user.getUser().getUserId();
+            Map<String, Object> result = accountService.getAccounts(userId);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            log.error("계좌 조회 중 오류 발생", e);  // 예외와 함께 로그 남기기
+            return ResponseEntity.status(500).body(Map.of("error", "서버 오류가 발생했습니다."));
+        }
     }
-}
 
 
     @GetMapping("/get-by-goal")
@@ -44,35 +44,35 @@ public ResponseEntity<?> getAccounts(@AuthenticationPrincipal CustomUser user) {
     }
 
 
-@PostMapping("/add")
-public ResponseEntity<Map<String, Object>> addAccounts(
-        @RequestBody BankLoginRequestDTO bankLoginRequestDTO,
-        @AuthenticationPrincipal CustomUser user
-){
-    if (user == null) {
-        log.error("AuthenticationPrincipal로부터 CustomUser를 받지 못했습니다.");
-        return ResponseEntity.status(401).body(Map.of("success", false, "error", "인증되지 않은 사용자입니다."));
+    @PostMapping("/add")
+    public ResponseEntity<Map<String, Object>> addAccounts(
+            @RequestBody BankLoginRequestDTO bankLoginRequestDTO,
+            @AuthenticationPrincipal CustomUser user
+    ){
+        if (user == null) {
+            log.error("AuthenticationPrincipal로부터 CustomUser를 받지 못했습니다.");
+            return ResponseEntity.status(401).body(Map.of("success", false, "error", "인증되지 않은 사용자입니다."));
+        }
+        int userId = user.getUser().getUserId();
+        log.info("요청한 userId: {}", userId);
+        try {
+            boolean success = accountService.addAccounts(bankLoginRequestDTO, userId);
+            log.info("계좌 추가 성공: {}", success);
+            return ResponseEntity.ok(Map.of("success", success));
+        } catch (Exception e) {
+            log.error("계좌 추가 실패: ", e);
+            return ResponseEntity.status(500).body(Map.of("success", false, "error", e.getMessage()));
+        }
     }
-    int userId = user.getUser().getUserId();
-    log.info("요청한 userId: {}", userId);
-    try {
-        boolean success = accountService.addAccounts(bankLoginRequestDTO, userId);
-        log.info("계좌 추가 성공: {}", success);
-        return ResponseEntity.ok(Map.of("success", success));
-    } catch (Exception e) {
-        log.error("계좌 추가 실패: ", e);
-        return ResponseEntity.status(500).body(Map.of("success", false, "error", e.getMessage()));
-    }
-}
 
 
     @DeleteMapping("/delete")
-    public ResponseEntity<List<String>> deleteAccounts(
+    public ResponseEntity<Map<String, Object>> deleteAccounts(
             @RequestBody List<String> bankCodeList,
             @AuthenticationPrincipal CustomUser user
     ){
         Integer userId=user.getUser().getUserId();
-        List<String> deletedBankCode=accountService.deleteAccounts(bankCodeList, userId);
+        Map<String, Object> deletedBankCode=accountService.deleteAccounts(bankCodeList, userId);
         return ResponseEntity.ok(deletedBankCode);
     }
 
@@ -103,11 +103,11 @@ public ResponseEntity<Map<String, Object>> addAccounts(
         return ResponseEntity.ok(list);
     }
 
-    @PutMapping("/refresh")
-    public ResponseEntity<List<AccountVO>> refreshAccounts(@AuthenticationPrincipal CustomUser user
+    @PostMapping("/refresh")
+    public ResponseEntity<Map<String, Object>> refreshAccounts(@AuthenticationPrincipal CustomUser user
     ){
         Integer userId=user.getUser().getUserId();
-        List<AccountVO> accounts=accountService.refreshAccounts(userId);
+        Map<String, Object> accounts=accountService.refreshAccounts(userId);
         return ResponseEntity.ok(accounts);
     }
 
@@ -118,7 +118,7 @@ public ResponseEntity<Map<String, Object>> addAccounts(
         return ResponseEntity.ok(result);
     }
 
-    @PostMapping("/set-mainbank")
+    @PutMapping("/set-mainbank")
     public ResponseEntity<Map<String, Object>> setMainBank(@RequestBody Map<String, String> body,@AuthenticationPrincipal CustomUser user) {
         Integer userId=user.getUser().getUserId();
         String bankCode = body.get("bankCode");
@@ -126,7 +126,7 @@ public ResponseEntity<Map<String, Object>> addAccounts(
         return ResponseEntity.ok(result);
     }
 
-    @PostMapping("/update-by-goal")
+    @PutMapping("/update-by-goal")
     public ResponseEntity<Map<String, Object>> updateAccountsByGoal(
             @RequestBody Map<String, Object> body,
             @AuthenticationPrincipal CustomUser user
@@ -139,7 +139,7 @@ public ResponseEntity<Map<String, Object>> addAccounts(
     }
 
     @GetMapping("/connected-banks")
-    public ResponseEntity<Map<String, Object>> getUnconnectedBanks(@AuthenticationPrincipal CustomUser user){
+    public ResponseEntity<Map<String, Object>> getConnectedBanks(@AuthenticationPrincipal CustomUser user){
         Integer userId=user.getUser().getUserId();
         Map<String,Object> result=accountService.getConnectedBanks(userId);
         return ResponseEntity.ok(result);

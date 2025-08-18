@@ -10,8 +10,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 public class BankSummaryDTO {
-    private String bankCode;
-    private Integer accountCount;
+    @Builder.Default
+    private String bankCode="";
+    @Builder.Default
+    private Integer accountCount=0;
     @Builder.Default
     private Double totalBalance = 0.0;
 

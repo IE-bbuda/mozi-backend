@@ -139,7 +139,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public List<AccountVO> refreshAccounts(Integer userId) {
+    public Map<String, Object> refreshAccounts(Integer userId) {
         List<BankLoginVO> bankLogins = bankLoginMapper.getByUserID(userId);
         List<AccountVO> resultList = new ArrayList<>();
 
@@ -161,11 +161,11 @@ public class AccountServiceImpl implements AccountService {
             }
         }
 
-        return resultList;
+        return Map.of("accountList", resultList);
     }
 
     @Override
-    public List<String> deleteAccounts(List<String> bankCodeList, Integer userId) {
+    public Map<String, Object> deleteAccounts(List<String> bankCodeList, Integer userId) {
         String mainBankCode = userMapper.getMainBankCodeByUserId(userId);
         System.out.println(mainBankCode);
 
@@ -185,7 +185,7 @@ public class AccountServiceImpl implements AccountService {
             }
         }
 
-        return deletedBanks;
+        return Map.of("deletedBankCodeList",deletedBanks);
     }
     //계좌없을 때도 처리함
     //일단 "원"만 고려
