@@ -1,6 +1,9 @@
 package org.iebbuda.mozi.domain.policy.util;
 
+
 import com.google.gson.*;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonWriter;
 import org.iebbuda.mozi.domain.policy.dto.PolicyDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -14,14 +17,12 @@ import java.util.List;
 @Component
 public class ApiCaller {
 
-    // API 호출 URL과 인증키는 application.properties에서 주입받음
     @Value("${youth.api.url}")
     private String apiUrl;
 
     @Value("${youth.api.key}")
     private String apiKey;
 
-    // 실제 요청 최종 URL
     public String getRequestUrl() {
         return apiUrl + "?apiKeyNm=" + apiKey + "&rtnType=json&pageNum=1&pageSize=1000";
     }
@@ -66,7 +67,12 @@ public class ApiCaller {
 
             if (result.has("youthPolicyList")) {
                 JsonArray dataList = result.getAsJsonArray("youthPolicyList");
-                Gson gson = new Gson();
+
+                // 빈 문자열을 0으로 처리하는 커스텀 어댑터 등록
+                Gson gson = new GsonBuilder()
+                        .registerTypeAdapter(Integer.class, new IntegerDefaultAdapter())
+                        .registerTypeAdapter(int.class, new IntegerDefaultAdapter())
+                        .create();
 
                 for (JsonElement element : dataList) {
                     PolicyDTO dto = gson.fromJson(element, PolicyDTO.class);
@@ -75,7 +81,7 @@ public class ApiCaller {
 
                 System.out.println("파싱된 정책 수: " + list.size());
             } else {
-                System.out.println("youthPolicyList' 항목이 없습니다.");
+                System.out.println("'youthPolicyList' 항목이 없습니다.");
             }
 
         } catch (Exception e) {
@@ -85,4 +91,28 @@ public class ApiCaller {
         return list;
     }
 
+    // 내부 클래스로 커스텀 어댑터 포함
+    private static class IntegerDefaultAdapter extends TypeAdapter<Integer> {
+        @Override
+        public void write(JsonWriter out, Integer value) throws IOException {
+            if (value == null) {
+                out.value(0);
+            } else {
+                out.value(value);
+            }
+        }
+
+        @Override
+        public Integer read(JsonReader in) throws IOException {
+            try {
+                String value = in.nextString();
+                if (value == null || value.trim().isEmpty()) {
+                    return 0;
+                }
+                return Integer.parseInt(value.trim());
+            } catch (NumberFormatException | IllegalStateException e) {
+                return 0;
+            }
+        }
+    }
 }

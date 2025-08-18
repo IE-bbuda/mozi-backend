@@ -41,4 +41,11 @@
     <delete id="truncateTable">
         TRUNCATE TABLE RegionCode
     </delete>
+
+    <select id="findSidoByZipCd" resultType="string" parameterType="string">
+        SELECT sido
+        FROM RegionCode
+        WHERE zip_code = #{zipCd}
+            LIMIT 1
+    </select>
 </mapper>

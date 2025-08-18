@@ -23,4 +23,6 @@ public interface RegionCodeMapper {
     // 시,도로 조회
     List<String> findZipCodesBySido(String sido);
 
+    // zipCd → sido 이름 조회용
+    String findSidoByZipCd(String zipCd);
 }
