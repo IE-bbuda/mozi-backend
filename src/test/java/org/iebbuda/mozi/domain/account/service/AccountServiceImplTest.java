@@ -53,15 +53,15 @@ class AccountServiceImplTest {
 
     @Test
     void refreshAccounts() {
-        List<AccountVO> list=accountService.refreshAccounts(1);
-        list.forEach(System.out::println);
+        Map<String, Object> result=accountService.refreshAccounts(1);
+        System.out.println(result);
     }
 
     @Test
     void deleteAccounts() {
-        List<String> list=accountService.deleteAccounts(List.of("0011", "0004"),1);
+        Map<String,Object> result=accountService.deleteAccounts(List.of("0011", "0004"),1);
         System.out.println("=============================================================");
-        list.forEach(System.out::println);
+        System.out.println(result);
 
     }
 
