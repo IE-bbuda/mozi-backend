@@ -27,4 +27,9 @@ public interface FinancialRecommendMapper {
                                                               @Param("limit") int limit,
                                                               @Param("rsrvType") String rsrvType,
                                                               @Param("intrRateType") String intrRateType);
+
+    // rsrv_type만 조건으로 하는 적금 조회
+    List<FinancialRecommendProductDTO> findTopSavingsByRsrvType(@Param("monthsLeft") long monthsLeft,
+                                                                @Param("limit") int limit,
+                                                                @Param("rsrvType") String rsrvType);
 }

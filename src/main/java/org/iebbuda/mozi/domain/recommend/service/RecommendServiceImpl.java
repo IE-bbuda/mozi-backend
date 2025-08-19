@@ -18,6 +18,9 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -78,20 +81,49 @@ public class RecommendServiceImpl implements RecommendService {
                     case MARRIAGE, HOME_PURCHASE -> {
                         depositScore += 20;
                         rsrvType = "S";
-                        String preferred = (monthsLeft >= 24) ? "M" : "S";
-                        intrRateTypeSavings = preferred;
-                        intrRateTypeDeposit = preferred;
-                        log.info("[keyword-adjust] {} -> preferred intrRateType = {}", keyword, preferred);
+                        
+                        // 적금: 1년 이상이면 복리
+                        intrRateTypeSavings = (monthsLeft >= 12) ? "M" : "S";
+                        
+                        // 예금: 24개월 이상이면 복리 (예금 최대 36개월이므로)
+                        intrRateTypeDeposit = (monthsLeft >= 24) ? "M" : "S";
+                        
+                        log.info("[keyword-adjust] {} -> 적금: {} ({}개월), 예금: {} ({}개월)", 
+                                 keyword, intrRateTypeSavings, monthsLeft, intrRateTypeDeposit, monthsLeft);
                     }
                     case TRAVEL, HOBBY -> {
                         savingsScore += 20;
-                        intrRateTypeSavings = "M";
-                        intrRateTypeDeposit = "M";
+                        
+                        // 적금: 기간별 이자 방식 최적화 (여행/취미는 대부분 단기)
+                        if (monthsLeft <= 12) {
+                            intrRateTypeSavings = "S";  // 1년 이하: 단리 (대부분의 경우)
+                        } else {
+                            intrRateTypeSavings = "M";  // 1년 초과: 복리 (드문 경우)
+                        }
+                        
+                        // 예금: 기간별 이자 방식 최적화
+                        if (monthsLeft <= 12) {
+                            intrRateTypeDeposit = "S";  // 1년 이하: 단리
+                        } else {
+                            intrRateTypeDeposit = "M";  // 1년 초과: 복리
+                        }
+                        
+                        log.info("[keyword-adjust] {} -> 단기 목표 주로 단리 적용, 적금: {} ({}개월), 예금: {} ({}개월)", 
+                                 keyword, intrRateTypeSavings, monthsLeft, intrRateTypeDeposit, monthsLeft);
                     }
                     case EMPLOYMENT, EDUCATION_FUND -> {
                         savingsScore += 20;
                         rsrvType = "F";
-                        intrRateTypeSavings = "M";
+                        
+                        // 적금: 기간별 이자 방식 최적화
+                        if (monthsLeft <= 12) {
+                            intrRateTypeSavings = "S";  // 1년 이하: 단리
+                        } else {
+                            intrRateTypeSavings = "M";  // 1년 초과: 복리
+                        }
+                        
+                        log.info("[keyword-adjust] {} -> 자유적립식 + 기간별 이자 방식, 적금: {} ({}개월)", 
+                                 keyword, intrRateTypeSavings, monthsLeft);
                     }
                 }
             }
@@ -112,17 +144,54 @@ public class RecommendServiceImpl implements RecommendService {
 
             // 추천 조회 + Fallback
             List<FinancialRecommendProductDTO> recommendedProducts = new ArrayList<>();
+            Set<Integer> usedProductIds = new HashSet<>(); // 중복 방지용
 
             if (savingsCount > 0) {
                 List<FinancialRecommendProductDTO> savings =
                         financialrecommendMapper.findTopSavingsByOption(monthsLeft, savingsCount, rsrvType, intrRateTypeSavings);
 
+                // 중복 제거하면서 목표 개수만큼만 추출
+                savings = savings.stream()
+                        .filter(s -> usedProductIds.add(s.getProductId()))
+                        .limit(savingsCount)
+                        .collect(Collectors.toList());
+
                 if (savings.size() < savingsCount) {
                     int remain = savingsCount - savings.size();
-                    List<FinancialRecommendProductDTO> fallback =
-                            financialrecommendMapper.findTopSavingsProducts(monthsLeft, remain);
-                    savings.addAll(fallback);
-                    log.info("[fallback:savings] 부족 {}개 일반 적금으로 보완", remain);
+                    log.info("[fallback:savings] 1차 조건: rsrv_type={}, intr_rate_type={}, 부족: {}개", 
+                             rsrvType, intrRateTypeSavings, remain);
+                    
+                    // 1단계: rsrv_type만 조건으로 조회 (intr_rate_type 조건 제거)
+                    List<FinancialRecommendProductDTO> fallback1 = new ArrayList<>();
+                    if (rsrvType != null) {
+                        // rsrv_type 조건으로 조회 (새로운 메서드 사용)
+                        fallback1 = financialrecommendMapper.findTopSavingsByRsrvType(monthsLeft, remain, rsrvType);
+                        
+                        // 중복 제거
+                        fallback1 = fallback1.stream()
+                                .filter(f -> usedProductIds.add(f.getProductId()))
+                                .limit(remain)
+                                .collect(Collectors.toList());
+                    }
+                    
+                    if (fallback1.size() < remain) {
+                        // 2단계: 일반 적금으로 보완
+                        int remain2 = remain - fallback1.size();
+                        List<FinancialRecommendProductDTO> fallback2 =
+                                financialrecommendMapper.findTopSavingsProducts(monthsLeft, remain2 * 2);
+                        
+                        fallback2 = fallback2.stream()
+                                .filter(f -> usedProductIds.add(f.getProductId()))
+                                .limit(remain2)
+                                .collect(Collectors.toList());
+                        
+                        fallback1.addAll(fallback2);
+                        log.info("[fallback:savings] 2단계 보완 완료: 1단계 {}개 + 2단계 {}개", 
+                                remain - remain2, remain2);
+                    }
+                    
+                    savings.addAll(fallback1);
+                    log.info("[fallback:savings] 단계별 보완 완료, 총 {}개 추가", fallback1.size());
                 }
                 recommendedProducts.addAll(savings);
             }
@@ -132,20 +201,68 @@ public class RecommendServiceImpl implements RecommendService {
                     List<FinancialRecommendProductDTO> deposits =
                             financialrecommendMapper.findTopDepositByOption(monthsLeft, depositCount, intrRateTypeDeposit);
 
+                    // 중복 제거하면서 목표 개수만큼만 추출
+                    deposits = deposits.stream()
+                            .filter(d -> usedProductIds.add(d.getProductId()))
+                            .limit(depositCount)
+                            .collect(Collectors.toList());
+
                     if (deposits.size() < depositCount) {
                         int remain = depositCount - deposits.size();
-                        List<FinancialRecommendProductDTO> fallback =
-                                financialrecommendMapper.findTopDepositProducts(monthsLeft, remain);
-                        deposits.addAll(fallback);
-                        log.info("[fallback:deposit] 부족 {}개 일반 예금으로 보완", remain);
+                        log.info("[fallback:deposit] 1차 조건으로 {}개 부족, 단계별 보완 시작", remain);
+                        
+                        // 1단계: intr_rate_type 조건만 제거하고 조회
+                        List<FinancialRecommendProductDTO> fallback1 =
+                                financialrecommendMapper.findTopDepositProducts(monthsLeft, remain * 2);
+                        
+                        fallback1 = fallback1.stream()
+                                .filter(f -> usedProductIds.add(f.getProductId()))
+                                .limit(remain)
+                                .collect(Collectors.toList());
+                        
+                        if (fallback1.size() < remain) {
+                            // 2단계: 일반 예금으로 보완
+                            int remain2 = remain - fallback1.size();
+                            List<FinancialRecommendProductDTO> fallback2 =
+                                    financialrecommendMapper.findTopDepositProducts(monthsLeft, remain2 * 2);
+                            
+                            fallback2 = fallback2.stream()
+                                    .filter(f -> usedProductIds.add(f.getProductId()))
+                                    .limit(remain2)
+                                    .collect(Collectors.toList());
+                            
+                            fallback1.addAll(fallback2);
+                            log.info("[fallback:deposit] 2단계 보완 완료: 1단계 {}개 + 2단계 {}개", 
+                                    remain - remain2, remain2);
+                        }
+                        
+                        deposits.addAll(fallback1);
+                        log.info("[fallback:deposit] 단계별 보완 완료, 총 {}개 추가", fallback1.size());
                     }
                     recommendedProducts.addAll(deposits);
                 } else {
-                    recommendedProducts.addAll(
-                            financialrecommendMapper.findTopDepositProducts(monthsLeft, depositCount)
-                    );
+                    List<FinancialRecommendProductDTO> deposits =
+                            financialrecommendMapper.findTopDepositProducts(monthsLeft, depositCount * 2); // 여유분으로 조회
+
+                    // 중복 제거하면서 목표 개수만큼만 추출
+                    deposits = deposits.stream()
+                            .filter(d -> usedProductIds.add(d.getProductId()))
+                            .limit(depositCount)
+                            .collect(Collectors.toList());
+
+                    recommendedProducts.addAll(deposits);
                 }
             }
+
+            // 최종적으로 정확히 4개가 되도록 보정
+            if (recommendedProducts.size() < 4) {
+                log.warn("추천 상품이 부족합니다. 현재: {}, 목표: 4개", recommendedProducts.size());
+            } else if (recommendedProducts.size() > 4) {
+                recommendedProducts = recommendedProducts.subList(0, 4);
+                log.info("추천 상품을 4개로 제한했습니다.");
+            }
+
+            log.info("최종 추천 상품 수: {}개 (목표: 4개)", recommendedProducts.size());
 
             goalRecommendations.add(new GoalRecommendationDTO(
                     goal.getGoalId(),

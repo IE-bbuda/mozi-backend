@@ -68,7 +68,7 @@
         <if test="intrRateType != null">
             AND do.intr_rate_type = #{intrRateType}
         </if>
-        ORDER BY do.intr_rate DESC
+        ORDER BY COALESCE(do.intr_rate2, do.intr_rate) DESC
         LIMIT #{limit}
     </select>
     <!-- 정액/자유 적립 방식, 단리/복리 필터 포함한 적금 상품 추천 -->
@@ -91,7 +91,28 @@
         <if test="intrRateType != null">
             AND so.intr_rate_type = #{intrRateType}
         </if>
-        ORDER BY so.intr_rate DESC
+        ORDER BY COALESCE(so.intr_rate2, so.intr_rate) DESC
+        LIMIT #{limit}
+    </select>
+
+    <!-- rsrv_type만 조건으로 하는 적금 조회 -->
+    <select id="findTopSavingsByRsrvType" resultType="org.iebbuda.mozi.domain.recommend.dto.FinancialRecommendProductDTO">
+        SELECT
+        sp.saving_id AS productId,
+        sp.fin_prdt_nm AS productName,
+        sp.fin_co_no AS bankCode,
+        sp.kor_co_nm AS bankName,
+        so.intr_rate AS intRate,
+        so.intr_rate2 AS intRate2,
+        so.save_trm AS saveTrm,
+        'SAVINGS' AS productType
+        FROM SavingProduct sp
+        JOIN SavingOption so ON sp.saving_id = so.saving_id
+        WHERE <![CDATA[so.save_trm <= #{monthsLeft}]]>
+        <if test="rsrvType != null">
+            AND so.rsrv_type = #{rsrvType}
+        </if>
+        ORDER BY COALESCE(so.intr_rate2, so.intr_rate) DESC
         LIMIT #{limit}
     </select>
 </mapper>
