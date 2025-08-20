@@ -130,7 +130,7 @@ public class RecommendServiceImpl implements RecommendService {
 
             // 월 납입 필요액 기반 보정
             if (monthlyNeed.compareTo(new BigDecimal("1000000")) > 0) {
-                depositScore += 15;
+                depositScore += 10;
             } else {
                 savingsScore += 10;
             }
